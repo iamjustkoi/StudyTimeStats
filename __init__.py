@@ -29,28 +29,28 @@ class Day:
 # from aqt import preferences
 # mw.col.conf
 # mw.col.crt
-# TODO: get actual preference values
+# TODO: get value from addon config
 week_start_day = Day.SUN
+# TODO: get value from anki preferences
 offset_hour = 6
-
 
 html_time = """    
         <style>
             .time-studied-header {{
                 text-align: center;
                 color: darkgray;
-                font-size: .8em;
+                font-size: 1.1em;
                 font-weight: normal;
             }}
 
             .time-studied-row {{
                 text-align: center;
                 color: white;
-                font-size: .8em;
+                font-size: 1.1em;
                 font-weight: normal;
             }}
         </style>
-        <table width="70%%" id="time_table">
+        <table width="60%%" id="time_table" style="margin: 12px;">
             <tr>
                 <th class="time-studied-header">{total_label}</th>
                 <th class="time-studied-header">{range_label}</th>
@@ -67,6 +67,9 @@ def build_hooks():
     from aqt import gui_hooks
     gui_hooks.deck_browser_will_render_content.append(on_deck_browser_will_render_content)
 
+
+# TODO: add to overview page
+# TODO: add to congrats page
 
 def on_deck_browser_will_render_content(deck_browser: deckbrowser.DeckBrowser, content: deckbrowser.DeckBrowserContent):
     total, ranged = get_review_times()
