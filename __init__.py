@@ -72,11 +72,17 @@ stats_html_shell = '''
 def build_hooks():
     from aqt import gui_hooks
     gui_hooks.webview_will_set_content.append(on_webview_will_set_content)
+    gui_hooks.webview_did_inject_style_into_page.append(on_webview_did_inject_style_into_page)
 
 
 def on_webview_will_set_content(content: aqt.webview.WebContent, context: object or None):
     if isinstance(context, (DeckBrowser, Overview)):
         content.body += stats_html()
+
+
+def on_webview_did_inject_style_into_page(webview: aqt.webview.AnkiWebView):
+    if webview.page().url().path().find('congrats.html') != -1:
+        webview.eval(f'document.body.innerHTML += `{stats_html()}`')
 
 
 def get_review_times() -> (float, float):
@@ -104,11 +110,13 @@ def get_review_times() -> (float, float):
 
 
 def stats_html():
-    total, ranged = get_review_times()
-    total_val = round(total, 2) if total > 1 else round(total * 60, 2)
-    total_unit = Text.HRS if total > 1 else Text.MIN
-    range_val = round(ranged, 2) if ranged > 1 else round(ranged * 60, 2)
-    range_unit = Text.HRS if ranged > 1 else Text.MIN
+    total_hrs, ranged_hrs = get_review_times()
+
+    total_val = round(total_hrs, 2) if total_hrs > 1 else round(total_hrs * 60, 2)
+    range_val = round(ranged_hrs, 2) if ranged_hrs > 1 else round(ranged_hrs * 60, 2)
+    total_unit = Text.HRS if total_hrs > 1 else Text.MIN
+    range_unit = Text.HRS if ranged_hrs > 1 else Text.MIN
+
     return stats_html_shell.format(total_label=Text.TOTAL, range_label=Text.PAST_WEEK,
                                    total_value=total_val, range_value=range_val,
                                    total_unit=total_unit, range_unit=range_unit)
