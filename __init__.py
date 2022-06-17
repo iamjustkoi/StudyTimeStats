@@ -4,23 +4,21 @@ from aqt.qt import QAction
 from aqt.deckbrowser import DeckBrowser
 from aqt.overview import Overview
 import datetime
-from .config import TimeStatsConfigManager
-from .consts import DAY_SUN, Text
-from .options_dialog import OptionsDialog
+from .config import RTConfigManager
+from .consts import Days, Text
+from .options_dialog import RTOptionsDialog
 
 delta_time = datetime.timedelta
 date_time = datetime.datetime
 
-# from pytz import timezone
-# from aqt import preferences
-# mw.col.conf
-# mw.col.crt
 # TODO: make addon config val
-week_start_day = DAY_SUN
+week_start_day = Days.SUNDAY
 # TODO: get value from anki profile prefs
 offset_hour = 6
+# from aqt import preferences
+# mw.col.crt
 
-stats_html_shell = '''    
+html_shell = '''    
         <style>
             .time-studied-header {{
                 text-align: center;
@@ -73,17 +71,17 @@ def build_actions():
 
 def on_webview_will_set_content(content: aqt.webview.WebContent, context: object or None):
     if isinstance(context, (DeckBrowser, Overview)):
-        content.body += stats_html()
+        content.body += formatted_html()
 
 
 def on_webview_did_inject_style_into_page(webview: aqt.webview.AnkiWebView):
     if webview.page().url().path().find('congrats.html') != -1:
-        webview.eval(f'if (document.getElementById("time_table") == null) document.body.innerHTML += `{stats_html()}`')
+        webview.eval(f'if (document.getElementById("time_table") == null) document.body.innerHTML += `{formatted_html()}`')
 
 
 def on_options_called():
-    config_manager = TimeStatsConfigManager(mw)
-    dialog = OptionsDialog(config_manager)
+    config_manager = RTConfigManager(mw)
+    dialog = RTOptionsDialog(config_manager)
     dialog.exec()
 
 
@@ -111,7 +109,7 @@ def get_review_times() -> (float, float):
     return sum(all_rev_times_ms) / 1000 / 60 / 60, sum(filtered_rev_times_ms) / 1000 / 60 / 60
 
 
-def stats_html():
+def formatted_html():
     total_hrs, ranged_hrs = get_review_times()
 
     total_val = round(total_hrs, 2) if total_hrs > 1 else round(total_hrs * 60, 2)
@@ -119,9 +117,9 @@ def stats_html():
     total_unit = Text.HRS if total_hrs > 1 else Text.MIN
     range_unit = Text.HRS if ranged_hrs > 1 else Text.MIN
 
-    return stats_html_shell.format(total_label=Text.TOTAL, range_label=Text.PAST_WEEK,
-                                   total_value=total_val, range_value=range_val,
-                                   total_unit=total_unit, range_unit=range_unit)
+    return html_shell.format(total_label=Text.TOTAL, range_label=Text.PAST_WEEK,
+                             total_value=total_val, range_value=range_val,
+                             total_unit=total_unit, range_unit=range_unit)
 
 
 def offset_date(date: date_time, hours: int = offset_hour):
