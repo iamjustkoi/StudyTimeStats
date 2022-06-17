@@ -11,8 +11,15 @@ from .options_dialog import RTOptionsDialog
 delta_time = datetime.timedelta
 date_time = datetime.datetime
 
-# TODO: make addon config val
+# TODO: make addon config vals
 week_start_day = Days.SUNDAY
+primary_color = "darkgray"
+secondary_color = "white"
+deckbrowser_enabled = True
+overview_enabled = True
+congrats_enabled = True
+excluded_decks = []
+
 # TODO: get value from anki profile prefs
 offset_hour = 6
 # from aqt import preferences
@@ -22,14 +29,14 @@ html_shell = '''
         <style>
             .time-studied-header {{
                 text-align: center;
-                color: darkgray;
+                color: {primary_color};
                 font-size: 1.1em;
                 font-weight: normal;
             }}
 
             .time-studied-row {{
                 text-align: center;
-                color: white;
+                color: {secondary_color};
                 font-size: 1.1em;
                 font-weight: normal;
             }}
@@ -38,7 +45,7 @@ html_shell = '''
             <table width="60%%" id="time_table" style="margin: 12px;">
                 <tr>
                         <th class="time-studied-header">{total_label}</th>
-                    <th class="time-studied-header">{range_label}</th>
+                        <th class="time-studied-header">{range_label}</th>
                 </tr>
                 <tr>
                     <td class="time-studied-row">{total_value} {total_unit}</td>
@@ -59,24 +66,34 @@ def build_actions():
     # TODO: add key shortcut to alt menu (&[t]ime Stats)
     options_action = QAction('Overview Time Stats Options...', mw)
     options_action.triggered.connect(on_options_called)
-
     # Handle edge cases where toolbar action already exists
     if mw.form.menuTools.actions().__contains__(options_action):
         mw.form.menuTools.removeAction(options_action)
 
+    # action_test = QAction('Test Action', mw)
+    # action_test.triggered.connect(test_action)
+    # # Handle edge cases where toolbar action already exists
+    # if mw.form.menuTools.actions().__contains__(action_test):
+    #     mw.form.menuTools.removeAction(action_test)
+
     mw.form.menuTools.addAction(options_action)
+    # mw.form.menuTools.addAction(action_test)
 
     mw.addonManager.setConfigAction(__name__, on_options_called)
 
 
 def on_webview_will_set_content(content: aqt.webview.WebContent, context: object or None):
-    if isinstance(context, (DeckBrowser, Overview)):
+    if (isinstance(context, DeckBrowser) and deckbrowser_enabled) or (isinstance(context, Overview) and overview_enabled):
+        # if mw.col.decks.get_current_id() not in excluded_decks:
         content.body += formatted_html()
 
 
 def on_webview_did_inject_style_into_page(webview: aqt.webview.AnkiWebView):
-    if webview.page().url().path().find('congrats.html') != -1:
-        webview.eval(f'if (document.getElementById("time_table") == null) document.body.innerHTML += `{formatted_html()}`')
+    if webview.page().url().path().find('congrats.html') != -1 and congrats_enabled:
+        # if mw.col.decks.get_current_id() not in excluded_decks:
+        webview.eval(f'''\
+            if (document.getElementById("time_table") == null) document.body.innerHTML += `{formatted_html()}`\
+            ''')
 
 
 def on_options_called():
@@ -90,6 +107,10 @@ def get_review_times() -> (float, float):
         dids = [str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))]
     else:
         dids = mw.col.decks.allIds()
+
+    # for did in dids:
+    #     if did in excluded_decks:
+    #         dids.pop(did)
 
     dids_as_args = '(' + ', '.join(dids) + ')'
     cids_cmd = f'SELECT id FROM cards WHERE did in {dids_as_args}\n'
@@ -119,7 +140,8 @@ def formatted_html():
 
     return html_shell.format(total_label=Text.TOTAL, range_label=Text.PAST_WEEK,
                              total_value=total_val, range_value=range_val,
-                             total_unit=total_unit, range_unit=range_unit)
+                             total_unit=total_unit, range_unit=range_unit,
+                             primary_color=primary_color, secondary_color=secondary_color)
 
 
 def offset_date(date: date_time, hours: int = offset_hour):
@@ -152,9 +174,12 @@ def filter_revlog(
     return filtered_logs
 
 
-def test_action():
-    from aqt.utils import tooltip
-    tooltip("Test")
+# def test_action():
+#     from aqt.utils import tooltip
+#     tooltip("Test")
+#     if mw.col.decks.id("test", create=False):
+#         excluded_decks.append(mw.col.decks.id("test", create=False))
+#         print("\n\nadded test to excluded.\n\n")
 
 
 build_hooks()
