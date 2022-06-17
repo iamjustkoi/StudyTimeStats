@@ -1,40 +1,22 @@
 import aqt.webview
-from PyQt5.QtWidgets import QAction
 from aqt import mw
+from aqt.qt import QAction
 from aqt.deckbrowser import DeckBrowser
 from aqt.overview import Overview
 import datetime
-
-# import aqt.preferences
-# from anki import cards
+from .config import TimeStatsConfigManager
+from .consts import DAY_SUN, Text
+from .options_dialog import OptionsDialog
 
 delta_time = datetime.timedelta
 date_time = datetime.datetime
-
-
-class Text:
-    TOTAL = 'Total'
-    PAST_WEEK = 'Past Week'
-    HRS = 'hrs'
-    MIN = 'min'
-
-
-class Day:
-    MON = 0
-    TUE = 1
-    WED = 2
-    THU = 3
-    FRI = 4
-    SAT = 5
-    SUN = 6
-
 
 # from pytz import timezone
 # from aqt import preferences
 # mw.col.conf
 # mw.col.crt
 # TODO: make addon config val
-week_start_day = Day.SUN
+week_start_day = DAY_SUN
 # TODO: get value from anki profile prefs
 offset_hour = 6
 
@@ -75,6 +57,20 @@ def build_hooks():
     gui_hooks.webview_did_inject_style_into_page.append(on_webview_did_inject_style_into_page)
 
 
+def build_actions():
+    # TODO: add key shortcut to alt menu (&[t]ime Stats)
+    options_action = QAction('Overview Time Stats Options...', mw)
+    options_action.triggered.connect(on_options_called)
+
+    # Handle edge cases where toolbar action already exists
+    if mw.form.menuTools.actions().__contains__(options_action):
+        mw.form.menuTools.removeAction(options_action)
+
+    mw.form.menuTools.addAction(options_action)
+
+    mw.addonManager.setConfigAction(__name__, on_options_called)
+
+
 def on_webview_will_set_content(content: aqt.webview.WebContent, context: object or None):
     if isinstance(context, (DeckBrowser, Overview)):
         content.body += stats_html()
@@ -82,7 +78,13 @@ def on_webview_will_set_content(content: aqt.webview.WebContent, context: object
 
 def on_webview_did_inject_style_into_page(webview: aqt.webview.AnkiWebView):
     if webview.page().url().path().find('congrats.html') != -1:
-        webview.eval(f'document.body.innerHTML += `{stats_html()}`')
+        webview.eval(f'if (document.getElementById("time_table") == null) document.body.innerHTML += `{stats_html()}`')
+
+
+def on_options_called():
+    config_manager = TimeStatsConfigManager(mw)
+    dialog = OptionsDialog(config_manager)
+    dialog.exec()
 
 
 def get_review_times() -> (float, float):
@@ -153,32 +155,9 @@ def filter_revlog(
 
 
 def test_action():
-    if mw.state == 'overview':
-        dids = [str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))]
-    else:
-        dids = mw.col.decks.allIds()
-
-    dids_as_args = '(' + ', '.join(dids) + ')'
-    cids = mw.col.db.all(f'SELECT id FROM cards WHERE did in {dids_as_args}\n')
-    formatted_cids = '(' + (str(cids).replace('[', '').replace(']', '')) + ')'
-
-    # Result: [ [ids(time of study), ...], [time(time elapsed), ...] ]
-    rev_logs = mw.col.db.all(f'SELECT id, time FROM revlog WHERE cid in {formatted_cids}')
-
-    names = [mw.col.decks.name(i) for i in dids]
-    print(f'dids: {dids_as_args}')
-    print(f'dnames: {names}')
-
-    filtered_revlog = filter_revlog(rev_logs, days_ago=7)
-    filtered_rev_times_ms = [i[1] for i in filtered_revlog[0:]]
-
-    print(round(sum(filtered_rev_times_ms) / 1000 / 60 / 60, 2))
+    from aqt.utils import tooltip
+    tooltip("Test")
 
 
 build_hooks()
-action_stats = QAction('Timelog Test', mw)
-action_stats.triggered.connect(test_action)
-# Handle edge cases where toolbar action already exists
-if mw.form.menuTools.actions().__contains__(action_stats):
-    mw.form.menuTools.removeAction(action_stats)
-mw.form.menuTools.addAction(action_stats)
+build_actions()
