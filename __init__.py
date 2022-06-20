@@ -85,16 +85,18 @@ def build_actions():
 def on_webview_will_set_content(content: aqt.webview.WebContent, context: object or None):
     if (isinstance(context, DeckBrowser) and deckbrowser_enabled) or (
             isinstance(context, Overview) and overview_enabled):
-        # if mw.col.decks.get_current_id() not in excluded_decks:
+
+        # if isinstance(context, Overview) and mw.col.decks.get_current_id() in excluded_decks:
+        #     return
+
         content.body += formatted_html()
 
 
 def on_webview_did_inject_style_into_page(webview: aqt.webview.AnkiWebView):
     if webview.page().url().path().find('congrats.html') != -1 and congrats_enabled:
         # if mw.col.decks.get_current_id() not in excluded_decks:
-        webview.eval(f'''\
-            if (document.getElementById("time_table") == null) document.body.innerHTML += `{formatted_html()}`\
-            ''')
+        webview.eval(f'''
+            if (document.getElementById("time_table") == null) document.body.innerHTML += `{formatted_html()}`''')
 
 
 def on_options_called():
@@ -107,7 +109,10 @@ def get_review_times() -> (float, float):
     if mw.state == 'overview':
         dids = [str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))]
     else:
-        dids = mw.col.decks.allIds()
+        dids = mw.col.decks.all_ids()
+
+    # for excluded_did in excluded_decks:
+    #     dids.remove(str(excluded_did))
 
     dids_as_args = '(' + ', '.join(dids) + ')'
     cids_cmd = f'SELECT id FROM cards WHERE did in {dids_as_args}\n'
@@ -118,8 +123,6 @@ def get_review_times() -> (float, float):
     rev_log = mw.col.db.all(revlog_cmd)
 
     current_date = datetime.date.today()
-    global week_start_day
-    week_start_day = Days.TUESDAY
     if current_date.weekday() >= week_start_day:
         days_since_week_start = (current_date.weekday() - week_start_day)
     else:
