@@ -12,7 +12,7 @@ delta_time = datetime.timedelta
 date_time = datetime.datetime
 
 # TODO: make addon config vals
-week_start_day = Days.SUNDAY
+week_start_day = Days.MONDAY
 primary_color = "darkgray"
 secondary_color = "white"
 deckbrowser_enabled = True
@@ -83,7 +83,8 @@ def build_actions():
 
 
 def on_webview_will_set_content(content: aqt.webview.WebContent, context: object or None):
-    if (isinstance(context, DeckBrowser) and deckbrowser_enabled) or (isinstance(context, Overview) and overview_enabled):
+    if (isinstance(context, DeckBrowser) and deckbrowser_enabled) or (
+            isinstance(context, Overview) and overview_enabled):
         # if mw.col.decks.get_current_id() not in excluded_decks:
         content.body += formatted_html()
 
@@ -108,10 +109,6 @@ def get_review_times() -> (float, float):
     else:
         dids = mw.col.decks.allIds()
 
-    # for did in dids:
-    #     if did in excluded_decks:
-    #         dids.pop(did)
-
     dids_as_args = '(' + ', '.join(dids) + ')'
     cids_cmd = f'SELECT id FROM cards WHERE did in {dids_as_args}\n'
     cids = mw.col.db.all(cids_cmd)
@@ -120,9 +117,17 @@ def get_review_times() -> (float, float):
     revlog_cmd = f'SELECT id, time FROM revlog WHERE cid in {formatted_cids}'
     rev_log = mw.col.db.all(revlog_cmd)
 
-    days_from_last_start = date_time.today().weekday() - week_start_day + 7
-    date_of_last_start = date_time.today() - delta_time(days=days_from_last_start)
-    filtered_revlog = filter_revlog(rev_log, after=date_of_last_start)
+    current_date = datetime.date.today()
+    global week_start_day
+    week_start_day = Days.TUESDAY
+    if current_date.weekday() >= week_start_day:
+        days_since_week_start = (current_date.weekday() - week_start_day)
+    else:
+        days_since_week_start = (current_date.weekday() - week_start_day) + 7
+
+    prev_start_date = current_date - delta_time(days=days_since_week_start)
+    prev_start_datetime = date_time(prev_start_date.year, prev_start_date.month, prev_start_date.day)
+    filtered_revlog = filter_revlog(rev_log, after=prev_start_datetime)
 
     all_rev_times_ms = [log[1] for log in rev_log[0:]]
     filtered_rev_times_ms = [log[1] for log in filtered_revlog[0:]]
@@ -145,27 +150,21 @@ def formatted_html():
 
 
 def offset_date(date: date_time, hours: int = offset_hour):
-    return date - delta_time(hours=hours)
+    return date + delta_time(hours=hours)
 
 
-def filter_revlog(
-        rev_logs: [[int, int]],
-        days_ago: int = None,
-        after: date_time = None
-) -> [[int, int]]:
+def filter_revlog(rev_logs: [[int, int]], days_ago: int = None, after: date_time = None) -> [[int, int]]:
     print(f'check against: {offset_date(after)}')
 
     filtered_logs = []
     for log in rev_logs[0:]:
-
         log_epoch_seconds = log[0] / 1000
-        log_date = offset_date(date_time.fromtimestamp(log_epoch_seconds))
+        log_date = date_time.fromtimestamp(log_epoch_seconds)
 
         if days_ago is not None:
             log_days_ago = offset_date(date_time.now()) - log_date
             if log_days_ago.days < days_ago:
                 filtered_logs.append(log)
-
         elif after is not None:
             log_days_after = (log_date - offset_date(after)).days
             if log_days_after >= 0:
