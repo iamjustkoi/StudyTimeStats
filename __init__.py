@@ -3,27 +3,28 @@ from aqt import mw
 from aqt.qt import QAction
 from aqt.deckbrowser import DeckBrowser
 from aqt.overview import Overview
-import datetime
+from datetime import timedelta, datetime, date
 from .config import RTConfigManager
 from .consts import Days, Text
 from .options_dialog import RTOptionsDialog
 
-delta_time = datetime.timedelta
-date_time = datetime.datetime
-
-# TODO: make addon config vals
+# Dynamic Vars
 week_start_day = Days.MONDAY
 primary_color = "darkgray"
 secondary_color = "white"
+total_label = Text.TOTAL
+range_label = Text.PAST_WEEK
 deckbrowser_enabled = True
 overview_enabled = True
 congrats_enabled = True
-excluded_decks = []
+excluded_dids = ['1']
+
 
 # TODO: get value from anki profile prefs
 offset_hour = 6
 # from aqt import preferences
 # mw.col.crt
+
 
 html_shell = '''    
         <style>
@@ -64,39 +65,28 @@ def build_hooks():
 
 def build_actions():
     # TODO: add key shortcut to alt menu (&[t]ime Stats)
-    options_action = QAction('Overview Time Stats Options...', mw)
+    options_action = QAction(Text.OPTIONS_ACTION, mw)
     options_action.triggered.connect(on_options_called)
-    # Handle edge cases where toolbar action already exists
-    if mw.form.menuTools.actions().__contains__(options_action):
+    # Handle edge case where toolbar action already exists
+    if options_action in mw.form.menuTools.actions():
         mw.form.menuTools.removeAction(options_action)
 
-    # action_test = QAction('Test Action', mw)
-    # action_test.triggered.connect(test_action)
-    # # Handle edge cases where toolbar action already exists
-    # if mw.form.menuTools.actions().__contains__(action_test):
-    #     mw.form.menuTools.removeAction(action_test)
-
     mw.form.menuTools.addAction(options_action)
-    # mw.form.menuTools.addAction(action_test)
 
     mw.addonManager.setConfigAction(__name__, on_options_called)
 
 
 def on_webview_will_set_content(content: aqt.webview.WebContent, context: object or None):
-    if (isinstance(context, DeckBrowser) and deckbrowser_enabled) or (
-            isinstance(context, Overview) and overview_enabled):
-
-        # if isinstance(context, Overview) and mw.col.decks.get_current_id() in excluded_decks:
-        #     return
-
+    if (isinstance(context, DeckBrowser) and deckbrowser_enabled) or \
+            (isinstance(context, Overview) and overview_enabled and should_display_on_current_screen()):
         content.body += formatted_html()
 
 
 def on_webview_did_inject_style_into_page(webview: aqt.webview.AnkiWebView):
     if webview.page().url().path().find('congrats.html') != -1 and congrats_enabled:
-        # if mw.col.decks.get_current_id() not in excluded_decks:
-        webview.eval(f'''
-            if (document.getElementById("time_table") == null) document.body.innerHTML += `{formatted_html()}`''')
+        if should_display_on_current_screen():
+            webview.eval(f'''
+                if (document.getElementById("time_table") == null) document.body.innerHTML += `{formatted_html()}`''')
 
 
 def on_options_called():
@@ -105,14 +95,22 @@ def on_options_called():
     dialog.exec()
 
 
+def should_display_on_current_screen():
+    return str(mw.col.decks.current().get('id')) not in excluded_dids
+
+
 def get_review_times() -> (float, float):
+    print(f'mw state: {mw.state}')
     if mw.state == 'overview':
         dids = [str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))]
     else:
         dids = mw.col.decks.all_ids()
 
-    # for excluded_did in excluded_decks:
-    #     dids.remove(str(excluded_did))
+    for excluded_did in excluded_dids:
+        if excluded_did in dids:
+            dids.remove(str(excluded_did))
+
+    print(f'checking dids: {[mw.col.decks.name(i) for i in dids]}')
 
     dids_as_args = '(' + ', '.join(dids) + ')'
     cids_cmd = f'SELECT id FROM cards WHERE did in {dids_as_args}\n'
@@ -122,14 +120,14 @@ def get_review_times() -> (float, float):
     revlog_cmd = f'SELECT id, time FROM revlog WHERE cid in {formatted_cids}'
     rev_log = mw.col.db.all(revlog_cmd)
 
-    current_date = datetime.date.today()
+    current_date = date.today()
     if current_date.weekday() >= week_start_day:
         days_since_week_start = (current_date.weekday() - week_start_day)
     else:
         days_since_week_start = (current_date.weekday() - week_start_day) + 7
 
-    prev_start_date = current_date - delta_time(days=days_since_week_start)
-    prev_start_datetime = date_time(prev_start_date.year, prev_start_date.month, prev_start_date.day)
+    prev_start_date = current_date - timedelta(days=days_since_week_start)
+    prev_start_datetime = datetime(prev_start_date.year, prev_start_date.month, prev_start_date.day)
     filtered_revlog = filter_revlog(rev_log, after=prev_start_datetime)
 
     all_rev_times_ms = [log[1] for log in rev_log[0:]]
@@ -146,26 +144,26 @@ def formatted_html():
     total_unit = Text.HRS if total_hrs > 1 else Text.MIN
     range_unit = Text.HRS if ranged_hrs > 1 else Text.MIN
 
-    return html_shell.format(total_label=Text.TOTAL, range_label=Text.PAST_WEEK,
+    return html_shell.format(total_label=total_label, range_label=range_label,
                              total_value=total_val, range_value=range_val,
                              total_unit=total_unit, range_unit=range_unit,
                              primary_color=primary_color, secondary_color=secondary_color)
 
 
-def offset_date(date: date_time, hours: int = offset_hour):
-    return date + delta_time(hours=hours)
+def offset_date(dt: datetime, hours: int = offset_hour):
+    return dt + timedelta(hours=hours)
 
 
-def filter_revlog(rev_logs: [[int, int]], days_ago: int = None, after: date_time = None) -> [[int, int]]:
+def filter_revlog(rev_logs: [[int, int]], days_ago: int = None, after: datetime = None) -> [[int, int]]:
     print(f'check against: {offset_date(after)}')
 
     filtered_logs = []
     for log in rev_logs[0:]:
         log_epoch_seconds = log[0] / 1000
-        log_date = date_time.fromtimestamp(log_epoch_seconds)
+        log_date = datetime.fromtimestamp(log_epoch_seconds)
 
         if days_ago is not None:
-            log_days_ago = offset_date(date_time.now()) - log_date
+            log_days_ago = offset_date(datetime.now()) - log_date
             if log_days_ago.days < days_ago:
                 filtered_logs.append(log)
         elif after is not None:
@@ -174,14 +172,6 @@ def filter_revlog(rev_logs: [[int, int]], days_ago: int = None, after: date_time
                 filtered_logs.append(log)
 
     return filtered_logs
-
-
-# def test_action():
-#     from aqt.utils import tooltip
-#     tooltip("Test")
-#     if mw.col.decks.id("test", create=False):
-#         excluded_decks.append(mw.col.decks.id("test", create=False))
-#         print("\n\nadded test to excluded.\n\n")
 
 
 build_hooks()

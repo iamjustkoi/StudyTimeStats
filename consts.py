@@ -3,6 +3,7 @@ class Text:
     PAST_WEEK = 'Past Week'
     HRS = 'hrs'
     MIN = 'min'
+    OPTIONS_ACTION = 'Overview Time Stats Options...'
 
 
 class Days:
