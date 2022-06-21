@@ -1,8 +1,13 @@
+import anki.config
 from aqt import AnkiQt
 from .consts import CONFIG_DEFAULTS, CONFIG_WEEK_START
 
 
-class RTConfigManager:
+class StudyTimeStatsConfig:
+    """
+    Generic config manager for accessing and storing the add-on's properties.
+    """
+
     fields = {CONFIG_WEEK_START}
 
     def __init__(self, mw: AnkiQt):
@@ -13,10 +18,11 @@ class RTConfigManager:
         print(f'Config: {__name__}')
 
     def get(self):
-        config = self._mw.col.conf.get(__name__, {})
+        config = anki.config.ConfigManager(self._mw.col.conf.get(__name__, {}))
         for field in self.fields:
             if field not in config:
                 config[field] = CONFIG_DEFAULTS[field]
+
         return config
 
     def set(self, new_conf):
