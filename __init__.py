@@ -20,12 +20,6 @@ congrats_enabled = True
 excluded_dids = ['1']
 
 
-# TODO: get value from anki profile prefs
-offset_hour = 6
-# from aqt import preferences
-# mw.col.crt
-
-
 html_shell = '''    
         <style>
             .time-studied-header {{
@@ -77,12 +71,18 @@ def build_actions():
 
 
 def on_webview_will_set_content(content: aqt.webview.WebContent, context: object or None):
+    if mw.col is None:
+        print(f'--mw was NoneType')
+        return
     if (isinstance(context, DeckBrowser) and deckbrowser_enabled) or \
             (isinstance(context, Overview) and overview_enabled and should_display_on_current_screen()):
         content.body += formatted_html()
 
 
 def on_webview_did_inject_style_into_page(webview: aqt.webview.AnkiWebView):
+    if mw.col is None:
+        print(f'--mw was NoneType')
+        return
     if webview.page().url().path().find('congrats.html') != -1 and congrats_enabled:
         if should_display_on_current_screen():
             webview.eval(f'''
@@ -150,12 +150,13 @@ def formatted_html():
                              primary_color=primary_color, secondary_color=secondary_color)
 
 
-def offset_date(dt: datetime, hours: int = offset_hour):
+def offset_date(dt: datetime, hours: int = 0):
     return dt + timedelta(hours=hours)
 
 
 def filter_revlog(rev_logs: [[int, int]], days_ago: int = None, after: datetime = None) -> [[int, int]]:
-    print(f'check against: {offset_date(after)}')
+    offset_hour = mw.col.get_preferences().scheduling.rollover
+    print(f'check against: {offset_date(after, offset_hour)}')
 
     filtered_logs = []
     for log in rev_logs[0:]:
@@ -163,11 +164,11 @@ def filter_revlog(rev_logs: [[int, int]], days_ago: int = None, after: datetime 
         log_date = datetime.fromtimestamp(log_epoch_seconds)
 
         if days_ago is not None:
-            log_days_ago = offset_date(datetime.now()) - log_date
+            log_days_ago = offset_date(datetime.now(), offset_hour) - log_date
             if log_days_ago.days < days_ago:
                 filtered_logs.append(log)
         elif after is not None:
-            log_days_after = (log_date - offset_date(after)).days
+            log_days_after = (log_date - offset_date(after, offset_hour)).days
             if log_days_after >= 0:
                 filtered_logs.append(log)
 
