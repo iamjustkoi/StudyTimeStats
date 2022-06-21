@@ -4,9 +4,9 @@ from aqt.qt import QAction
 from aqt.deckbrowser import DeckBrowser
 from aqt.overview import Overview
 from datetime import timedelta, datetime, date
-from .config import RTConfigManager
+from .config import StudyTimeStatsConfig
 from .consts import Days, Text
-from .options_dialog import RTOptionsDialog
+from .options import OptionsDialog
 
 # Dynamic Vars
 week_start_day = Days.MONDAY
@@ -14,6 +14,8 @@ primary_color = "darkgray"
 secondary_color = "white"
 total_label = Text.TOTAL
 range_label = Text.PAST_WEEK
+# range_type = Range.WEEK
+# range_days = Range.DAYS[Range.WEEK]
 deckbrowser_enabled = True
 overview_enabled = True
 congrats_enabled = True
@@ -90,8 +92,7 @@ def on_webview_did_inject_style_into_page(webview: aqt.webview.AnkiWebView):
 
 
 def on_options_called():
-    config_manager = RTConfigManager(mw)
-    dialog = RTOptionsDialog(config_manager)
+    dialog = OptionsDialog(StudyTimeStatsConfig(mw))
     dialog.exec()
 
 
