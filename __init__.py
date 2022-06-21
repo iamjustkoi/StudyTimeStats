@@ -97,13 +97,13 @@ def on_options_called():
 
 
 def should_display_on_current_screen():
-    return str(mw.col.decks.current().get_config('id')) not in excluded_dids
+    return str(mw.col.decks.current().get('id')) not in excluded_dids
 
 
 def get_review_times() -> (float, float):
     print(f'mw state: {mw.state}')
     if mw.state == 'overview':
-        dids = [str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get_config('id'))]
+        dids = [str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))]
     else:
         dids = mw.col.decks.all_ids()
 
