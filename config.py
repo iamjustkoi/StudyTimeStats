@@ -3,9 +3,9 @@ from aqt import AnkiQt
 from .consts import Config
 
 
-class TimeStatsConfigManager(dict):
+class TimeStatsConfigManager:
     """
-    Generic config manager for accessing and storing the add-on's properties.
+    Generic config manager for accessing and storing add-on's properties.
     """
 
     fields = {Config.WEEK_START}
@@ -26,10 +26,4 @@ class TimeStatsConfigManager(dict):
 
     def write_config(self):
         self._mw.addonManager.writeAddonMeta(self._addon, self._meta)
-
-    # def set_config(self, new_conf):
-    #     self.addon = self._mw.addonManager.addonFromModule(__name__)
-    #     # self._mw.addonManager.addonMeta(self.addon)['config'] = new_conf
-    #     meta = self._mw.addonManager.addon_meta(self.addon)
-    #     self._mw.addonManager.write_addon_meta(meta)
 
