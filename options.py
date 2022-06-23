@@ -1,6 +1,6 @@
 from aqt.qt import QDialog
 from .config import TimeStatsConfigManager
-from .consts import Config, Days
+from .consts import Config
 from .options_dialog import Ui_OptionsDialog
 
 
@@ -12,18 +12,16 @@ class TimeStatsOptionsDialog(QDialog):
         self.ui = Ui_OptionsDialog()
         self.ui.setupUi(OptionsDialog=self)
         self.config_manager = conf_manager
-        self.config = self.config_manager.get_config()
+        config = conf_manager.get_config()
 
-        print(f'loaded idx: {self.config[Config.WEEK_START]}')
-        self.ui.week_start_dropdown.setCurrentIndex(self.config[Config.WEEK_START])
+        self._load(config)
+
+    def _load(self, config):
+        self.ui.week_start_dropdown.setCurrentIndex(config[Config.WEEK_START])
 
     def accept(self) -> None:
-        # super(self.ui).accepted()
-        print(f'saved idx: {self.ui.week_start_dropdown.currentIndex()}')
-
-        self.config[Config.WEEK_START] = self.ui.week_start_dropdown.currentIndex()
-        self.config_manager.set_config(self.config)
-
+        self.config_manager.get_config()[Config.WEEK_START] = self.ui.week_start_dropdown.currentIndex()
+        self.config_manager.write_config()
         self.close()
 
 
