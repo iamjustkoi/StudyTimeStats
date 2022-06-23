@@ -4,9 +4,9 @@ from aqt.qt import QAction
 from aqt.deckbrowser import DeckBrowser
 from aqt.overview import Overview
 from datetime import timedelta, datetime, date
-from .config import StudyTimeStatsConfig
+from .config import TimeStatsConfigManager
 from .consts import Days, Text
-from .options import OptionsDialog
+from .options import TimeStatsOptionsDialog
 
 # Dynamic Vars
 week_start_day = Days.MONDAY
@@ -92,7 +92,7 @@ def on_webview_did_inject_style_into_page(webview: aqt.webview.AnkiWebView):
 
 
 def on_options_called():
-    dialog = OptionsDialog(StudyTimeStatsConfig(mw))
+    dialog = TimeStatsOptionsDialog(TimeStatsConfigManager(mw))
     dialog.exec()
 
 

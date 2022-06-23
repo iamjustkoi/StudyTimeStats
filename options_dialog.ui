@@ -72,11 +72,6 @@
              </property>
              <item>
               <property name="text">
-               <string>Sunday</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
                <string>Monday</string>
               </property>
              </item>
@@ -103,6 +98,11 @@
              <item>
               <property name="text">
                <string>Saturday</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Sunday</string>
               </property>
              </item>
             </widget>
