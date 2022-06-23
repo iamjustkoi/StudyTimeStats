@@ -3,7 +3,7 @@ from aqt import AnkiQt
 from .consts import Config
 
 
-class StudyTimeStatsConfig:
+class TimeStatsConfigManager(dict):
     """
     Generic config manager for accessing and storing the add-on's properties.
     """
@@ -11,22 +11,26 @@ class StudyTimeStatsConfig:
     fields = {Config.WEEK_START}
 
     def __init__(self, mw: AnkiQt):
+        super().__init__()
         self._mw = mw
-        self.config = mw.col.get_config(__name__, default=Config.DEFAULTS)
+        self.config = self._mw.col.get_config(__name__, default=Config.DEFAULT_CONFIG)
         self._mw.col.set_config(__name__, self.config)
 
-        print(f'Config: {__name__}')
+        # self.config = self._mw.addonManager.getConfig(__name__)
+
+        # self._mw.addonManager.addonConfigDefaults(__name__)
+
+        # self._mw.addonManager.getConfig(__name__)
+        #
+        # print(f'Config: {__name__}')
 
     def get_config(self):
-        config = anki.config.ConfigManager(self._mw.col.conf.get_config(__name__, {}))
+        # config = self._mw.addonManager.getConfig(__name__)
+        config = self.config
         for field in self.fields:
-            if field not in config:
-                config[field] = Config.DEFAULTS[field]
+            if field not in self.config:
+                config[field] = Config.DEFAULT_CONFIG[field]
         return config
 
     def set_config(self, new_conf):
-        conf_manager = self._mw.col.conf
-        if __name__ not in conf_manager:
-            conf_manager[__name__] = {}
-        for field in self.fields:
-            conf_manager[__name__][field] = new_conf[field]
+        self._mw.col.set_config(__name__, new_conf)

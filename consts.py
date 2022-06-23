@@ -21,4 +21,4 @@ class Days:
 
 class Config:
     WEEK_START = 'week_start'
-    DEFAULTS = {WEEK_START: Days.SUNDAY}
+    DEFAULT_CONFIG = {WEEK_START: Days.SUNDAY}
