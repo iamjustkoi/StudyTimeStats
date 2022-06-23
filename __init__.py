@@ -9,17 +9,17 @@ from .consts import Days, Text
 from .options import TimeStatsOptionsDialog
 
 # Dynamic Vars
-week_start_day = Days.MONDAY
-primary_color = "darkgray"
-secondary_color = "white"
-total_label = Text.TOTAL
-range_label = Text.PAST_WEEK
+Week_Start_Day = Days.MONDAY
+Primary_Color = "darkgray"
+Secondary_Color = "white"
+Total_Label = Text.TOTAL
+Range_Label = Text.PAST_WEEK
 # range_type = Range.WEEK
 # range_days = Range.DAYS[Range.WEEK]
-deckbrowser_enabled = True
-overview_enabled = True
-congrats_enabled = True
-excluded_dids = ['1']
+Deckbrowser_Enabled = True
+Overview_Enabled = True
+Congrats_Enabled = True
+Excluded_DIDs = ['1']
 
 
 html_shell = '''    
@@ -76,8 +76,8 @@ def on_webview_will_set_content(content: aqt.webview.WebContent, context: object
     if mw.col is None:
         print(f'--mw was NoneType')
         return
-    if (isinstance(context, DeckBrowser) and deckbrowser_enabled) or \
-            (isinstance(context, Overview) and overview_enabled and should_display_on_current_screen()):
+    if (isinstance(context, DeckBrowser) and Deckbrowser_Enabled) or \
+            (isinstance(context, Overview) and Overview_Enabled and should_display_on_current_screen()):
         content.body += formatted_html()
 
 
@@ -85,7 +85,7 @@ def on_webview_did_inject_style_into_page(webview: aqt.webview.AnkiWebView):
     if mw.col is None:
         print(f'--mw was NoneType')
         return
-    if webview.page().url().path().find('congrats.html') != -1 and congrats_enabled:
+    if webview.page().url().path().find('congrats.html') != -1 and Congrats_Enabled:
         if should_display_on_current_screen():
             webview.eval(f'''
                 if (document.getElementById("time_table") == null) document.body.innerHTML += `{formatted_html()}`''')
@@ -97,7 +97,7 @@ def on_options_called():
 
 
 def should_display_on_current_screen():
-    return str(mw.col.decks.current().get('id')) not in excluded_dids
+    return str(mw.col.decks.current().get('id')) not in Excluded_DIDs
 
 
 def get_review_times() -> (float, float):
@@ -107,7 +107,7 @@ def get_review_times() -> (float, float):
     else:
         dids = mw.col.decks.all_ids()
 
-    for excluded_did in excluded_dids:
+    for excluded_did in Excluded_DIDs:
         if excluded_did in dids:
             dids.remove(str(excluded_did))
 
@@ -122,10 +122,10 @@ def get_review_times() -> (float, float):
     rev_log = mw.col.db.all(revlog_cmd)
 
     current_date = date.today()
-    if current_date.weekday() >= week_start_day:
-        days_since_week_start = (current_date.weekday() - week_start_day)
+    if current_date.weekday() >= Week_Start_Day:
+        days_since_week_start = (current_date.weekday() - Week_Start_Day)
     else:
-        days_since_week_start = (current_date.weekday() - week_start_day) + 7
+        days_since_week_start = (current_date.weekday() - Week_Start_Day) + 7
 
     prev_start_date = current_date - timedelta(days=days_since_week_start)
     prev_start_datetime = datetime(prev_start_date.year, prev_start_date.month, prev_start_date.day)
@@ -145,10 +145,10 @@ def formatted_html():
     total_unit = Text.HRS if total_hrs > 1 else Text.MIN
     range_unit = Text.HRS if ranged_hrs > 1 else Text.MIN
 
-    return html_shell.format(total_label=total_label, range_label=range_label,
+    return html_shell.format(total_label=Total_Label, range_label=Range_Label,
                              total_value=total_val, range_value=range_val,
                              total_unit=total_unit, range_unit=range_unit,
-                             primary_color=primary_color, secondary_color=secondary_color)
+                             primary_color=Primary_Color, secondary_color=Secondary_Color)
 
 
 def offset_date(dt: datetime, hours: int = 0):
