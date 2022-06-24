@@ -18,7 +18,7 @@
    <item>
     <widget class="QTabWidget" name="tabs_widget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="appearance_tab">
       <property name="enabled">
@@ -178,12 +178,6 @@
            </item>
            <item row="2" column="1">
             <widget class="QSpinBox" name="custom_range_spinbox">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
              <property name="suffix">
               <string> days</string>
              </property>
@@ -335,12 +329,9 @@
         </layout>
        </item>
        <item>
-        <widget class="QListView" name="excluded_decks_list">
-         <property name="editTriggers">
-          <set>QAbstractItemView::SelectedClicked</set>
-         </property>
+        <widget class="QListWidget" name="excluded_decks_list">
          <property name="selectionMode">
-          <enum>QAbstractItemView::MultiSelection</enum>
+          <enum>QAbstractItemView::ExtendedSelection</enum>
          </property>
          <property name="selectionBehavior">
           <enum>QAbstractItemView::SelectRows</enum>

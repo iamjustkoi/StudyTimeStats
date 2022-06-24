@@ -7,11 +7,7 @@ class Text:
 
 
 class Range:
-    WEEK = 'Week'
-    TWO_WEEKS = '2 Weeks'
-    MONTH = 'Month'
-    YEAR = 'Year'
-    CUSTOM = 'Custom'
+    WEEK, TWO_WEEKS, MONTH, YEAR, CUSTOM = 0, 1, 2, 3, 4
     DAYS = {WEEK: 7, TWO_WEEKS: 14, MONTH: 30, YEAR: 365, CUSTOM: 0}
 
 
@@ -44,5 +40,5 @@ class Config:
         BROWSER_ENABLED: True,
         OVERVIEW_ENABLED: True,
         CONGRATS_ENABLED: True,
-        EXCLUDED_DIDS: ['1']
+        EXCLUDED_DIDS: [1]
     }
