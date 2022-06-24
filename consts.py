@@ -30,7 +30,7 @@ class Config:
     EXCLUDED_DIDS = "Excluded_Deck_IDs"
     DEFAULT_CONFIG = {
         WEEK_START: Days.SUNDAY,
-        USE_WEEK_START: False,
+        USE_WEEK_START: True,
         RANGE_TYPE: Range.WEEK,
         CUSTOM_RANGE: 7,
         CUSTOM_TOTAL_TEXT: '',

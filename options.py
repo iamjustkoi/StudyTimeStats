@@ -1,5 +1,5 @@
 # from PyQt5.QtWidgets import QAction
-from aqt.qt import QDialog, QColorDialog, QColor, QLabel
+from aqt.qt import QDialog, QColorDialog, QColor, QLabel, QDialogButtonBox
 from .config import TimeStatsConfigManager
 from .consts import Config, Range
 from .options_dialog import Ui_OptionsDialog
@@ -16,7 +16,6 @@ def get_background_color(label: QLabel):
 
 
 class TimeStatsOptionsDialog(QDialog):
-    form = None
 
     def __init__(self, conf_manager: TimeStatsConfigManager):
         super().__init__()
@@ -25,7 +24,7 @@ class TimeStatsOptionsDialog(QDialog):
         self.manager = conf_manager
         self.config = conf_manager.config
 
-        self._load()
+        self._load(True)
 
     def accept(self) -> None:
         self._save()
@@ -74,43 +73,52 @@ class TimeStatsOptionsDialog(QDialog):
             QColorDialog.getColor(initial=QColor(get_background_color(preview)), options=QColorDialog.ShowAlphaChannel)
         if color.isValid():
             set_background_color(preview, color.name(QColor.HexArgb))
-            # if button.objectName() == self.ui.primary_color_button.objectName():
-            # elif button.objectName() == self.ui.seconday_color_button.objectName():
-            #     set_background_color(self.ui.secondary_color_preview, color.name(QColor.HexArgb))
 
-    def _load(self):
-        config = self.config
+    def _load(self, init=False):
         ui = self.ui
-        ui.week_start_dropdown.setCurrentIndex(config[Config.WEEK_START])
+
+        if init:
+            # Exclude Tab Button Actions
+            ui.add_button.clicked.connect(self.on_add_clicked)
+            ui.remove_button.clicked.connect(self.on_remove_clicked)
+
+            # Restore Defaults Button Action
+            ui.confirm_button_box.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.on_restore_defaults)
+
+            # Color Select Button Actions
+            ui.primary_color_button.clicked.connect(lambda: self.on_color_dialog(ui.primary_color_preview))
+            ui.seconday_color_button.clicked.connect(lambda: self.on_color_dialog(ui.secondary_color_preview))
+
+        ui.week_start_dropdown.setCurrentIndex(self.config[Config.WEEK_START])
 
         ui.range_select_dropdown.activated[int].connect(self.on_range_type_change)
-        ui.range_select_dropdown.setCurrentIndex(config[Config.RANGE_TYPE])
+        ui.range_select_dropdown.setCurrentIndex(self.config[Config.RANGE_TYPE])
         self.on_range_type_change(self.ui.range_select_dropdown.currentIndex())
 
-        ui.use_start_checkbox.setChecked(config[Config.USE_WEEK_START])
-        ui.custom_range_spinbox.setValue(config[Config.CUSTOM_RANGE])
-        ui.total_line.setText(config[Config.CUSTOM_TOTAL_TEXT])
-        ui.ranged_line.setText(config[Config.CUSTOM_RANGE_TEXT])
+        ui.use_start_checkbox.setChecked(self.config[Config.USE_WEEK_START])
+        ui.custom_range_spinbox.setValue(self.config[Config.CUSTOM_RANGE])
+        ui.total_line.setText(self.config[Config.CUSTOM_TOTAL_TEXT])
+        ui.ranged_line.setText(self.config[Config.CUSTOM_RANGE_TEXT])
 
         # Color Pickers
-        set_background_color(ui.primary_color_preview, config[Config.PRIMARY_COLOR])
-        ui.primary_color_button.clicked.connect(lambda: self.on_color_dialog(ui.primary_color_preview))
-        set_background_color(ui.secondary_color_preview, config[Config.SECONDARY_COLOR])
-        ui.seconday_color_button.clicked.connect(lambda: self.on_color_dialog(ui.secondary_color_preview))
+        set_background_color(ui.primary_color_preview, self.config[Config.PRIMARY_COLOR])
+        set_background_color(ui.secondary_color_preview, self.config[Config.SECONDARY_COLOR])
 
-        ui.browser_checkbox.setChecked(config[Config.BROWSER_ENABLED])
-        ui.overview_checkbox.setChecked(config[Config.OVERVIEW_ENABLED])
-        ui.congrats_checkbox.setChecked(config[Config.CONGRATS_ENABLED])
+        ui.browser_checkbox.setChecked(self.config[Config.BROWSER_ENABLED])
+        ui.overview_checkbox.setChecked(self.config[Config.OVERVIEW_ENABLED])
+        ui.congrats_checkbox.setChecked(self.config[Config.CONGRATS_ENABLED])
 
         # Excluded Decks
         self.excluded_deck_names = [self.manager.decks.name(i) for i in self.config.get(Config.EXCLUDED_DIDS)]
+        ui.excluded_decks_list.clear()
         ui.excluded_decks_list.addItems(self.excluded_deck_names)
 
-        # Button Actions
-        ui.add_button.clicked.connect(self.on_add_clicked)
-        ui.remove_button.clicked.connect(self.on_remove_clicked)
-
-        ui.tabs_widget.setCurrentIndex(0)
+    def on_restore_defaults(self):
+        print(f'restore defaults')
+        for field in Config.DEFAULT_CONFIG:
+            # load temp defaults
+            self.config[field] = Config.DEFAULT_CONFIG[field]
+        self._load()
 
     def _save(self):
         self.config[Config.WEEK_START] = self.ui.week_start_dropdown.currentIndex()
