@@ -1,9 +1,18 @@
 # from PyQt5.QtWidgets import QAction
-from aqt.qt import QDialog
+from aqt.qt import QDialog, QColorDialog, QColor, QLabel
 from .config import TimeStatsConfigManager
 from .consts import Config, Range
 from .options_dialog import Ui_OptionsDialog
 from aqt.studydeck import StudyDeck
+
+
+def set_background_color(label: QLabel, hex_arg: str):
+    label.setStyleSheet(f'QWidget {{background-color: {hex_arg}}}')
+
+
+def get_background_color(label: QLabel):
+    stylesheet = label.styleSheet()
+    return stylesheet.replace('QWidget {background-color: ', '').replace('}', '')
 
 
 class TimeStatsOptionsDialog(QDialog):
@@ -60,6 +69,15 @@ class TimeStatsOptionsDialog(QDialog):
         self.ui.excluded_decks_list.clear()
         self.ui.excluded_decks_list.addItems(self.excluded_deck_names)
 
+    def on_color_dialog(self, preview: QLabel):
+        color = \
+            QColorDialog.getColor(initial=QColor(get_background_color(preview)), options=QColorDialog.ShowAlphaChannel)
+        if color.isValid():
+            set_background_color(preview, color.name(QColor.HexArgb))
+            # if button.objectName() == self.ui.primary_color_button.objectName():
+            # elif button.objectName() == self.ui.seconday_color_button.objectName():
+            #     set_background_color(self.ui.secondary_color_preview, color.name(QColor.HexArgb))
+
     def _load(self):
         config = self.config
         ui = self.ui
@@ -73,10 +91,13 @@ class TimeStatsOptionsDialog(QDialog):
         ui.custom_range_spinbox.setValue(config[Config.CUSTOM_RANGE])
         ui.total_line.setText(config[Config.CUSTOM_TOTAL_TEXT])
         ui.ranged_line.setText(config[Config.CUSTOM_RANGE_TEXT])
-        # Primary Color css stylesheet
-        # Primary Color button action
-        # Secondary Color css style stylesheet
-        # Secondary Color button action
+
+        # Color Pickers
+        set_background_color(ui.primary_color_preview, config[Config.PRIMARY_COLOR])
+        ui.primary_color_button.clicked.connect(lambda: self.on_color_dialog(ui.primary_color_preview))
+        set_background_color(ui.secondary_color_preview, config[Config.SECONDARY_COLOR])
+        ui.seconday_color_button.clicked.connect(lambda: self.on_color_dialog(ui.secondary_color_preview))
+
         ui.browser_checkbox.setChecked(config[Config.BROWSER_ENABLED])
         ui.overview_checkbox.setChecked(config[Config.OVERVIEW_ENABLED])
         ui.congrats_checkbox.setChecked(config[Config.CONGRATS_ENABLED])
@@ -89,7 +110,7 @@ class TimeStatsOptionsDialog(QDialog):
         ui.add_button.clicked.connect(self.on_add_clicked)
         ui.remove_button.clicked.connect(self.on_remove_clicked)
 
-        # ui.tabs_widget.setCurrentIndex(0)
+        ui.tabs_widget.setCurrentIndex(0)
 
     def _save(self):
         self.config[Config.WEEK_START] = self.ui.week_start_dropdown.currentIndex()
@@ -100,7 +121,8 @@ class TimeStatsOptionsDialog(QDialog):
         self.config[Config.CUSTOM_RANGE_TEXT] = self.ui.ranged_line.text()
 
         # Primary Color css stylesheet
-        # Secondary Color css style stylesheet
+        self.config[Config.PRIMARY_COLOR] = get_background_color(self.ui.primary_color_preview)
+        self.config[Config.SECONDARY_COLOR] = get_background_color(self.ui.secondary_color_preview)
 
         self.config[Config.BROWSER_ENABLED] = self.ui.browser_checkbox.isChecked()
         self.config[Config.OVERVIEW_ENABLED] = self.ui.overview_checkbox.isChecked()
