@@ -8,20 +8,21 @@ class TimeStatsOptionsDialog(QDialog):
 
     def __init__(self, conf_manager: TimeStatsConfigManager):
         super().__init__()
-
         self.ui = Ui_OptionsDialog()
         self.ui.setupUi(OptionsDialog=self)
-        self.config_manager = conf_manager
-        config = conf_manager.get_config()
+        self.manager = conf_manager
+        self.config = conf_manager.config
+        self._load()
 
-        self._load(config)
+    def _load(self):
+        self.ui.week_start_dropdown.setCurrentIndex(self.config[Config.WEEK_START])
 
-    def _load(self, config):
-        self.ui.week_start_dropdown.setCurrentIndex(config[Config.WEEK_START])
+    def _save(self):
+        self.config[Config.WEEK_START] = self.ui.week_start_dropdown.currentIndex()
+        self.manager.write_config()
 
     def accept(self) -> None:
-        self.config_manager.get_config()[Config.WEEK_START] = self.ui.week_start_dropdown.currentIndex()
-        self.config_manager.write_config()
+        self._save()
         self.close()
 
 
