@@ -20,5 +20,29 @@ class Days:
 
 
 class Config:
-    WEEK_START = 'week_start'
-    DEFAULT_CONFIG = {WEEK_START: Days.SUNDAY}
+    WEEK_START = 'Week_Start'
+    USE_WEEK_START = 'Use_Week_Start'
+    RANGE_TYPE = 'Range_Type'
+    CUSTOM_RANGE = 'Custom_Range'
+    CUSTOM_TOTAL_TEXT = 'Custom_Total_Text'
+    CUSTOM_RANGE_TEXT = 'Custom_Range_Text'
+    PRIMARY_COLOR = 'Primary_Color'
+    SECONDARY_COLOR = 'Secondary_Color'
+    BROWSER_ENABLED = 'Browser_Enabled'
+    OVERVIEW_ENABLED = 'Overview_Enabled'
+    CONGRATS_ENABLED = 'Congrats_Enabled'
+    EXCLUDED_DIDS = "Excluded_Deck_IDs"
+    DEFAULT_CONFIG = {
+        WEEK_START: Days.SUNDAY,
+        USE_WEEK_START: False,
+        RANGE_TYPE: Range.WEEK,
+        CUSTOM_RANGE: 7,
+        CUSTOM_TOTAL_TEXT: '',
+        CUSTOM_RANGE_TEXT: '',
+        PRIMARY_COLOR: 'darkgray',
+        SECONDARY_COLOR: 'white',
+        BROWSER_ENABLED: True,
+        OVERVIEW_ENABLED: True,
+        CONGRATS_ENABLED: True,
+        EXCLUDED_DIDS: ['1']
+    }
