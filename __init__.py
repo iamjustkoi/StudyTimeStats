@@ -5,24 +5,25 @@ from aqt.deckbrowser import DeckBrowser
 from aqt.overview import Overview
 from datetime import timedelta, datetime, date
 from .config import TimeStatsConfigManager
-from .consts import Days, Text, RangeType, SPECIAL_DATE
+from .consts import Days, Text, RangeType, SPECIAL_DATE, Config
 from .options import TimeStatsOptionsDialog
 
-# Dynamic Vars
-Week_Start_Day = Days.MONDAY
-Range_Type = RangeType.CUSTOM
-Use_Calendar_Range = True
-Range_Days = RangeType.DAYS[Range_Type]
-Primary_Color = "darkgray"
-Secondary_Color = "white"
-Total_Label = Text.TOTAL
-Range_Label = Text.PAST_WEEK
-Custom_Days = 7
-Deckbrowser_Enabled = True
-Overview_Enabled = True
-Congrats_Enabled = True
-Excluded_DIDs = ['1']
+# Config Vars
+Config_Manager = TimeStatsConfigManager(mw, (date.today() - date.fromisoformat(SPECIAL_DATE)).days)
+Week_Start_Day = Config_Manager.config[Config.WEEK_START]
+Range_Type = Config_Manager.config[Config.RANGE_TYPE]
+Use_Calendar_Range = Config_Manager.config[Config.USE_CALENDAR_RANGE]
+Primary_Color = Config_Manager.config[Config.PRIMARY_COLOR]
+Secondary_Color = Config_Manager.config[Config.SECONDARY_COLOR]
+Total_Label = Config_Manager.config[Config.CUSTOM_TOTAL_TEXT]
+Range_Label = Config_Manager.config[Config.CUSTOM_RANGE_TEXT]
+Custom_Days = Config_Manager.config[Config.CUSTOM_RANGE]
+Deckbrowser_Enabled = Config_Manager.config[Config.BROWSER_ENABLED]
+Overview_Enabled = Config_Manager.config[Config.OVERVIEW_ENABLED]
+Congrats_Enabled = Config_Manager.config[Config.CONGRATS_ENABLED]
+Excluded_DIDs = Config_Manager.config[Config.EXCLUDED_DIDS]
 
+print(f'\nCONFIG: {Config_Manager.config}\n')
 
 html_shell = '''    
         <style>
@@ -55,10 +56,16 @@ html_shell = '''
 '''
 
 
+def initialize():
+    build_hooks()
+    build_actions()
+
+
 def build_hooks():
     from aqt import gui_hooks
     gui_hooks.webview_will_set_content.append(on_webview_will_set_content)
     gui_hooks.webview_did_inject_style_into_page.append(on_webview_did_inject_style_into_page)
+    # gui_hooks.main_window_did_init.append(load_config)
 
 
 def build_actions():
@@ -78,6 +85,7 @@ def on_webview_will_set_content(content: aqt.webview.WebContent, context: object
     if mw.col is None:
         print(f'--mw was NoneType')
         return
+
     if (isinstance(context, DeckBrowser) and Deckbrowser_Enabled) or \
             (isinstance(context, Overview) and Overview_Enabled and should_display_on_current_screen()):
         content.body += formatted_html()
@@ -87,17 +95,38 @@ def on_webview_did_inject_style_into_page(webview: aqt.webview.AnkiWebView):
     if mw.col is None:
         print(f'--mw was NoneType')
         return
+
     if webview.page().url().path().find('congrats.html') != -1 and Congrats_Enabled:
         if should_display_on_current_screen():
             webview.eval(f'''
                 if (document.getElementById("time_table") == null) document.body.innerHTML += `{formatted_html()}`''')
 
 
+# def load_config():
+#     global Config_Manager
+#     global Week_Start_Day, Range_Type, Use_Calendar_Range, Primary_Color, Secondary_Color
+#     global Total_Label, Range_Label, Custom_Days, Deckbrowser_Enabled, Overview_Enabled, Congrats_Enabled, Excluded_DIDs
+#
+#     Config_Manager = TimeStatsConfigManager(mw, (date.today() - date.fromisoformat(SPECIAL_DATE)).days)
+#
+#     # Config Vars
+#     Week_Start_Day = Config_Manager.config[Config.WEEK_START]
+#     Range_Type = Config_Manager.config[Config.RANGE_TYPE]
+#     Use_Calendar_Range = Config_Manager.config[Config.USE_CALENDAR_RANGE]
+#     Primary_Color = Config_Manager.config[Config.PRIMARY_COLOR]
+#     Secondary_Color = Config_Manager.config[Config.SECONDARY_COLOR]
+#     Total_Label = Config_Manager.config[Config.CUSTOM_TOTAL_TEXT]
+#     Range_Label = Config_Manager.config[Config.CUSTOM_RANGE_TEXT]
+#     Custom_Days = Config_Manager.config[Config.CUSTOM_RANGE]
+#     Deckbrowser_Enabled = Config_Manager.config[Config.BROWSER_ENABLED]
+#     Overview_Enabled = Config_Manager.config[Config.OVERVIEW_ENABLED]
+#     Congrats_Enabled = Config_Manager.config[Config.CONGRATS_ENABLED]
+#     Excluded_DIDs = Config_Manager.config[Config.EXCLUDED_DIDS]
+
+
 def on_options_called():
     # this is neat and all, but also maybe a date option for the custom filter might be nice...
-    max_range = (date.today() - date.fromisoformat(SPECIAL_DATE)).days
-    dialog = TimeStatsOptionsDialog(TimeStatsConfigManager(mw, max_range))
-    # dialog.exec()
+    dialog = TimeStatsOptionsDialog(Config_Manager)
     dialog.show()
 
 
@@ -126,7 +155,7 @@ def get_review_times() -> (float, float):
 
     rev_log = mw.col.db.all(revlog_cmd)
 
-    days_ago = Range_Days
+    days_ago = RangeType.DAYS[Range_Type]
     # Calendar Range Days-Ago Math!
     if Use_Calendar_Range:
         if Range_Type == RangeType.WEEK or Range_Type == RangeType.TWO_WEEKS:
@@ -188,5 +217,4 @@ def filter_revlog(rev_logs: [[int, int]], days_ago: int = None) -> [[int, int]]:
     return filtered_logs
 
 
-build_hooks()
-build_actions()
+initialize()
