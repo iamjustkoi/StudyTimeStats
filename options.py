@@ -1,7 +1,7 @@
 # from PyQt5.QtWidgets import QAction
 from aqt.qt import QDialog, QColorDialog, QColor, QLabel, QDialogButtonBox, QRect
 from .config import TimeStatsConfigManager
-from .consts import Config, Range, Text
+from .consts import Config, RangeType, Text
 from .options_dialog import Ui_OptionsDialog
 from aqt.studydeck import StudyDeck
 
@@ -31,7 +31,7 @@ class TimeStatsOptionsDialog(QDialog):
         self.close()
 
     def on_range_type_change(self, idx: int):
-        if idx == Range.CUSTOM:
+        if idx == RangeType.CUSTOM:
             self.ui.custom_range_spinbox.show()
             self.ui.use_calendar_checkbox.hide()
             self.ui.appearance_grid_layout.replaceWidget(self.ui.use_calendar_checkbox, self.ui.custom_range_spinbox)
@@ -55,17 +55,17 @@ class TimeStatsOptionsDialog(QDialog):
     def update_calendar_range_extras(self):
         self._redraw_cal_checkbox()
         dropdown_index = self.ui.range_select_dropdown.currentIndex()
-        if dropdown_index != Range.CUSTOM:
+        if dropdown_index != RangeType.CUSTOM:
             text_range = {
-                Range.WEEK: Text.WEEK,
-                Range.TWO_WEEKS: Text.WEEK,
-                Range.MONTH: Text.MONTH,
-                Range.YEAR: Text.YEAR
+                RangeType.WEEK: Text.WEEK,
+                RangeType.TWO_WEEKS: Text.WEEK,
+                RangeType.MONTH: Text.MONTH,
+                RangeType.YEAR: Text.YEAR
             }
             self.ui.use_calendar_checkbox.setText(f'{Text.USE_CALENDAR} {text_range[dropdown_index]}')
 
         using_calendar_range = self.ui.use_calendar_checkbox.isChecked()
-        if (dropdown_index == Range.WEEK or dropdown_index == Range.TWO_WEEKS) and using_calendar_range:
+        if (dropdown_index == RangeType.WEEK or dropdown_index == RangeType.TWO_WEEKS) and using_calendar_range:
             self.ui.week_start_dropdown.show()
             self.ui.week_start_label.show()
         else:

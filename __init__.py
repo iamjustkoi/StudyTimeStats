@@ -5,14 +5,14 @@ from aqt.deckbrowser import DeckBrowser
 from aqt.overview import Overview
 from datetime import timedelta, datetime, date
 from .config import TimeStatsConfigManager
-from .consts import Days, Text, Range
+from .consts import Days, Text, RangeType
 from .options import TimeStatsOptionsDialog
 
 # Dynamic Vars
-Week_Start_Day = Days.SATURDAY
-Range_Type = Range.WEEK
+Week_Start_Day = Days.MONDAY
+Range_Type = RangeType.TWO_WEEKS
 Use_Calendar_Range = True
-Range_Days = Range.TOTAL_DAYS[Range_Type]
+Range_Days = RangeType.DAYS[Range_Type]
 Primary_Color = "darkgray"
 Secondary_Color = "white"
 Total_Label = Text.TOTAL
@@ -146,26 +146,18 @@ def get_review_times() -> (float, float):
     days_ago = Range_Days
 
     if Use_Calendar_Range:
-        if Range_Type == Range.WEEK:
-            today = date.today()
-            if today.weekday() >= Week_Start_Day:
-                days_ago = (today.weekday() - Week_Start_Day)
+        if Range_Type == RangeType.WEEK or Range_Type == RangeType.TWO_WEEKS:
+            week_date = date.today() - timedelta(days=(RangeType.DAYS[Range_Type] - 7))
+            if week_date.weekday() >= Week_Start_Day:
+                days_ago = (week_date.weekday() - Week_Start_Day) + (RangeType.DAYS[Range_Type] - 7)
             else:
-                days_ago = (today.weekday() - Week_Start_Day) + Range.TOTAL_DAYS[Range.WEEK]
-        elif Range_Type == Range.TWO_WEEKS:
-            week_ago = date.today() - timedelta(days=Range.TOTAL_DAYS[Range.WEEK])
-            print(f'week_ago: {week_ago.ctime()}')
-            if week_ago.weekday() >= Week_Start_Day:
-                print(f' Using week only: ({week_ago.weekday()} - {Week_Start_Day}) + {Range.TOTAL_DAYS[Range.WEEK]}')
-                days_ago = (week_ago.weekday() - Week_Start_Day) + Range.TOTAL_DAYS[Range.WEEK]
-            else:
-                print(f' Using two weeks: ({week_ago.weekday()} - {Week_Start_Day}) + {Range.TOTAL_DAYS[Range.TWO_WEEKS]}')
-                days_ago = (week_ago.weekday() - Week_Start_Day) + Range.TOTAL_DAYS[Range.TWO_WEEKS]
-        elif Range_Type == Range.MONTH:
+                days_ago = (week_date.weekday() - Week_Start_Day) + (RangeType.DAYS[Range_Type])
+        elif Range_Type == RangeType.MONTH:
+            days_ago = (date.today() - date.today().replace(day=1)).days
             pass
-        elif Range_Type == Range.YEAR:
+        elif Range_Type == RangeType.YEAR:
             pass
-        elif Range_Type == Range.CUSTOM:
+        elif Range_Type == RangeType.CUSTOM:
             pass
 
     filtered_revlog = filter_revlog(rev_log, days_ago=days_ago)
