@@ -6,19 +6,8 @@ from .options_dialog import Ui_OptionsDialog
 from aqt.studydeck import StudyDeck
 
 
-def get_background_color(label: QLabel):
-    stylesheet = label.styleSheet()
-    return stylesheet.replace('QWidget {background-color: ', '').replace('}', '')
-
-
-def set_background_color(label: QLabel, hex_arg: str):
+def set_label_background(label: QLabel, hex_arg: str):
     label.setStyleSheet(f'QWidget {{background-color: {hex_arg}}}')
-
-
-def open_color_dialog(preview: QLabel):
-    color = QColorDialog.getColor(initial=QColor(get_background_color(preview)), options=QColorDialog.ShowAlphaChannel)
-    if color.isValid():
-        set_background_color(preview, color.name(QColor.HexArgb))
 
 
 class TimeStatsOptionsDialog(QDialog):
@@ -30,6 +19,9 @@ class TimeStatsOptionsDialog(QDialog):
         self.ui = Ui_OptionsDialog()
         self.ui.setupUi(OptionsDialog=self)
 
+        self._primary_color = self.config[Config.PRIMARY_COLOR]
+        self._secondary_color = self.config[Config.SECONDARY_COLOR]
+
         # Exclude Tab Button Actions
         self.ui.add_button.clicked.connect(self.on_add_clicked)
         self.ui.remove_button.clicked.connect(self.on_remove_clicked)
@@ -38,8 +30,8 @@ class TimeStatsOptionsDialog(QDialog):
         self.ui.confirm_button_box.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.on_restore_defaults)
 
         # Color Select Button
-        self.ui.primary_color_button.clicked.connect(lambda: open_color_dialog(self.ui.primary_color_preview))
-        self.ui.seconday_color_button.clicked.connect(lambda: open_color_dialog(self.ui.secondary_color_preview))
+        self.ui.primary_color_button.clicked.connect(lambda: self.open_color_dialog(self.ui.primary_color_preview))
+        self.ui.seconday_color_button.clicked.connect(lambda: self.open_color_dialog(self.ui.secondary_color_preview))
 
         # Range Button
         self.ui.range_select_dropdown.activated[int].connect(self.on_range_type_change)
@@ -52,6 +44,20 @@ class TimeStatsOptionsDialog(QDialog):
         self.ui.custom_range_spinbox.setMaximum(self.manager.max_range)
 
         self._load()
+
+    def open_color_dialog(self, preview: QLabel):
+        is_primary = preview.objectName() == self.ui.primary_color_preview.objectName()
+        selected_color = self._primary_color if is_primary else self._secondary_color
+
+        color = QColorDialog.getColor(initial=QColor(selected_color), options=QColorDialog.ShowAlphaChannel)
+
+        if color.isValid():
+            color_name = color.name(QColor.HexRgb)
+            set_label_background(preview, color_name)
+            if is_primary:
+                self._primary_color = color_name
+            else:
+                self._secondary_color = color_name
 
     def on_range_type_change(self, idx: int):
         if idx == RangeType.CUSTOM:
@@ -86,7 +92,7 @@ class TimeStatsOptionsDialog(QDialog):
     def on_remove_clicked(self):
         for item in self.ui.excluded_decks_list.selectedItems():
             self.excluded_deck_names.remove(item.text())
-            list(self.config[Config.EXCLUDED_DIDS]).remove(self.manager.decks.id(name=item.text(), create=False))
+            list(self.config[Config.EXCLUDED_DIDS]).remove(self.manager.get_decks().id(name=item.text(), create=False))
 
         self.ui.excluded_decks_list.clear()
         self.ui.excluded_decks_list.addItems(self.excluded_deck_names)
@@ -94,7 +100,7 @@ class TimeStatsOptionsDialog(QDialog):
     def on_deck_excluded(self, study_deck: StudyDeck):
         excluded_deck_name = study_deck.name
         self.excluded_deck_names += [excluded_deck_name]
-        self.config[Config.EXCLUDED_DIDS] += [self.manager.decks.id(name=excluded_deck_name, create=False)]
+        self.config[Config.EXCLUDED_DIDS] += [self.manager.get_decks().id(name=excluded_deck_name, create=False)]
         self.ui.excluded_decks_list.addItem(excluded_deck_name)
 
     def on_restore_defaults(self):
@@ -138,7 +144,7 @@ class TimeStatsOptionsDialog(QDialog):
 
     def _get_excluded_dids(self):
         names = [self.ui.excluded_decks_list.item(i).text() for i in range(self.ui.excluded_decks_list.count())]
-        return [self.manager.decks.id(item, create=False) for item in names]
+        return [self.manager.get_decks().id(item, create=False) for item in names]
 
     def _load(self):
         self.ui.week_start_dropdown.setCurrentIndex(self.config[Config.WEEK_START])
@@ -154,15 +160,15 @@ class TimeStatsOptionsDialog(QDialog):
         self.ui.ranged_line.setText(self.config[Config.CUSTOM_RANGE_TEXT])
 
         # Color Pickers
-        set_background_color(self.ui.primary_color_preview, self.config[Config.PRIMARY_COLOR])
-        set_background_color(self.ui.secondary_color_preview, self.config[Config.SECONDARY_COLOR])
+        set_label_background(self.ui.primary_color_preview, self.config[Config.PRIMARY_COLOR])
+        set_label_background(self.ui.secondary_color_preview, self.config[Config.SECONDARY_COLOR])
 
         self.ui.browser_checkbox.setChecked(self.config[Config.BROWSER_ENABLED])
         self.ui.overview_checkbox.setChecked(self.config[Config.OVERVIEW_ENABLED])
         self.ui.congrats_checkbox.setChecked(self.config[Config.CONGRATS_ENABLED])
 
         # Excluded Decks
-        self.excluded_deck_names = [self.manager.decks.name(i) for i in self.config.get(Config.EXCLUDED_DIDS)]
+        self.excluded_deck_names = [self.manager.get_decks().name(i) for i in self.config.get(Config.EXCLUDED_DIDS)]
         self.ui.excluded_decks_list.clear()
         self.ui.excluded_decks_list.addItems(self.excluded_deck_names)
 
@@ -175,8 +181,8 @@ class TimeStatsOptionsDialog(QDialog):
         self.config[Config.CUSTOM_RANGE_TEXT] = self.ui.ranged_line.text()
 
         # Primary Color css stylesheet
-        self.config[Config.PRIMARY_COLOR] = get_background_color(self.ui.primary_color_preview)
-        self.config[Config.SECONDARY_COLOR] = get_background_color(self.ui.secondary_color_preview)
+        self.config[Config.PRIMARY_COLOR] = self._primary_color
+        self.config[Config.SECONDARY_COLOR] = self._secondary_color
 
         self.config[Config.BROWSER_ENABLED] = self.ui.browser_checkbox.isChecked()
         self.config[Config.OVERVIEW_ENABLED] = self.ui.overview_checkbox.isChecked()
