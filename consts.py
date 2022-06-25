@@ -46,3 +46,6 @@ class Config:
         CONGRATS_ENABLED: True,
         EXCLUDED_DIDS: [1]
     }
+
+
+SPECIAL_DATE = '2006-10-05'
