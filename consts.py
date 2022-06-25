@@ -4,11 +4,15 @@ class Text:
     HRS = 'hrs'
     MIN = 'min'
     OPTIONS_ACTION = 'Study Time Stats Options...'
+    USE_CALENDAR = 'Use Calendar'
+    WEEK = 'Week'
+    MONTH = 'Month'
+    YEAR = 'Year'
 
 
 class Range:
     WEEK, TWO_WEEKS, MONTH, YEAR, CUSTOM = 0, 1, 2, 3, 4
-    DAYS = {WEEK: 7, TWO_WEEKS: 14, MONTH: 30, YEAR: 365, CUSTOM: 0}
+    TOTAL_DAYS = {WEEK: 7, TWO_WEEKS: 14, MONTH: 30, YEAR: 365, CUSTOM: 0}
 
 
 class Days:
@@ -17,7 +21,7 @@ class Days:
 
 class Config:
     WEEK_START = 'Week_Start'
-    USE_WEEK_START = 'Use_Week_Start'
+    USE_CALENDAR_RANGE = 'Use_Calendar_Range'
     RANGE_TYPE = 'Range_Type'
     CUSTOM_RANGE = 'Custom_Range'
     CUSTOM_TOTAL_TEXT = 'Custom_Total_Text'
@@ -30,7 +34,7 @@ class Config:
     EXCLUDED_DIDS = "Excluded_Deck_IDs"
     DEFAULT_CONFIG = {
         WEEK_START: Days.SUNDAY,
-        USE_WEEK_START: True,
+        USE_CALENDAR_RANGE: True,
         RANGE_TYPE: Range.WEEK,
         CUSTOM_RANGE: 7,
         CUSTOM_TOTAL_TEXT: '',
