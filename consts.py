@@ -5,7 +5,9 @@ class Text:
     MIN = 'min'
     OPTIONS_ACTION = 'Study Time Stats Options...'
     USE_CALENDAR = 'Use Calendar'
+    DAYS = 'Days'
     WEEK = 'Week'
+    TWO_WEEKS = '2 Weeks'
     MONTH = 'Month'
     YEAR = 'Year'
 
@@ -13,9 +15,15 @@ class Text:
 class RangeType:
     WEEK, TWO_WEEKS, MONTH, YEAR, CUSTOM = 0, 1, 2, 3, 4
     DAYS = {WEEK: 7, TWO_WEEKS: 14, MONTH: 30, YEAR: 365, CUSTOM: 0}
+    TEXT = {
+        WEEK: Text.WEEK,
+        TWO_WEEKS: Text.TWO_WEEKS,
+        MONTH: Text.MONTH,
+        YEAR: Text.YEAR
+    }
 
 
-class Days:
+class Weekday:
     MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY = 0, 1, 2, 3, 4, 5, 6
 
 
@@ -33,12 +41,12 @@ class Config:
     CONGRATS_ENABLED = 'Congrats_Enabled'
     EXCLUDED_DIDS = "Excluded_Deck_IDs"
     DEFAULT_CONFIG = {
-        WEEK_START: Days.SUNDAY,
+        WEEK_START: Weekday.SUNDAY,
         USE_CALENDAR_RANGE: True,
         RANGE_TYPE: RangeType.WEEK,
         CUSTOM_RANGE: 7,
         CUSTOM_TOTAL_TEXT: 'Total',
-        CUSTOM_RANGE_TEXT: 'Past Week',
+        CUSTOM_RANGE_TEXT: 'Past %s',
         PRIMARY_COLOR: 'darkgray',
         SECONDARY_COLOR: 'white',
         BROWSER_ENABLED: True,

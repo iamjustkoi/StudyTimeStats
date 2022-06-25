@@ -1,3 +1,4 @@
+import re
 import aqt.webview
 from aqt import mw
 from aqt.qt import QAction
@@ -7,9 +8,6 @@ from datetime import timedelta, datetime, date
 from .config import TimeStatsConfigManager
 from .consts import Text, RangeType, SPECIAL_DATE, Config
 from .options import TimeStatsOptionsDialog
-
-# Config Vars
-# Config_Manager = TimeStatsConfigManager(mw, (date.today() - date.fromisoformat(SPECIAL_DATE)).days)
 
 html_shell = '''    
         <style>
@@ -162,14 +160,26 @@ def formatted_html():
     total_unit = Text.HRS if total_hrs > 1 else Text.MIN
     range_unit = Text.HRS if ranged_hrs > 1 else Text.MIN
 
-    config_manager = get_config_manager()
+    addon_config = get_config_manager().config
+    html_string = html_shell.format(total_label=addon_config[Config.CUSTOM_TOTAL_TEXT],
+                                    range_label=addon_config[Config.CUSTOM_RANGE_TEXT],
+                                    total_value=total_val, range_value=range_val,
+                                    total_unit=total_unit, range_unit=range_unit,
+                                    primary_color=addon_config[Config.PRIMARY_COLOR],
+                                    secondary_color=addon_config[Config.SECONDARY_COLOR])
 
-    return html_shell.format(total_label=config_manager.config[Config.CUSTOM_TOTAL_TEXT],
-                             range_label=config_manager.config[Config.CUSTOM_RANGE_TEXT],
-                             total_value=total_val, range_value=range_val,
-                             total_unit=total_unit, range_unit=range_unit,
-                             primary_color=config_manager.config[Config.PRIMARY_COLOR],
-                             secondary_color=config_manager.config[Config.SECONDARY_COLOR])
+    if re.search(r'(?<!%)%range', html_string):
+        if addon_config[Config.RANGE_TYPE] != RangeType.CUSTOM:
+            print(f'Will format with: %range again: %range'.replace('%range', RangeType.TEXT[addon_config[
+                Config.RANGE_TYPE]]))
+            range_text = RangeType.TEXT[addon_config[Config.RANGE_TYPE]]
+        else:
+            range_text = f'{addon_config[Config.CUSTOM_RANGE]} {Text.DAYS}'
+        html_string = html_string.replace('%range', range_text)
+    elif re.search(r'%%', html_string):
+        html_string = html_string.replace('%%', '%')
+
+    return html_string
 
 
 def offset_date(dt: datetime, hours: int = 0):
