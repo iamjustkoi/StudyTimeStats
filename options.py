@@ -118,13 +118,8 @@ class TimeStatsOptionsDialog(QDialog):
         self._redraw_cal_checkbox()
         dropdown_index = self.ui.range_select_dropdown.currentIndex()
         if dropdown_index != RangeType.CUSTOM:
-            text_range = {
-                RangeType.WEEK: Text.WEEK,
-                RangeType.TWO_WEEKS: Text.WEEK,
-                RangeType.MONTH: Text.MONTH,
-                RangeType.YEAR: Text.YEAR
-            }
-            self.ui.use_calendar_checkbox.setText(f'{Text.USE_CALENDAR} {text_range[dropdown_index]}')
+            type_index = dropdown_index if dropdown_index != RangeType.TWO_WEEKS else RangeType.WEEK
+            self.ui.use_calendar_checkbox.setText(f'{Text.USE_CALENDAR} {RangeType.TEXT[type_index]}')
 
         using_calendar_range = self.ui.use_calendar_checkbox.isChecked()
         if (dropdown_index == RangeType.WEEK or dropdown_index == RangeType.TWO_WEEKS) and using_calendar_range:
