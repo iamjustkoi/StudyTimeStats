@@ -9,9 +9,9 @@ from .consts import Days, Text, Range
 from .options import TimeStatsOptionsDialog
 
 # Dynamic Vars
-Week_Start_Day = Days.FRIDAY
-Use_Calendar_Range = True
+Week_Start_Day = Days.SATURDAY
 Range_Type = Range.WEEK
+Use_Calendar_Range = True
 Range_Days = Range.TOTAL_DAYS[Range_Type]
 Primary_Color = "darkgray"
 Secondary_Color = "white"
@@ -142,19 +142,33 @@ def get_review_times() -> (float, float):
     #
     # else:
     #     print(f'ago_input: {Range_Days}')
-    filtered_revlog = filter_revlog(rev_log, days_ago=Range_Days)
 
-    if Range_Type == Range.WEEK:
+    days_ago = Range_Days
 
-        pass
-    elif Range_Type == Range.TWO_WEEKS:
-        pass
-    elif Range_Type == Range.MONTH:
-        pass
-    elif Range_Type == Range.YEAR:
-        pass
-    elif Range_Type == Range.CUSTOM:
-        pass
+    if Use_Calendar_Range:
+        if Range_Type == Range.WEEK:
+            today = date.today()
+            if today.weekday() >= Week_Start_Day:
+                days_ago = (today.weekday() - Week_Start_Day)
+            else:
+                days_ago = (today.weekday() - Week_Start_Day) + Range.TOTAL_DAYS[Range.WEEK]
+        elif Range_Type == Range.TWO_WEEKS:
+            week_ago = date.today() - timedelta(days=Range.TOTAL_DAYS[Range.WEEK])
+            print(f'week_ago: {week_ago.ctime()}')
+            if week_ago.weekday() >= Week_Start_Day:
+                print(f' Using week only: ({week_ago.weekday()} - {Week_Start_Day}) + {Range.TOTAL_DAYS[Range.WEEK]}')
+                days_ago = (week_ago.weekday() - Week_Start_Day) + Range.TOTAL_DAYS[Range.WEEK]
+            else:
+                print(f' Using two weeks: ({week_ago.weekday()} - {Week_Start_Day}) + {Range.TOTAL_DAYS[Range.TWO_WEEKS]}')
+                days_ago = (week_ago.weekday() - Week_Start_Day) + Range.TOTAL_DAYS[Range.TWO_WEEKS]
+        elif Range_Type == Range.MONTH:
+            pass
+        elif Range_Type == Range.YEAR:
+            pass
+        elif Range_Type == Range.CUSTOM:
+            pass
+
+    filtered_revlog = filter_revlog(rev_log, days_ago=days_ago)
 
     all_rev_times_ms = [log[1] for log in rev_log[0:]]
     filtered_rev_times_ms = [log[1] for log in filtered_revlog[0:]]
@@ -195,7 +209,7 @@ def filter_revlog(rev_logs: [[int, int]], days_ago: int = None) -> [[int, int]]:
         log_date = datetime.fromtimestamp(log_epoch_seconds)
 
         log_days_ago = offset_date(datetime.now(), offset_hour) - log_date
-        if log_days_ago.days < days_ago:
+        if log_days_ago.days <= days_ago:
             filtered_logs.append(log)
 
         # if days_ago is not None:
