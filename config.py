@@ -8,7 +8,7 @@ class TimeStatsConfigManager:
     Generic config manager for accessing and storing add-on's properties.
     """
 
-    def __init__(self, mw: AnkiQt):
+    def __init__(self, mw: AnkiQt, max_filter_range: int):
         super().__init__()
         self.mw = mw
         self._addon = self.mw.addonManager.addonFromModule(__name__)
@@ -16,6 +16,7 @@ class TimeStatsConfigManager:
 
         self.config = self._meta.get('config', Config.DEFAULT_CONFIG)
         self.decks = self.mw.col.decks
+        self.max_range = max_filter_range
 
         for field in Config.DEFAULT_CONFIG:
             if field not in self.config:

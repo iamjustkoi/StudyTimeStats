@@ -131,6 +131,7 @@ class TimeStatsOptionsDialog(QDialog):
             ui.range_select_dropdown.activated[int].connect(self.on_range_type_change)
             # ui.use_calendar_checkbox.activated[bool].connect(self.update_calendar_range_extras)
             ui.use_calendar_checkbox.clicked.connect(self.update_calendar_range_extras)
+            ui.custom_range_spinbox.setMaximum(self.manager.max_range)
 
         ui.week_start_dropdown.setCurrentIndex(self.config[Config.WEEK_START])
 

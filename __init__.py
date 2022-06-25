@@ -5,7 +5,7 @@ from aqt.deckbrowser import DeckBrowser
 from aqt.overview import Overview
 from datetime import timedelta, datetime, date
 from .config import TimeStatsConfigManager
-from .consts import Days, Text, RangeType
+from .consts import Days, Text, RangeType, SPECIAL_DATE
 from .options import TimeStatsOptionsDialog
 
 # Dynamic Vars
@@ -94,7 +94,9 @@ def on_webview_did_inject_style_into_page(webview: aqt.webview.AnkiWebView):
 
 
 def on_options_called():
-    dialog = TimeStatsOptionsDialog(TimeStatsConfigManager(mw))
+    # this is neat and all, but also maybe a date option for the custom filter might be nice...
+    max_range = (date.today() - date.fromisoformat(SPECIAL_DATE)).days
+    dialog = TimeStatsOptionsDialog(TimeStatsConfigManager(mw, max_range))
     dialog.exec()
 
 
@@ -122,26 +124,6 @@ def get_review_times() -> (float, float):
     revlog_cmd = f'SELECT id, time FROM revlog WHERE cid in {formatted_cids}'
 
     rev_log = mw.col.db.all(revlog_cmd)
-
-    # if date.today().weekday() >= Week_Start_Day:
-    #     print(f'was greater than start day')
-    #     date_at_range = date.today() - timedelta(days=Range_Days - Range.WEEK)
-    # else:
-    #     print(f'was less than start day')
-    #     date_at_range = date.today() - timedelta(days=Range_Days)
-    #
-    # if Use_Week_Start:
-    #     days_since_week_start = Range_Days + (date_at_range.weekday() - Week_Start_Day)
-    #
-    #     print(f'({date_at_range.strftime("%A")} - day({Week_Start_Day})): ({date_at_range.weekday()} -'
-    #           f' {Week_Start_Day}) '
-    #           f'= {(date_at_range.weekday() - Week_Start_Day)}')
-    #
-    #     print(f'since_input: {days_since_week_start}')
-    #     filtered_revlog = filter_revlog(rev_log, days_ago=days_since_week_start)
-    #
-    # else:
-    #     print(f'ago_input: {Range_Days}')
 
     days_ago = Range_Days
     # Calendar Range Days-Ago Math!
