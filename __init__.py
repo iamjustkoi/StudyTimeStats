@@ -5,17 +5,19 @@ from aqt.deckbrowser import DeckBrowser
 from aqt.overview import Overview
 from datetime import timedelta, datetime, date
 from .config import TimeStatsConfigManager
-from .consts import Days, Text
+from .consts import Days, Text, Range
 from .options import TimeStatsOptionsDialog
 
 # Dynamic Vars
-Week_Start_Day = Days.MONDAY
+Week_Start_Day = Days.FRIDAY
+Use_Calendar_Range = True
+Range_Type = Range.WEEK
+Range_Days = Range.TOTAL_DAYS[Range_Type]
 Primary_Color = "darkgray"
 Secondary_Color = "white"
 Total_Label = Text.TOTAL
 Range_Label = Text.PAST_WEEK
-# range_type = Range.WEEK
-# range_days = Range.DAYS[Range.WEEK]
+Custom_Days = 12
 Deckbrowser_Enabled = True
 Overview_Enabled = True
 Congrats_Enabled = True
@@ -116,20 +118,43 @@ def get_review_times() -> (float, float):
     dids_as_args = '(' + ', '.join(dids) + ')'
     cids_cmd = f'SELECT id FROM cards WHERE did in {dids_as_args}\n'
     cids = mw.col.db.all(cids_cmd)
-
     formatted_cids = '(' + (str(cids).replace('[', '').replace(']', '')) + ')'
     revlog_cmd = f'SELECT id, time FROM revlog WHERE cid in {formatted_cids}'
+
     rev_log = mw.col.db.all(revlog_cmd)
 
-    current_date = date.today()
-    if current_date.weekday() >= Week_Start_Day:
-        days_since_week_start = (current_date.weekday() - Week_Start_Day)
-    else:
-        days_since_week_start = (current_date.weekday() - Week_Start_Day) + 7
+    # if date.today().weekday() >= Week_Start_Day:
+    #     print(f'was greater than start day')
+    #     date_at_range = date.today() - timedelta(days=Range_Days - Range.WEEK)
+    # else:
+    #     print(f'was less than start day')
+    #     date_at_range = date.today() - timedelta(days=Range_Days)
+    #
+    # if Use_Week_Start:
+    #     days_since_week_start = Range_Days + (date_at_range.weekday() - Week_Start_Day)
+    #
+    #     print(f'({date_at_range.strftime("%A")} - day({Week_Start_Day})): ({date_at_range.weekday()} -'
+    #           f' {Week_Start_Day}) '
+    #           f'= {(date_at_range.weekday() - Week_Start_Day)}')
+    #
+    #     print(f'since_input: {days_since_week_start}')
+    #     filtered_revlog = filter_revlog(rev_log, days_ago=days_since_week_start)
+    #
+    # else:
+    #     print(f'ago_input: {Range_Days}')
+    filtered_revlog = filter_revlog(rev_log, days_ago=Range_Days)
 
-    prev_start_date = current_date - timedelta(days=days_since_week_start)
-    prev_start_datetime = datetime(prev_start_date.year, prev_start_date.month, prev_start_date.day)
-    filtered_revlog = filter_revlog(rev_log, after=prev_start_datetime)
+    if Range_Type == Range.WEEK:
+
+        pass
+    elif Range_Type == Range.TWO_WEEKS:
+        pass
+    elif Range_Type == Range.MONTH:
+        pass
+    elif Range_Type == Range.YEAR:
+        pass
+    elif Range_Type == Range.CUSTOM:
+        pass
 
     all_rev_times_ms = [log[1] for log in rev_log[0:]]
     filtered_rev_times_ms = [log[1] for log in filtered_revlog[0:]]
@@ -155,23 +180,32 @@ def offset_date(dt: datetime, hours: int = 0):
     return dt + timedelta(hours=hours)
 
 
-def filter_revlog(rev_logs: [[int, int]], days_ago: int = None, after: datetime = None) -> [[int, int]]:
+def filter_revlog(rev_logs: [[int, int]], days_ago: int = None) -> [[int, int]]:
     offset_hour = mw.col.get_preferences().scheduling.rollover
-    print(f'check against: {offset_date(after, offset_hour)}')
+
+    current_date = date.today()
+    prev_start_date = current_date - timedelta(days=days_ago)
+    prev_start_datetime = datetime(prev_start_date.year, prev_start_date.month, prev_start_date.day)
+    date_ago = offset_date(prev_start_datetime, offset_hour)
+    print(f'check against: {date_ago}, on: {date_ago.strftime("%a")}, days ago: {days_ago}')
 
     filtered_logs = []
     for log in rev_logs[0:]:
         log_epoch_seconds = log[0] / 1000
         log_date = datetime.fromtimestamp(log_epoch_seconds)
 
-        if days_ago is not None:
-            log_days_ago = offset_date(datetime.now(), offset_hour) - log_date
-            if log_days_ago.days < days_ago:
-                filtered_logs.append(log)
-        elif after is not None:
-            log_days_after = (log_date - offset_date(after, offset_hour)).days
-            if log_days_after >= 0:
-                filtered_logs.append(log)
+        log_days_ago = offset_date(datetime.now(), offset_hour) - log_date
+        if log_days_ago.days < days_ago:
+            filtered_logs.append(log)
+
+        # if days_ago is not None:
+        #     log_days_ago = offset_date(datetime.now(), offset_hour) - log_date
+        #     if log_days_ago.days < days_ago:
+        #         filtered_logs.append(log)
+        # elif after is not None:
+        #     log_days_after = (log_date - offset_date(after, offset_hour)).days
+        #     if log_days_after >= 0:
+        #         filtered_logs.append(log)
 
     return filtered_logs
 
