@@ -156,7 +156,9 @@ class TimeStatsOptionsDialog(QDialog):
 
         # Color Pickers
         set_label_background(self.ui.primary_color_preview, self.config[Config.PRIMARY_COLOR])
+        self._primary_color = self.config[Config.PRIMARY_COLOR]
         set_label_background(self.ui.secondary_color_preview, self.config[Config.SECONDARY_COLOR])
+        self._secondary_color = self.config[Config.SECONDARY_COLOR]
 
         self.ui.browser_checkbox.setChecked(self.config[Config.BROWSER_ENABLED])
         self.ui.overview_checkbox.setChecked(self.config[Config.OVERVIEW_ENABLED])
@@ -186,4 +188,4 @@ class TimeStatsOptionsDialog(QDialog):
         self.config[Config.EXCLUDED_DIDS] = self._get_excluded_dids()
 
         self.manager.write_config()
-        self.manager.reload()
+        self.manager.mw.reset()
