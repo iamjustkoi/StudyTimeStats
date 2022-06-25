@@ -10,14 +10,14 @@ from .options import TimeStatsOptionsDialog
 
 # Dynamic Vars
 Week_Start_Day = Days.MONDAY
-Range_Type = RangeType.TWO_WEEKS
+Range_Type = RangeType.CUSTOM
 Use_Calendar_Range = True
 Range_Days = RangeType.DAYS[Range_Type]
 Primary_Color = "darkgray"
 Secondary_Color = "white"
 Total_Label = Text.TOTAL
 Range_Label = Text.PAST_WEEK
-Custom_Days = 12
+Custom_Days = 7
 Deckbrowser_Enabled = True
 Overview_Enabled = True
 Congrats_Enabled = True
@@ -144,7 +144,7 @@ def get_review_times() -> (float, float):
     #     print(f'ago_input: {Range_Days}')
 
     days_ago = Range_Days
-
+    # Calendar Range Days-Ago Math!
     if Use_Calendar_Range:
         if Range_Type == RangeType.WEEK or Range_Type == RangeType.TWO_WEEKS:
             week_date = date.today() - timedelta(days=(RangeType.DAYS[Range_Type] - 7))
@@ -154,12 +154,10 @@ def get_review_times() -> (float, float):
                 days_ago = (week_date.weekday() - Week_Start_Day) + (RangeType.DAYS[Range_Type])
         elif Range_Type == RangeType.MONTH:
             days_ago = (date.today() - date.today().replace(day=1)).days
-            pass
         elif Range_Type == RangeType.YEAR:
-            pass
+            days_ago = (date.today() - date.today().replace(month=1, day=1)).days
         elif Range_Type == RangeType.CUSTOM:
-            pass
-
+            days_ago = Custom_Days
     filtered_revlog = filter_revlog(rev_log, days_ago=days_ago)
 
     all_rev_times_ms = [log[1] for log in rev_log[0:]]
@@ -203,15 +201,6 @@ def filter_revlog(rev_logs: [[int, int]], days_ago: int = None) -> [[int, int]]:
         log_days_ago = offset_date(datetime.now(), offset_hour) - log_date
         if log_days_ago.days <= days_ago:
             filtered_logs.append(log)
-
-        # if days_ago is not None:
-        #     log_days_ago = offset_date(datetime.now(), offset_hour) - log_date
-        #     if log_days_ago.days < days_ago:
-        #         filtered_logs.append(log)
-        # elif after is not None:
-        #     log_days_after = (log_date - offset_date(after, offset_hour)).days
-        #     if log_days_after >= 0:
-        #         filtered_logs.append(log)
 
     return filtered_logs
 
