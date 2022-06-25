@@ -97,7 +97,8 @@ def on_options_called():
     # this is neat and all, but also maybe a date option for the custom filter might be nice...
     max_range = (date.today() - date.fromisoformat(SPECIAL_DATE)).days
     dialog = TimeStatsOptionsDialog(TimeStatsConfigManager(mw, max_range))
-    dialog.exec()
+    # dialog.exec()
+    dialog.show()
 
 
 def should_display_on_current_screen():

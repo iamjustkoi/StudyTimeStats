@@ -14,7 +14,9 @@ from PyQt5 import QtCore, QtWidgets
 class Ui_OptionsDialog(object):
     def setupUi(self, OptionsDialog):
         OptionsDialog.setObjectName("OptionsDialog")
-        OptionsDialog.resize(402, 380)
+        OptionsDialog.setWindowModality(QtCore.Qt.ApplicationModal)
+        OptionsDialog.resize(472, 380)
+        OptionsDialog.setModal(False)
         self.options_vert_layout = QtWidgets.QVBoxLayout(OptionsDialog)
         self.options_vert_layout.setObjectName("options_vert_layout")
         self.tabs_widget = QtWidgets.QTabWidget(OptionsDialog)
