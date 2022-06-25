@@ -10,9 +10,9 @@ class Text:
     YEAR = 'Year'
 
 
-class Range:
+class RangeType:
     WEEK, TWO_WEEKS, MONTH, YEAR, CUSTOM = 0, 1, 2, 3, 4
-    TOTAL_DAYS = {WEEK: 7, TWO_WEEKS: 14, MONTH: 30, YEAR: 365, CUSTOM: 0}
+    DAYS = {WEEK: 7, TWO_WEEKS: 14, MONTH: 30, YEAR: 365, CUSTOM: 0}
 
 
 class Days:
@@ -35,7 +35,7 @@ class Config:
     DEFAULT_CONFIG = {
         WEEK_START: Days.SUNDAY,
         USE_CALENDAR_RANGE: True,
-        RANGE_TYPE: Range.WEEK,
+        RANGE_TYPE: RangeType.WEEK,
         CUSTOM_RANGE: 7,
         CUSTOM_TOTAL_TEXT: '',
         CUSTOM_RANGE_TEXT: '',
