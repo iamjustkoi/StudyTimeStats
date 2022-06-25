@@ -3,16 +3,22 @@
  <author>JustKoi</author>
  <class>OptionsDialog</class>
  <widget class="QDialog" name="OptionsDialog">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>402</width>
+    <width>472</width>
     <height>380</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Study TIme Stats Options</string>
+  </property>
+  <property name="modal">
+   <bool>false</bool>
   </property>
   <layout class="QVBoxLayout" name="options_vert_layout">
    <item>
