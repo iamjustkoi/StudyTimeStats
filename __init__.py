@@ -5,25 +5,11 @@ from aqt.deckbrowser import DeckBrowser
 from aqt.overview import Overview
 from datetime import timedelta, datetime, date
 from .config import TimeStatsConfigManager
-from .consts import Days, Text, RangeType, SPECIAL_DATE, Config
+from .consts import Text, RangeType, SPECIAL_DATE, Config
 from .options import TimeStatsOptionsDialog
 
 # Config Vars
-Config_Manager = TimeStatsConfigManager(mw, (date.today() - date.fromisoformat(SPECIAL_DATE)).days)
-Week_Start_Day = Config_Manager.config[Config.WEEK_START]
-Range_Type = Config_Manager.config[Config.RANGE_TYPE]
-Use_Calendar_Range = Config_Manager.config[Config.USE_CALENDAR_RANGE]
-Primary_Color = Config_Manager.config[Config.PRIMARY_COLOR]
-Secondary_Color = Config_Manager.config[Config.SECONDARY_COLOR]
-Total_Label = Config_Manager.config[Config.CUSTOM_TOTAL_TEXT]
-Range_Label = Config_Manager.config[Config.CUSTOM_RANGE_TEXT]
-Custom_Days = Config_Manager.config[Config.CUSTOM_RANGE]
-Deckbrowser_Enabled = Config_Manager.config[Config.BROWSER_ENABLED]
-Overview_Enabled = Config_Manager.config[Config.OVERVIEW_ENABLED]
-Congrats_Enabled = Config_Manager.config[Config.CONGRATS_ENABLED]
-Excluded_DIDs = Config_Manager.config[Config.EXCLUDED_DIDS]
-
-print(f'\nCONFIG: {Config_Manager.config}\n')
+# Config_Manager = TimeStatsConfigManager(mw, (date.today() - date.fromisoformat(SPECIAL_DATE)).days)
 
 html_shell = '''    
         <style>
@@ -65,7 +51,6 @@ def build_hooks():
     from aqt import gui_hooks
     gui_hooks.webview_will_set_content.append(on_webview_will_set_content)
     gui_hooks.webview_did_inject_style_into_page.append(on_webview_did_inject_style_into_page)
-    # gui_hooks.main_window_did_init.append(load_config)
 
 
 def build_actions():
@@ -77,61 +62,48 @@ def build_actions():
         mw.form.menuTools.removeAction(options_action)
 
     mw.form.menuTools.addAction(options_action)
-
     mw.addonManager.setConfigAction(__name__, on_options_called)
+
+
+def get_config_manager():
+    return TimeStatsConfigManager(mw, (date.today() - date.fromisoformat(SPECIAL_DATE)).days)
 
 
 def on_webview_will_set_content(content: aqt.webview.WebContent, context: object or None):
     if mw.col is None:
-        print(f'--mw was NoneType')
+        print(f'--Anki Window was NoneType')
         return
 
-    if (isinstance(context, DeckBrowser) and Deckbrowser_Enabled) or \
-            (isinstance(context, Overview) and Overview_Enabled and should_display_on_current_screen()):
+    config_manager = get_config_manager()
+
+    if (isinstance(context, DeckBrowser) and config_manager.config[Config.BROWSER_ENABLED]) or \
+            (isinstance(context, Overview) and config_manager.config[Config.OVERVIEW_ENABLED] and
+             should_display_on_current_screen()):
         content.body += formatted_html()
 
 
 def on_webview_did_inject_style_into_page(webview: aqt.webview.AnkiWebView):
     if mw.col is None:
-        print(f'--mw was NoneType')
+        print(f'--Anki Window was NoneType')
         return
 
-    if webview.page().url().path().find('congrats.html') != -1 and Congrats_Enabled:
+    config_manager = get_config_manager()
+
+    if webview.page().url().path().find('congrats.html') != -1 and config_manager.config[Config.CONGRATS_ENABLED]:
         if should_display_on_current_screen():
-            webview.eval(f'''
-                if (document.getElementById("time_table") == null) document.body.innerHTML += `{formatted_html()}`''')
-
-
-# def load_config():
-#     global Config_Manager
-#     global Week_Start_Day, Range_Type, Use_Calendar_Range, Primary_Color, Secondary_Color
-#     global Total_Label, Range_Label, Custom_Days, Deckbrowser_Enabled, Overview_Enabled, Congrats_Enabled, Excluded_DIDs
-#
-#     Config_Manager = TimeStatsConfigManager(mw, (date.today() - date.fromisoformat(SPECIAL_DATE)).days)
-#
-#     # Config Vars
-#     Week_Start_Day = Config_Manager.config[Config.WEEK_START]
-#     Range_Type = Config_Manager.config[Config.RANGE_TYPE]
-#     Use_Calendar_Range = Config_Manager.config[Config.USE_CALENDAR_RANGE]
-#     Primary_Color = Config_Manager.config[Config.PRIMARY_COLOR]
-#     Secondary_Color = Config_Manager.config[Config.SECONDARY_COLOR]
-#     Total_Label = Config_Manager.config[Config.CUSTOM_TOTAL_TEXT]
-#     Range_Label = Config_Manager.config[Config.CUSTOM_RANGE_TEXT]
-#     Custom_Days = Config_Manager.config[Config.CUSTOM_RANGE]
-#     Deckbrowser_Enabled = Config_Manager.config[Config.BROWSER_ENABLED]
-#     Overview_Enabled = Config_Manager.config[Config.OVERVIEW_ENABLED]
-#     Congrats_Enabled = Config_Manager.config[Config.CONGRATS_ENABLED]
-#     Excluded_DIDs = Config_Manager.config[Config.EXCLUDED_DIDS]
+            webview.eval(
+                f'if (document.getElementById("time_table") == null) document.body.innerHTML += `{formatted_html()}`'
+            )
 
 
 def on_options_called():
     # this is neat and all, but also maybe a date option for the custom filter might be nice...
-    dialog = TimeStatsOptionsDialog(Config_Manager)
+    dialog = TimeStatsOptionsDialog(get_config_manager())
     dialog.show()
 
 
 def should_display_on_current_screen():
-    return str(mw.col.decks.current().get('id')) not in Excluded_DIDs
+    return str(mw.col.decks.current().get('id')) not in get_config_manager().config[Config.EXCLUDED_DIDS]
 
 
 def get_review_times() -> (float, float):
@@ -141,7 +113,7 @@ def get_review_times() -> (float, float):
     else:
         dids = mw.col.decks.all_ids()
 
-    for excluded_did in Excluded_DIDs:
+    for excluded_did in get_config_manager().config[Config.EXCLUDED_DIDS]:
         if excluded_did in dids:
             dids.remove(str(excluded_did))
 
@@ -155,21 +127,25 @@ def get_review_times() -> (float, float):
 
     rev_log = mw.col.db.all(revlog_cmd)
 
-    days_ago = RangeType.DAYS[Range_Type]
+    config_manager = get_config_manager()
+
+    range_type = config_manager.config[Config.RANGE_TYPE]
+    days_ago = RangeType.DAYS[range_type]
     # Calendar Range Days-Ago Math!
-    if Use_Calendar_Range:
-        if Range_Type == RangeType.WEEK or Range_Type == RangeType.TWO_WEEKS:
-            week_date = date.today() - timedelta(days=(RangeType.DAYS[Range_Type] - 7))
-            if week_date.weekday() >= Week_Start_Day:
-                days_ago = (week_date.weekday() - Week_Start_Day) + (RangeType.DAYS[Range_Type] - 7)
+    if config_manager.config[Config.USE_CALENDAR_RANGE]:
+        if range_type == RangeType.WEEK or range_type == RangeType.TWO_WEEKS:
+            week_date = date.today() - timedelta(days=(RangeType.DAYS[range_type] - 7))
+            week_start_day = config_manager.config[Config.WEEK_START]
+            if week_date.weekday() >= week_start_day:
+                days_ago = (week_date.weekday() - week_start_day) + (RangeType.DAYS[range_type] - 7)
             else:
-                days_ago = (week_date.weekday() - Week_Start_Day) + (RangeType.DAYS[Range_Type])
-        elif Range_Type == RangeType.MONTH:
+                days_ago = (week_date.weekday() - week_start_day) + (RangeType.DAYS[range_type])
+        elif range_type == RangeType.MONTH:
             days_ago = (date.today() - date.today().replace(day=1)).days
-        elif Range_Type == RangeType.YEAR:
+        elif range_type == RangeType.YEAR:
             days_ago = (date.today() - date.today().replace(month=1, day=1)).days
-        elif Range_Type == RangeType.CUSTOM:
-            days_ago = Custom_Days
+        elif range_type == RangeType.CUSTOM:
+            days_ago = config_manager.config[Config.CUSTOM_RANGE]
     filtered_revlog = filter_revlog(rev_log, days_ago=days_ago)
 
     all_rev_times_ms = [log[1] for log in rev_log[0:]]
@@ -186,10 +162,14 @@ def formatted_html():
     total_unit = Text.HRS if total_hrs > 1 else Text.MIN
     range_unit = Text.HRS if ranged_hrs > 1 else Text.MIN
 
-    return html_shell.format(total_label=Total_Label, range_label=Range_Label,
+    config_manager = get_config_manager()
+
+    return html_shell.format(total_label=config_manager.config[Config.CUSTOM_TOTAL_TEXT],
+                             range_label=config_manager.config[Config.CUSTOM_RANGE_TEXT],
                              total_value=total_val, range_value=range_val,
                              total_unit=total_unit, range_unit=range_unit,
-                             primary_color=Primary_Color, secondary_color=Secondary_Color)
+                             primary_color=config_manager.config[Config.PRIMARY_COLOR],
+                             secondary_color=config_manager.config[Config.SECONDARY_COLOR])
 
 
 def offset_date(dt: datetime, hours: int = 0):

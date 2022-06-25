@@ -85,14 +85,14 @@ class TimeStatsOptionsDialog(QDialog):
         )
 
         # Filter out currently excluded and redraw the study deck dialog
-        deck_dialog.form.buttonBox.removeButton(deck_dialog.form.buttonBox.button(QDialogButtonBox.StandardButton.Help))
+        deck_dialog.form.buttonBox.removeButton(deck_dialog.form.buttonBox.button(QDialogButtonBox.Help))
         deck_dialog.origNames = list(filter(lambda name: name not in self.excluded_deck_names, deck_dialog.names))
         deck_dialog.redraw('')
 
     def on_remove_clicked(self):
         for item in self.ui.excluded_decks_list.selectedItems():
             self.excluded_deck_names.remove(item.text())
-            list(self.config[Config.EXCLUDED_DIDS]).remove(self.manager.get_decks().id(name=item.text(), create=False))
+            list(self.config[Config.EXCLUDED_DIDS]).remove(self.manager.decks.id(name=item.text(), create=False))
 
         self.ui.excluded_decks_list.clear()
         self.ui.excluded_decks_list.addItems(self.excluded_deck_names)
@@ -100,7 +100,7 @@ class TimeStatsOptionsDialog(QDialog):
     def on_deck_excluded(self, study_deck: StudyDeck):
         excluded_deck_name = study_deck.name
         self.excluded_deck_names += [excluded_deck_name]
-        self.config[Config.EXCLUDED_DIDS] += [self.manager.get_decks().id(name=excluded_deck_name, create=False)]
+        self.config[Config.EXCLUDED_DIDS] += [self.manager.decks.id(name=excluded_deck_name, create=False)]
         self.ui.excluded_decks_list.addItem(excluded_deck_name)
 
     def on_restore_defaults(self):
@@ -144,7 +144,7 @@ class TimeStatsOptionsDialog(QDialog):
 
     def _get_excluded_dids(self):
         names = [self.ui.excluded_decks_list.item(i).text() for i in range(self.ui.excluded_decks_list.count())]
-        return [self.manager.get_decks().id(item, create=False) for item in names]
+        return [self.manager.decks.id(item, create=False) for item in names]
 
     def _load(self):
         self.ui.week_start_dropdown.setCurrentIndex(self.config[Config.WEEK_START])
@@ -168,7 +168,7 @@ class TimeStatsOptionsDialog(QDialog):
         self.ui.congrats_checkbox.setChecked(self.config[Config.CONGRATS_ENABLED])
 
         # Excluded Decks
-        self.excluded_deck_names = [self.manager.get_decks().name(i) for i in self.config.get(Config.EXCLUDED_DIDS)]
+        self.excluded_deck_names = [self.manager.decks.name(i) for i in self.config.get(Config.EXCLUDED_DIDS)]
         self.ui.excluded_decks_list.clear()
         self.ui.excluded_decks_list.addItems(self.excluded_deck_names)
 
@@ -191,4 +191,4 @@ class TimeStatsOptionsDialog(QDialog):
         self.config[Config.EXCLUDED_DIDS] = self._get_excluded_dids()
 
         self.manager.write_config()
-        print(f'Result Config: {self.config}')
+        self.manager.reload()

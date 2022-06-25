@@ -3,15 +3,6 @@ from aqt import AnkiQt
 from .consts import Config
 
 
-class DeckManager:
-    def name(self, did: int or str):
-        return None
-
-    def id(self, name: str, create: bool = False):
-        return None
-    pass
-
-
 class TimeStatsConfigManager:
     """
     Generic config manager for accessing and storing add-on's properties.
@@ -34,9 +25,8 @@ class TimeStatsConfigManager:
 
         self._meta['config'] = self.config
 
-    def get_decks(self):
-        decks_shell = DeckManager
-        return self.mw.col.decks if self.mw.col is not None else decks_shell
-
     def write_config(self):
         self.mw.addonManager.writeAddonMeta(self._addon, self._meta)
+
+    def reload(self):
+        self.mw.reset()
