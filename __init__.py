@@ -70,7 +70,7 @@ def get_config_manager():
 
 def on_webview_will_set_content(content: aqt.webview.WebContent, context: object or None):
     if mw.col is None:
-        print(f'--Anki Window was NoneType')
+        # print(f'--Anki Window was NoneType')
         return
 
     config_manager = get_config_manager()
@@ -83,7 +83,7 @@ def on_webview_will_set_content(content: aqt.webview.WebContent, context: object
 
 def on_webview_did_inject_style_into_page(webview: aqt.webview.AnkiWebView):
     if mw.col is None:
-        print(f'--Anki Window was NoneType')
+        # print(f'--Anki Window was NoneType')
         return
 
     config_manager = get_config_manager()
@@ -101,21 +101,24 @@ def on_options_called():
 
 
 def should_display_on_current_screen():
-    return str(mw.col.decks.current().get('id')) not in get_config_manager().config[Config.EXCLUDED_DIDS]
+    return mw.col.decks.current().get('id') not in get_config_manager().config[Config.EXCLUDED_DIDS]
 
 
 def get_review_times() -> (float, float):
-    print(f'mw state: {mw.state}')
+    config_manager = get_config_manager()
+    addon_config = get_config_manager().config
+
+    # print(f'mw state: {mw.state}')
     if mw.state == 'overview':
         dids = [str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))]
     else:
         dids = mw.col.decks.all_ids()
 
-    for excluded_did in get_config_manager().config[Config.EXCLUDED_DIDS]:
-        if excluded_did in dids:
+    for excluded_did in addon_config[Config.EXCLUDED_DIDS]:
+        if str(excluded_did) in dids:
             dids.remove(str(excluded_did))
 
-    print(f'checking dids: {[mw.col.decks.name(i) for i in dids]}')
+    # print(f'checking dids: {[mw.col.decks.name(i) for i in dids]}')
 
     dids_as_args = '(' + ', '.join(dids) + ')'
     cids_cmd = f'SELECT id FROM cards WHERE did in {dids_as_args}\n'
@@ -125,15 +128,13 @@ def get_review_times() -> (float, float):
 
     rev_log = mw.col.db.all(revlog_cmd)
 
-    config_manager = get_config_manager()
-
-    range_type = config_manager.config[Config.RANGE_TYPE]
+    range_type = addon_config[Config.RANGE_TYPE]
     days_ago = RangeType.DAYS[range_type]
     # Calendar Range Days-Ago Math!
-    if config_manager.config[Config.USE_CALENDAR_RANGE]:
+    if addon_config[Config.USE_CALENDAR_RANGE]:
         if range_type == RangeType.WEEK or range_type == RangeType.TWO_WEEKS:
             week_date = date.today() - timedelta(days=(RangeType.DAYS[range_type] - 7))
-            week_start_day = config_manager.config[Config.WEEK_START]
+            week_start_day = addon_config[Config.WEEK_START]
             if week_date.weekday() >= week_start_day:
                 days_ago = (week_date.weekday() - week_start_day) + (RangeType.DAYS[range_type] - 7)
             else:
@@ -143,7 +144,7 @@ def get_review_times() -> (float, float):
         elif range_type == RangeType.YEAR:
             days_ago = (date.today() - date.today().replace(month=1, day=1)).days
         elif range_type == RangeType.CUSTOM:
-            days_ago = config_manager.config[Config.CUSTOM_RANGE]
+            days_ago = addon_config[Config.CUSTOM_RANGE]
     filtered_revlog = filter_revlog(rev_log, days_ago=days_ago)
 
     all_rev_times_ms = [log[1] for log in rev_log[0:]]
@@ -195,7 +196,7 @@ def filter_revlog(rev_logs: [[int, int]], days_ago: int = None) -> [[int, int]]:
     prev_start_date = current_date - timedelta(days=days_ago)
     prev_start_datetime = datetime(prev_start_date.year, prev_start_date.month, prev_start_date.day)
     date_ago = offset_date(prev_start_datetime, offset_hour)
-    print(f'check against: {date_ago}, on: {date_ago.strftime("%a")}, days ago: {days_ago}')
+    # print(f'check against: {date_ago}, on: {date_ago.strftime("%a")}, days ago: {days_ago}')
 
     filtered_logs = []
     for log in rev_logs[0:]:
