@@ -48,7 +48,7 @@ class Config:
         CUSTOM_TOTAL_TEXT: 'Total',
         CUSTOM_RANGE_TEXT: 'Past %range',
         PRIMARY_COLOR: 'white',
-        SECONDARY_COLOR: '#80e179',
+        SECONDARY_COLOR: '#76bfb4',
         BROWSER_ENABLED: True,
         OVERVIEW_ENABLED: True,
         CONGRATS_ENABLED: True,
