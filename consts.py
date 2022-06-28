@@ -51,4 +51,4 @@ class Config:
     }
 
 
-SPECIAL_DATE = '2006-10-05'
+UNIQUE_DATE = '2006-10-05'
