@@ -12,7 +12,6 @@ class String:
     YEAR = 'Year'
 
 
-
 class Range:
     WEEK, TWO_WEEKS, MONTH, YEAR, CUSTOM = 0, 1, 2, 3, 4
     DAYS_IN = {WEEK: 7, TWO_WEEKS: 14, MONTH: 30, YEAR: 365}

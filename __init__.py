@@ -142,21 +142,22 @@ def get_review_stats() -> (float, float, int):
 
     # Calendar Range Math!
     range_type = addon_config[Config.RANGE_TYPE]
-    days_ago = Range.DAYS_IN[range_type]
-    if addon_config[Config.USE_CALENDAR_RANGE]:
-        if range_type == Range.WEEK or range_type == Range.TWO_WEEKS:
-            week_date = date.today() - timedelta(days=(Range.DAYS_IN[range_type] - 7))
-            week_start_day = addon_config[Config.WEEK_START]
-            if week_date.weekday() >= week_start_day:
-                days_ago = (week_date.weekday() - week_start_day) + (Range.DAYS_IN[range_type] - 7)
-            else:
-                days_ago = (week_date.weekday() - week_start_day) + (Range.DAYS_IN[range_type])
-        elif range_type == Range.MONTH:
-            days_ago = (date.today() - date.today().replace(day=1)).days
-        elif range_type == Range.YEAR:
-            days_ago = (date.today() - date.today().replace(month=1, day=1)).days
-        elif range_type == Range.CUSTOM:
-            days_ago = addon_config[Config.CUSTOM_DAYS]
+    if range_type != Range.CUSTOM:
+        days_ago = Range.DAYS_IN[range_type]
+        if addon_config[Config.USE_CALENDAR_RANGE]:
+            if range_type == Range.WEEK or range_type == Range.TWO_WEEKS:
+                week_date = date.today() - timedelta(days=(Range.DAYS_IN[range_type] - 7))
+                week_start_day = addon_config[Config.WEEK_START]
+                if week_date.weekday() >= week_start_day:
+                    days_ago = (week_date.weekday() - week_start_day) + (Range.DAYS_IN[range_type] - 7)
+                else:
+                    days_ago = (week_date.weekday() - week_start_day) + (Range.DAYS_IN[range_type])
+            elif range_type == Range.MONTH:
+                days_ago = (date.today() - date.today().replace(day=1)).days
+            elif range_type == Range.YEAR:
+                days_ago = (date.today() - date.today().replace(month=1, day=1)).days
+    else:
+        days_ago = addon_config[Config.CUSTOM_DAYS]
     filtered_revlog = filter_revlog(rev_log, days_ago=days_ago)
 
     all_rev_times_ms = [log[1] for log in rev_log[0:]]
@@ -218,8 +219,6 @@ def filter_revlog(rev_logs: [[int, int]], days_ago: int = None) -> [[int, int]]:
     current_date = date.today()
     prev_start_date = current_date - timedelta(days=days_ago)
     prev_start_datetime = datetime(prev_start_date.year, prev_start_date.month, prev_start_date.day)
-    date_ago = offset_date(prev_start_datetime, offset_hour)
-    # print(f'check against: {date_ago}, on: {date_ago.strftime("%a")}, days ago: {days_ago}')
 
     filtered_logs = []
     for log in rev_logs[0:]:
