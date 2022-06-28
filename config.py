@@ -4,11 +4,14 @@ from .consts import Config
 
 
 class TimeStatsConfigManager:
-    """
-    Generic config manager for accessing and storing add-on's properties.
-    """
 
     def __init__(self, mw: AnkiQt, max_filter_range: int):
+        """
+Generic config manager for accessing and writing addon config values.
+
+    :param mw: Anki window to retrieve addon and other data from
+    :param max_filter_range: maximum days the addon can filter through
+        """
         super().__init__()
         self.mw = mw
         self._addon = self.mw.addonManager.addonFromModule(__name__)
@@ -26,7 +29,7 @@ class TimeStatsConfigManager:
         self._meta['config'] = self.config
 
     def write_config(self):
+        """
+Writes the config manager's current values to the addon meta file.
+        """
         self.mw.addonManager.writeAddonMeta(self._addon, self._meta)
-
-    def reload(self):
-        self.mw.reset()

@@ -6,7 +6,7 @@ from aqt.deckbrowser import DeckBrowser
 from aqt.overview import Overview
 from datetime import timedelta, datetime, date
 from .config import TimeStatsConfigManager
-from .consts import String, Range, SPECIAL_DATE, Config
+from .consts import String, Range, UNIQUE_DATE, Config
 from .options import TimeStatsOptionsDialog
 
 html_shell = '''
@@ -49,17 +49,27 @@ html_shell = '''
 
 
 def initialize():
+    """
+Initializer for add-on. Called at start for finer execution order and a bit of readability.
+    """
     build_hooks()
     build_actions()
 
 
 def build_hooks():
+    """
+Append addon hooks to Anki.
+    """
     from aqt import gui_hooks
-    gui_hooks.webview_will_set_content.append(on_webview_will_set_content)
-    gui_hooks.webview_did_inject_style_into_page.append(on_webview_did_inject_style_into_page)
+    gui_hooks.webview_will_set_content.append(format_webview)
+    gui_hooks.webview_did_inject_style_into_page.append(format_congrats)
 
 
 def build_actions():
+    """
+Add and connect addon actions. Currently, adds an options menu action and sets the addon configuration action,
+found in Anki's addon window, to also open the options menu.
+    """
     # TODO: add key shortcut to alt menu (&[t]ime Stats)
     options_action = QAction(String.OPTIONS_ACTION, mw)
     options_action.triggered.connect(on_options_called)
@@ -71,12 +81,22 @@ def build_actions():
     mw.addonManager.setConfigAction(__name__, on_options_called)
 
 
-def get_config_manager():
+def get_config_manager() -> TimeStatsConfigManager:
+    """
+Retrieves the addon's config manager.
+    :return: a deep-copy of the TimeStatsConfigManager Class
+    """
     # this is neat, but also maybe a date option for the custom filter might be nice...
-    return TimeStatsConfigManager(mw, (date.today() - date.fromisoformat(SPECIAL_DATE)).days)
+    return TimeStatsConfigManager(mw, (date.today() - date.fromisoformat(UNIQUE_DATE)).days)
 
 
-def on_webview_will_set_content(content: aqt.webview.WebContent, context: object or None):
+def format_webview(content: aqt.webview.WebContent, context: object or None):
+    """
+If the current deck screen isn't excluded, formats the Anki webview to include html with study time data,
+else does nothing.
+    :param content: WebContent to be formatted
+    :param context: object used to check if the current view can/should be formatted
+    """
     if mw.col is None:
         # print(f'--Anki Window was NoneType')
         return
@@ -89,7 +109,11 @@ def on_webview_will_set_content(content: aqt.webview.WebContent, context: object
         content.body += formatted_html()
 
 
-def on_webview_did_inject_style_into_page(webview: aqt.webview.AnkiWebView):
+def format_congrats(webview: aqt.webview.AnkiWebView):
+    """
+Extra handler used for the congrats page since it can't be as easily retrieved with the existing hooks.
+    :param webview: AnkiWebView to check against and format.
+    """
     if mw.col is None:
         # print(f'--Anki Window was NoneType')
         return
@@ -104,19 +128,26 @@ def on_webview_did_inject_style_into_page(webview: aqt.webview.AnkiWebView):
 
 
 def on_options_called():
+    """
+Initializes and opens the options dialog.
+    """
     dialog = TimeStatsOptionsDialog(get_config_manager())
     dialog.show()
 
 
 def should_display_on_current_screen():
+    """
+Determines whether the current screen's selection should display stats based on user's excluded deck ID's.
+    :return: True if current selection isn't excluded, otherwise false.
+    """
     return mw.col.decks.current().get('id') not in get_config_manager().config[Config.EXCLUDED_DIDS]
 
 
 def get_review_stats() -> (float, float, int):
     """
-
-    :return: (total_hours, filtered_hours, days_filtered)
-
+Retrieves Anki review data needed for formatting using the currently visible decks and SQL commands filtering through
+the Anki database files.
+    :return: Tuple: (total review time, filtered review time, total days filtered)
     """
     addon_config = get_config_manager().config
 
@@ -163,10 +194,14 @@ def get_review_stats() -> (float, float, int):
     all_rev_times_ms = [log[1] for log in rev_log[0:]]
     filtered_rev_times_ms = [log[1] for log in filtered_revlog[0:]]
 
-    return sum(all_rev_times_ms) / 1000 / 60 / 60, sum(filtered_rev_times_ms) / 1000 / 60 / 60, days_ago
+    return sum(all_rev_times_ms) / 1000 / 60 / 60, sum(filtered_rev_times_ms) / 1000 / 60 / 60, int(days_ago)
 
 
 def formatted_html():
+    """
+Uses the addon config and current stats to retrieve the html to display on Anki's main window.
+    :return: html string containing review configured review information
+    """
     addon_config = get_config_manager().config
     total_hrs, ranged_hrs, days_ago = get_review_stats()
 
@@ -182,10 +217,17 @@ def formatted_html():
                                     primary_color=addon_config[Config.PRIMARY_COLOR],
                                     secondary_color=addon_config[Config.SECONDARY_COLOR])
 
-    return filter_html_range_id(html_string, days_ago)
+    return filter_html_ids(html_string, days_ago)
 
 
-def filter_html_range_id(html_string: str, days_ago: int):
+def filter_html_ids(html_string: str, days_ago: int):
+    """
+Replaces the input html string with some basic formatted text based on identifier codes.
+Currently uses the string identifiers: %range, %from_date, %from_year, %from_full_weekday, %from_weekday, and %days.
+    :param html_string: html string to be formatted
+    :param days_ago: days to use when replacing date-type identifiers
+    :return: the formatted html string object
+    """
     addon_config = get_config_manager().config
     if re.search(r'(?<!%)%range', html_string):
         start = addon_config[Config.RANGE_TYPE]
@@ -209,24 +251,33 @@ def filter_html_range_id(html_string: str, days_ago: int):
     return html_string
 
 
-def offset_date(dt: datetime, hours: int = 0):
-    return dt + timedelta(hours=hours)
+# def offset_date(dt: datetime, hours: int = 0):
+#     """
+# Offsets a datetime object using a set amount of hours. Mainly for adjusting times based on the rollover/day-end hour
+# in Anki.
+#     :param dt: datetime object to offset
+#     :param hours: number of hours to offset the date
+#     :return: an offset datetime object
+#     """
+#     return dt + timedelta(hours=hours)
 
 
 def filter_revlog(rev_logs: [[int, int]], days_ago: int = None) -> [[int, int]]:
+    """
+Retrieves a collection of review logs based on the input number of days to retrieve from today.
+    :param rev_logs: list of review logs containing an array with [log time-identifier, log time spent]
+    :param days_ago: number of days to filter through
+    :return: a new list of review logs based on the input days to filter
+    """
     offset_hour = mw.col.get_preferences().scheduling.rollover
-
-    current_date = date.today()
-    prev_start_date = current_date - timedelta(days=days_ago)
-    prev_start_datetime = datetime(prev_start_date.year, prev_start_date.month, prev_start_date.day)
-
     filtered_logs = []
     for log in rev_logs[0:]:
         log_epoch_seconds = log[0] / 1000
         log_date = datetime.fromtimestamp(log_epoch_seconds)
 
-        log_days_ago = offset_date(datetime.now(), offset_hour) - log_date
-        if log_days_ago.days <= days_ago:
+        # log_delta = offset_date(datetime.now(), offset_hour) - log_date
+        log_delta = (datetime.now() + timedelta(hours=offset_hour)) - log_date
+        if log_delta.days <= days_ago:
             filtered_logs.append(log)
 
     return filtered_logs
