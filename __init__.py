@@ -6,36 +6,44 @@ from aqt.deckbrowser import DeckBrowser
 from aqt.overview import Overview
 from datetime import timedelta, datetime, date
 from .config import TimeStatsConfigManager
-from .consts import Text, RangeType, SPECIAL_DATE, Config
+from .consts import String, Range, SPECIAL_DATE, Config
 from .options import TimeStatsOptionsDialog
 
-html_shell = '''    
+html_shell = '''
         <style>
-            .time-studied-header {{
-                text-align: center;
-                color: {primary_color};
-                font-size: 1.1em;
+            #sts-table {{
+                display: table;
+                margin-top: .5em;
+                width: 50%%;
                 font-weight: normal;
             }}
-
-            .time-studied-row {{
-                text-align: center;
+            .sts-col {{
+                display: table-cell;
+                word-break: break-all;
+                width: 30vh;
+            }}
+            .sts-col > * {{
+                display: table-row;
+            }}
+            .sts-label {{
+                color: {primary_color};
+            }}
+            .sts-data {{
                 color: {secondary_color};
-                font-size: 1.1em;
-                font-weight: normal;
+                font-weight: bold;
             }}
         </style>
         <center>
-            <table width="60%%" id="time_table" style="margin: 12px;">
-                <tr>
-                        <th class="time-studied-header">{total_label}</th>
-                        <th class="time-studied-header">{range_label}</th>
-                </tr>
-                <tr>
-                    <td class="time-studied-row">{total_value} {total_unit}</td>
-                    <td class="time-studied-row">{range_value} {range_unit}</td>
-                </tr>
-            </table>
+            <div id=sts-table>
+                <div class="sts-col">
+                    <div class="sts-label">{total_label}</div>
+                    <div class="sts-data">{total_value} {total_unit}</div>
+                </div>
+                <div class="sts-col">
+                    <div class="sts-label">{range_label}</div>
+                    <div class="sts-data">{range_value} {range_unit}</div>
+                </div>
+            </div>
         </center>
 '''
 
@@ -53,7 +61,7 @@ def build_hooks():
 
 def build_actions():
     # TODO: add key shortcut to alt menu (&[t]ime Stats)
-    options_action = QAction(Text.OPTIONS_ACTION, mw)
+    options_action = QAction(String.OPTIONS_ACTION, mw)
     options_action.triggered.connect(on_options_called)
     # Handle edge case where toolbar action already exists
     if options_action in mw.form.menuTools.actions():
@@ -64,7 +72,7 @@ def build_actions():
 
 
 def get_config_manager():
-    # this is neat and all, but also maybe a date option for the custom filter might be nice...
+    # this is neat, but also maybe a date option for the custom filter might be nice...
     return TimeStatsConfigManager(mw, (date.today() - date.fromisoformat(SPECIAL_DATE)).days)
 
 
@@ -104,8 +112,12 @@ def should_display_on_current_screen():
     return mw.col.decks.current().get('id') not in get_config_manager().config[Config.EXCLUDED_DIDS]
 
 
-def get_review_times() -> (float, float):
-    config_manager = get_config_manager()
+def get_review_stats() -> (float, float, int):
+    """
+
+    :return: (total_hours, filtered_hours, days_filtered)
+
+    """
     addon_config = get_config_manager().config
 
     # print(f'mw state: {mw.state}')
@@ -128,39 +140,39 @@ def get_review_times() -> (float, float):
 
     rev_log = mw.col.db.all(revlog_cmd)
 
+    # Calendar Range Math!
     range_type = addon_config[Config.RANGE_TYPE]
-    days_ago = RangeType.DAYS[range_type]
-    # Calendar Range Days-Ago Math!
+    days_ago = Range.DAYS_IN[range_type]
     if addon_config[Config.USE_CALENDAR_RANGE]:
-        if range_type == RangeType.WEEK or range_type == RangeType.TWO_WEEKS:
-            week_date = date.today() - timedelta(days=(RangeType.DAYS[range_type] - 7))
+        if range_type == Range.WEEK or range_type == Range.TWO_WEEKS:
+            week_date = date.today() - timedelta(days=(Range.DAYS_IN[range_type] - 7))
             week_start_day = addon_config[Config.WEEK_START]
             if week_date.weekday() >= week_start_day:
-                days_ago = (week_date.weekday() - week_start_day) + (RangeType.DAYS[range_type] - 7)
+                days_ago = (week_date.weekday() - week_start_day) + (Range.DAYS_IN[range_type] - 7)
             else:
-                days_ago = (week_date.weekday() - week_start_day) + (RangeType.DAYS[range_type])
-        elif range_type == RangeType.MONTH:
+                days_ago = (week_date.weekday() - week_start_day) + (Range.DAYS_IN[range_type])
+        elif range_type == Range.MONTH:
             days_ago = (date.today() - date.today().replace(day=1)).days
-        elif range_type == RangeType.YEAR:
+        elif range_type == Range.YEAR:
             days_ago = (date.today() - date.today().replace(month=1, day=1)).days
-        elif range_type == RangeType.CUSTOM:
-            days_ago = addon_config[Config.CUSTOM_RANGE]
+        elif range_type == Range.CUSTOM:
+            days_ago = addon_config[Config.CUSTOM_DAYS]
     filtered_revlog = filter_revlog(rev_log, days_ago=days_ago)
 
     all_rev_times_ms = [log[1] for log in rev_log[0:]]
     filtered_rev_times_ms = [log[1] for log in filtered_revlog[0:]]
 
-    return sum(all_rev_times_ms) / 1000 / 60 / 60, sum(filtered_rev_times_ms) / 1000 / 60 / 60
+    return sum(all_rev_times_ms) / 1000 / 60 / 60, sum(filtered_rev_times_ms) / 1000 / 60 / 60, days_ago
 
 
 def formatted_html():
     addon_config = get_config_manager().config
-    total_hrs, ranged_hrs = get_review_times()
+    total_hrs, ranged_hrs, days_ago = get_review_stats()
 
     total_val = round(total_hrs, 2) if total_hrs > 1 else round(total_hrs * 60, 2)
     range_val = round(ranged_hrs, 2) if ranged_hrs > 1 else round(ranged_hrs * 60, 2)
-    total_unit = Text.HRS if total_hrs > 1 else Text.MIN
-    range_unit = Text.HRS if ranged_hrs > 1 else Text.MIN
+    total_unit = String.HRS if total_hrs > 1 else String.MIN
+    range_unit = String.HRS if ranged_hrs > 1 else String.MIN
 
     html_string = html_shell.format(total_label=addon_config[Config.CUSTOM_TOTAL_TEXT],
                                     range_label=addon_config[Config.CUSTOM_RANGE_TEXT],
@@ -169,18 +181,29 @@ def formatted_html():
                                     primary_color=addon_config[Config.PRIMARY_COLOR],
                                     secondary_color=addon_config[Config.SECONDARY_COLOR])
 
-    return filter_html_range_id(html_string)
+    return filter_html_range_id(html_string, days_ago)
 
 
-def filter_html_range_id(html_string: str):
+def filter_html_range_id(html_string: str, days_ago: int):
     addon_config = get_config_manager().config
     if re.search(r'(?<!%)%range', html_string):
-        if addon_config[Config.RANGE_TYPE] != RangeType.CUSTOM:
-            range_text = RangeType.TEXT[addon_config[Config.RANGE_TYPE]]
-        else:
-            range_text = f'{addon_config[Config.CUSTOM_RANGE]} {Text.DAYS}'
+        start = addon_config[Config.RANGE_TYPE]
+        range_text = Range.LABEL[start] if start != Range.CUSTOM \
+            else f'{addon_config[Config.CUSTOM_DAYS]} {String.DAYS}'
         html_string = html_string.replace('%range', range_text)
-    elif re.search(r'%%', html_string):
+    if re.search(r'(?<!%)%from_date', html_string):
+        html_string = html_string.replace('%from_date', (date.today() - timedelta(days=days_ago)).strftime('%x'))
+    if re.search(r'(?<!%)%from_year', html_string):
+        html_string = html_string.replace('%from_year', (date.today() - timedelta(days=days_ago)).strftime('%Y'))
+    if re.search(r'(?<!%)%from_full_weekday', html_string):
+        html_string = html_string.replace('%from_full_weekday', (date.today() - timedelta(days=days_ago)).strftime(
+            '%A'))
+    if re.search(r'(?<!%)%from_weekday', html_string):
+        html_string = html_string.replace('%from_weekday', (date.today() - timedelta(days=days_ago)).strftime('%a'))
+    if re.search(r'(?<!%)%days', html_string):
+        html_string = html_string.replace('%days', f'{days_ago}')
+        # if re.search(r'(?<!%)%date\(.*,+.*\)', html_string):  # future filter?
+    if re.search(r'%%', html_string):
         html_string = html_string.replace('%%', '%')
     return html_string
 

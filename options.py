@@ -1,7 +1,7 @@
 # from PyQt5.QtWidgets import QAction
 from aqt.qt import QDialog, QColorDialog, QColor, QLabel, QDialogButtonBox, QRect
 from .config import TimeStatsConfigManager
-from .consts import Config, RangeType, Text
+from .consts import Config, Range, String
 from .options_dialog import Ui_OptionsDialog
 from aqt.studydeck import StudyDeck
 
@@ -60,7 +60,7 @@ class TimeStatsOptionsDialog(QDialog):
                 self._secondary_color = color_name
 
     def on_range_type_change(self, idx: int):
-        if idx == RangeType.CUSTOM:
+        if idx == Range.CUSTOM:
             self.ui.custom_range_spinbox.show()
             self.ui.use_calendar_checkbox.hide()
             self.ui.appearance_grid_layout.replaceWidget(self.ui.use_calendar_checkbox, self.ui.custom_range_spinbox)
@@ -117,12 +117,12 @@ class TimeStatsOptionsDialog(QDialog):
     def update_calendar_range_extras(self):
         self._redraw_cal_checkbox()
         dropdown_index = self.ui.range_select_dropdown.currentIndex()
-        if dropdown_index != RangeType.CUSTOM:
-            type_index = dropdown_index if dropdown_index != RangeType.TWO_WEEKS else RangeType.WEEK
-            self.ui.use_calendar_checkbox.setText(f'{Text.USE_CALENDAR} {RangeType.TEXT[type_index]}')
+        if dropdown_index != Range.CUSTOM:
+            type_index = dropdown_index if dropdown_index != Range.TWO_WEEKS else Range.WEEK
+            self.ui.use_calendar_checkbox.setText(f'{String.USE_CALENDAR} {Range.LABEL[type_index]}')
 
         using_calendar_range = self.ui.use_calendar_checkbox.isChecked()
-        if (dropdown_index == RangeType.WEEK or dropdown_index == RangeType.TWO_WEEKS) and using_calendar_range:
+        if (dropdown_index == Range.WEEK or dropdown_index == Range.TWO_WEEKS) and using_calendar_range:
             self.ui.week_start_dropdown.show()
             self.ui.week_start_label.show()
         else:
@@ -150,7 +150,7 @@ class TimeStatsOptionsDialog(QDialog):
         self.ui.use_calendar_checkbox.setChecked(self.config[Config.USE_CALENDAR_RANGE])
         self.update_calendar_range_extras()
 
-        self.ui.custom_range_spinbox.setValue(self.config[Config.CUSTOM_RANGE])
+        self.ui.custom_range_spinbox.setValue(self.config[Config.CUSTOM_DAYS])
         self.ui.total_line.setText(self.config[Config.CUSTOM_TOTAL_TEXT])
         self.ui.ranged_line.setText(self.config[Config.CUSTOM_RANGE_TEXT])
 
@@ -173,7 +173,7 @@ class TimeStatsOptionsDialog(QDialog):
         self.config[Config.WEEK_START] = self.ui.week_start_dropdown.currentIndex()
         self.config[Config.RANGE_TYPE] = self.ui.range_select_dropdown.currentIndex()
         self.config[Config.USE_CALENDAR_RANGE] = self.ui.use_calendar_checkbox.isChecked()
-        self.config[Config.CUSTOM_RANGE] = self.ui.custom_range_spinbox.value()
+        self.config[Config.CUSTOM_DAYS] = self.ui.custom_range_spinbox.value()
         self.config[Config.CUSTOM_TOTAL_TEXT] = self.ui.total_line.text()
         self.config[Config.CUSTOM_RANGE_TEXT] = self.ui.ranged_line.text()
 
