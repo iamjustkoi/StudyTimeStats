@@ -1,6 +1,6 @@
-class Text:
+class String:
     TOTAL = 'Total'
-    PAST_WEEK = 'Past Week'
+    PAST_RANGE = 'Past %range'
     HRS = 'hrs'
     MIN = 'min'
     OPTIONS_ACTION = 'Study Time Stats Options...'
@@ -12,15 +12,11 @@ class Text:
     YEAR = 'Year'
 
 
-class RangeType:
+
+class Range:
     WEEK, TWO_WEEKS, MONTH, YEAR, CUSTOM = 0, 1, 2, 3, 4
-    DAYS = {WEEK: 7, TWO_WEEKS: 14, MONTH: 30, YEAR: 365, CUSTOM: 0}
-    TEXT = {
-        WEEK: Text.WEEK,
-        TWO_WEEKS: Text.TWO_WEEKS,
-        MONTH: Text.MONTH,
-        YEAR: Text.YEAR
-    }
+    DAYS_IN = {WEEK: 7, TWO_WEEKS: 14, MONTH: 30, YEAR: 365}
+    LABEL = {WEEK: String.WEEK, TWO_WEEKS: String.TWO_WEEKS, MONTH: String.MONTH, YEAR: String.YEAR}
 
 
 class Weekday:
@@ -31,7 +27,7 @@ class Config:
     WEEK_START = 'Week_Start'
     USE_CALENDAR_RANGE = 'Use_Calendar_Range'
     RANGE_TYPE = 'Range_Type'
-    CUSTOM_RANGE = 'Custom_Range'
+    CUSTOM_DAYS = 'Custom_Days'
     CUSTOM_TOTAL_TEXT = 'Custom_Total_Text'
     CUSTOM_RANGE_TEXT = 'Custom_Range_Text'
     PRIMARY_COLOR = 'Primary_Color'
@@ -43,10 +39,10 @@ class Config:
     DEFAULT_CONFIG = {
         WEEK_START: Weekday.SUNDAY,
         USE_CALENDAR_RANGE: True,
-        RANGE_TYPE: RangeType.WEEK,
-        CUSTOM_RANGE: 7,
-        CUSTOM_TOTAL_TEXT: 'Total',
-        CUSTOM_RANGE_TEXT: 'Past %range',
+        RANGE_TYPE: Range.WEEK,
+        CUSTOM_DAYS: 7,
+        CUSTOM_TOTAL_TEXT: String.TOTAL,
+        CUSTOM_RANGE_TEXT: String.PAST_RANGE,
         PRIMARY_COLOR: 'white',
         SECONDARY_COLOR: '#76bfb4',
         BROWSER_ENABLED: True,
