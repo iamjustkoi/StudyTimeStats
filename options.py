@@ -174,6 +174,7 @@ class TimeStatsOptionsDialog(QDialog):
         self.config[Config.RANGE_TYPE] = self.ui.range_select_dropdown.currentIndex()
         self.config[Config.USE_CALENDAR_RANGE] = self.ui.use_calendar_checkbox.isChecked()
         self.config[Config.CUSTOM_DAYS] = self.ui.custom_range_spinbox.value()
+        print(f'custom val: {self.ui.custom_range_spinbox.value()}')
         self.config[Config.CUSTOM_TOTAL_TEXT] = self.ui.total_line.text()
         self.config[Config.CUSTOM_RANGE_TEXT] = self.ui.ranged_line.text()
 
