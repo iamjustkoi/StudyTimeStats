@@ -1,3 +1,17 @@
+"""
+MIT License: Copyright (c) 2022 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
+Full license text available in "LICENSE" file, located in the add-on's root directory.
+"""
+
+
+UNIQUE_DATE = '2006-10-05'
+ICON_PATH = 'raw/'
+KOFI_FILEPATH = 'raw\\kofilogo_blue.PNG'
+PATREON_FILEPATH = 'raw\\patreon.png'
+PATREON_URL = 'https://ko-fi.com/iamjustkoi'
+KOFI_URL = 'https://www.patreon.com/iamjustkoi'
+
+
 class String:
     TOTAL = 'Total'
     PAST_RANGE = 'Past %range'
@@ -49,6 +63,3 @@ class Config:
         CONGRATS_ENABLED: True,
         EXCLUDED_DIDS: [1]
     }
-
-
-UNIQUE_DATE = '2006-10-05'

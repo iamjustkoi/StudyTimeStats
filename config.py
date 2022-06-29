@@ -1,5 +1,8 @@
+"""
+MIT License: Copyright (c) 2022 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
+Full license text available in "LICENSE" file, located in the add-on's root directory.
+"""
 from aqt import AnkiQt
-
 from .consts import Config
 
 

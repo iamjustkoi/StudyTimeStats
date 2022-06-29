@@ -1,7 +1,16 @@
-# from PyQt5.QtWidgets import QAction
-from aqt.qt import QDialog, QColorDialog, QColor, QLabel, QDialogButtonBox, QRect
+"""
+MIT License: Copyright (c) 2022 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
+Full license text available in "LICENSE" file, located in the add-on's root directory.
+"""
+import pathlib
+import webbrowser
+
+import pyperclip
+from PyQt5.QtWidgets import QMenu
+from aqt.qt import QDialog, QColorDialog, QColor, QLabel, QDialogButtonBox, QRect, QIcon
+from aqt.qt.qt5 import Qt
 from .config import TimeStatsConfigManager
-from .consts import Config, Range, String
+from .consts import *
 from .options_dialog import Ui_OptionsDialog
 from aqt.studydeck import StudyDeck
 
@@ -18,7 +27,7 @@ Addon options QDialog class for accessing and changing the addon's config values
 
         :param conf_manager: TimeStatsConfigManager used to reading and writing user input.
         """
-        super().__init__()
+        super().__init__(flags=Qt.WindowFlags())
         self.manager = conf_manager
         self.config = conf_manager.config
         self.ui = Ui_OptionsDialog()
@@ -30,6 +39,21 @@ Addon options QDialog class for accessing and changing the addon's config values
         # Exclude Tab Button Actions
         self.ui.add_button.clicked.connect(self.on_add_clicked)
         self.ui.remove_button.clicked.connect(self.on_remove_clicked)
+
+        # About page buttons
+        self.ui.context_menu = QMenu(self)
+
+        self.ui.kofi_button.setIcon(QIcon(f'{pathlib.Path(__file__).parent.resolve()}\\{KOFI_FILEPATH}'))
+        self.ui.kofi_button.clicked.connect(lambda: webbrowser.open(KOFI_URL))
+        self.ui.kofi_button.customContextMenuRequested.connect(
+            lambda point: self.on_context_menu(point, self.ui.kofi_button)
+        )
+
+        self.ui.patreon_button.setIcon(QIcon(f'{pathlib.Path(__file__).parent.resolve()}\\{PATREON_FILEPATH}'))
+        self.ui.patreon_button.clicked.connect(lambda: webbrowser.open(PATREON_URL))
+        self.ui.patreon_button.customContextMenuRequested.connect(
+            lambda point: self.on_context_menu(point, self.ui.patreon_button)
+        )
 
         # Restore Defaults Button
         self.ui.confirm_button_box.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.on_restore_defaults)
@@ -50,6 +74,26 @@ Addon options QDialog class for accessing and changing the addon's config values
 
         self._load()
 
+    def on_context_menu(self, point, button):
+        """
+Handles context menu actions for the input button.
+        :param point: input coordinate to display the menu
+        :param button: button being clicked/triggered
+        """
+        self.ui.context_menu = QMenu(self)
+        self.ui.context_menu.addAction('Copy Link').triggered.connect(lambda: self.on_copy_link(button))
+        self.ui.context_menu.exec_(button.mapToGlobal(point))
+
+    def on_copy_link(self, button):
+        """
+Copies a link to the clipboard based on the input button.
+        :param button: button to use for determining which link to copy
+        """
+        if button.objectName() == self.ui.patreon_button.objectName():
+            pyperclip.copy(PATREON_URL)
+        elif button.objectName() == self.ui.kofi_button.objectName():
+            pyperclip.copy(KOFI_URL)
+
     def open_color_dialog(self, preview: QLabel):
         """
 Opens a color picker dialog and updates the selected config color.
@@ -58,7 +102,7 @@ Opens a color picker dialog and updates the selected config color.
         is_primary = preview.objectName() == self.ui.primary_color_preview.objectName()
         selected_color = self._primary_color if is_primary else self._secondary_color
 
-        color = QColorDialog.getColor(initial=QColor(selected_color), options=QColorDialog.ShowAlphaChannel)
+        color = QColorDialog().getColor(initial=QColor(selected_color), options=QColorDialog.ShowAlphaChannel)
 
         if color.isValid():
             color_name = color.name(QColor.HexRgb)
