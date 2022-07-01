@@ -14,8 +14,8 @@ CMD_DAYS = '%days'
 ICON_PATH = 'raw/'
 KOFI_FILEPATH = 'raw\\kofilogo_blue.PNG'
 PATREON_FILEPATH = 'raw\\patreon.png'
-PATREON_URL = 'https://ko-fi.com/iamjustkoi'
-KOFI_URL = 'https://www.patreon.com/iamjustkoi'
+PATREON_URL = 'https://www.patreon.com/iamjustkoi'
+KOFI_URL = 'https://ko-fi.com/iamjustkoi'
 
 
 class String:
@@ -30,6 +30,7 @@ class String:
     TWO_WEEKS = '2 Weeks'
     MONTH = 'Month'
     YEAR = 'Year'
+    COPY_LINK = 'Copy Link'
 
 
 class Range:
