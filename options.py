@@ -5,7 +5,7 @@ Full license text available in "LICENSE" file, located in the add-on's root dire
 import pathlib
 import webbrowser
 
-import pyperclip
+import aqt.qt.qt5
 from PyQt5.QtWidgets import QMenu
 from aqt.qt import QDialog, QColorDialog, QColor, QLabel, QDialogButtonBox, QRect, QIcon
 from aqt.qt.qt5 import Qt
@@ -89,10 +89,12 @@ Handles context menu actions for the input button.
 Copies a link to the clipboard based on the input button.
         :param button: button to use for determining which link to copy
         """
+        cb = aqt.qt.qt5.QApplication.clipboard()
+        cb.clear(mode=cb.Clipboard)
         if button.objectName() == self.ui.patreon_button.objectName():
-            pyperclip.copy(PATREON_URL)
+            cb.setText(PATREON_URL, mode=cb.Clipboard)
         elif button.objectName() == self.ui.kofi_button.objectName():
-            pyperclip.copy(KOFI_URL)
+            cb.setText(KOFI_URL, mode=cb.Clipboard)
 
     def open_color_dialog(self, preview: QLabel):
         """
