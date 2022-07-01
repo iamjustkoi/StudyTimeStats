@@ -6,7 +6,7 @@ Adds some total and ranged study time statistics to Anki's main window.
 ## Installation  
 Install from [Anki-Web]()  
 Or from Anki (Tools -> Add-ons -> Get Add-ons..)
-> 1464569547
+> 1247171202
 
 ## Options Menu  
 ### General
