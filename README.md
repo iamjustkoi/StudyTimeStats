@@ -1,10 +1,6 @@
 # Study Time Stats
-<p align="center">
 Adds some total and ranged study time statistics to Anki's main window.  
-<br>
-<img src="https://github.com/iamjustkoi/StudyTimeStats/raw/main/github/main_ui.png">
-
-</p>
+<p align="center"><img src="https://github.com/iamjustkoi/StudyTimeStats/raw/main/github/main_ui.png"></p>
 
 ## Installation  
 Install from [Anki-Web]()  
