@@ -6,8 +6,7 @@ from pathlib import Path
 import webbrowser
 
 import aqt.qt.qt5
-from PyQt5.QtWidgets import QMenu
-from aqt.qt import QDialog, QColorDialog, QColor, QLabel, QDialogButtonBox, QRect, QIcon
+from aqt.qt import QDialog, QColorDialog, QColor, QLabel, QDialogButtonBox, QRect, QIcon, QMenu
 from aqt.qt.qt5 import Qt
 from .config import TimeStatsConfigManager
 from .consts import *
