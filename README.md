@@ -3,6 +3,11 @@ Adds some total and ranged study time statistics to Anki's main window.
 
 ![Main UI](./github/main_ui.png)
 
+## Installation  
+Install from [Anki-Web]()  
+Or from Anki (Tools -> Add-ons -> Get Add-ons..)
+> 1464569547
+
 ## Options Menu  
 ### General
 These can be used to change the look/wording of the text and how the add-on should filter the total time studied.  
