@@ -3,7 +3,7 @@ Adds some total and ranged study time statistics to Anki's main window.
 <p align="center"><img src=".github/main_ui.png"></p>
 
 ## Installation  
-Install from [Anki-Web]()  
+Install from [Anki-Web](https://ankiweb.net/shared/info/1247171202)  
 Or from Anki (Tools -> Add-ons -> Get Add-ons..)
 > 1247171202
 
