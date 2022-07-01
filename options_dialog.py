@@ -158,7 +158,7 @@ class Ui_OptionsDialog(object):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setObjectName("scroll_area")
         self.about_scroll = QtWidgets.QWidget()
-        self.about_scroll.setGeometry(QtCore.QRect(0, -217, 470, 472))
+        self.about_scroll.setGeometry(QtCore.QRect(0, -217, 470, 459))
         self.about_scroll.setObjectName("about_scroll")
         self.scroll_layout = QtWidgets.QVBoxLayout(self.about_scroll)
         self.scroll_layout.setSpacing(6)
@@ -275,7 +275,7 @@ class Ui_OptionsDialog(object):
         self.patreon_button.setText(_translate("OptionsDialog", "  Become a Patron"))
         self.kofi_button.setText(_translate("OptionsDialog", "  Buy me a coffee"))
         self.about_label_body.setText(_translate("OptionsDialog", "### Text Macros\n"
-"The addon can filter text in the custom label inputs to show information based on what\'s set in its options (e.g. \"Past %range\" can filter to \"Past Week\"). These can be used multiple times and change based on the most recent update to the addon\'s config or the next time the Anki window reloads.\n"
+"The add-on can also filter text in the custom labels input to show information based on what\'s set in the config (e.g. \"Past %range\" to \"Past Week\"). These can be used multiple times and will update whenever Anki\'s main window reloads.\n"
 "\n"
 "##### Available Macros:\n"
 "+ **%range** - the currently selected range format (Week, 2 Weeks, Month, Year)\n"
