@@ -4,14 +4,12 @@ Full license text available in "LICENSE" file, located in the add-on's root dire
 """
 from pathlib import Path
 import webbrowser
-
-import aqt.qt.qt5
 from aqt.qt import QDialog, QColorDialog, QColor, QLabel, QDialogButtonBox, QRect, QIcon, QMenu
-from aqt.qt.qt5 import Qt
+from aqt.qt.qt5 import Qt, QApplication
+from aqt.studydeck import StudyDeck
 from .config import TimeStatsConfigManager
 from .consts import *
 from .options_dialog import Ui_OptionsDialog
-from aqt.studydeck import StudyDeck
 
 
 def set_label_background(label: QLabel, hex_arg: str):
@@ -87,7 +85,7 @@ Handles context menu actions for the input button.
 Copies a link to the clipboard based on the input button.
         :param button: button to use for determining which link to copy
         """
-        cb = aqt.qt.qt5.QApplication.clipboard()
+        cb = QApplication.clipboard()
         cb.clear(mode=cb.Clipboard)
 
         if button.objectName() == self.ui.patreon_button.objectName():
