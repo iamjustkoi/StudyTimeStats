@@ -2,7 +2,7 @@
 MIT License: Copyright (c) 2022 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
 Full license text available in "LICENSE" file, located in the add-on's root directory.
 """
-import pathlib
+from pathlib import Path
 import webbrowser
 
 import aqt.qt.qt5
@@ -43,13 +43,12 @@ Addon options QDialog class for accessing and changing the addon's config values
         # About page buttons
         self.ui.context_menu = QMenu(self)
 
-        self.ui.kofi_button.setIcon(QIcon(f'{pathlib.Path(__file__).parent.resolve()}\\{KOFI_FILEPATH}'))
+        self.ui.kofi_button.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{KOFI_FILEPATH}'))
         self.ui.kofi_button.clicked.connect(lambda: webbrowser.open(KOFI_URL))
         self.ui.kofi_button.customContextMenuRequested.connect(
             lambda point: self.on_context_menu(point, self.ui.kofi_button)
         )
-
-        self.ui.patreon_button.setIcon(QIcon(f'{pathlib.Path(__file__).parent.resolve()}\\{PATREON_FILEPATH}'))
+        self.ui.patreon_button.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{PATREON_FILEPATH}'))
         self.ui.patreon_button.clicked.connect(lambda: webbrowser.open(PATREON_URL))
         self.ui.patreon_button.customContextMenuRequested.connect(
             lambda point: self.on_context_menu(point, self.ui.patreon_button)
@@ -81,8 +80,8 @@ Handles context menu actions for the input button.
         :param button: button being clicked/triggered
         """
         self.ui.context_menu = QMenu(self)
-        self.ui.context_menu.addAction('Copy Link').triggered.connect(lambda: self.on_copy_link(button))
-        self.ui.context_menu.exec_(button.mapToGlobal(point))
+        self.ui.context_menu.addAction(String.COPY_LINK).triggered.connect(lambda: self.on_copy_link(button))
+        self.ui.context_menu.exec(button.mapToGlobal(point))
 
     def on_copy_link(self, button):
         """
@@ -91,9 +90,12 @@ Copies a link to the clipboard based on the input button.
         """
         cb = aqt.qt.qt5.QApplication.clipboard()
         cb.clear(mode=cb.Clipboard)
+
         if button.objectName() == self.ui.patreon_button.objectName():
+            print('pat')
             cb.setText(PATREON_URL, mode=cb.Clipboard)
         elif button.objectName() == self.ui.kofi_button.objectName():
+            print('kofi')
             cb.setText(KOFI_URL, mode=cb.Clipboard)
 
     def open_color_dialog(self, preview: QLabel):

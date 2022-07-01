@@ -158,21 +158,21 @@ class Ui_OptionsDialog(object):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setObjectName("scroll_area")
         self.about_scroll = QtWidgets.QWidget()
-        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 470, 417))
+        self.about_scroll.setGeometry(QtCore.QRect(0, -217, 470, 472))
         self.about_scroll.setObjectName("about_scroll")
         self.scroll_layout = QtWidgets.QVBoxLayout(self.about_scroll)
         self.scroll_layout.setSpacing(6)
         self.scroll_layout.setObjectName("scroll_layout")
-        self.about_label_top = QtWidgets.QLabel(self.about_scroll)
+        self.about_label_header = QtWidgets.QLabel(self.about_scroll)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.about_label_top.sizePolicy().hasHeightForWidth())
-        self.about_label_top.setSizePolicy(sizePolicy)
-        self.about_label_top.setTextFormat(QtCore.Qt.MarkdownText)
-        self.about_label_top.setWordWrap(True)
-        self.about_label_top.setObjectName("about_label_top")
-        self.scroll_layout.addWidget(self.about_label_top)
+        sizePolicy.setHeightForWidth(self.about_label_header.sizePolicy().hasHeightForWidth())
+        self.about_label_header.setSizePolicy(sizePolicy)
+        self.about_label_header.setTextFormat(QtCore.Qt.MarkdownText)
+        self.about_label_header.setWordWrap(True)
+        self.about_label_header.setObjectName("about_label_header")
+        self.scroll_layout.addWidget(self.about_label_header)
         self.support_buttons = QtWidgets.QHBoxLayout()
         self.support_buttons.setContentsMargins(6, 6, 6, 6)
         self.support_buttons.setObjectName("support_buttons")
@@ -201,15 +201,16 @@ class Ui_OptionsDialog(object):
         self.kofi_button.setObjectName("kofi_button")
         self.support_buttons.addWidget(self.kofi_button)
         self.scroll_layout.addLayout(self.support_buttons)
-        self.about_label_bottom = QtWidgets.QLabel(self.about_scroll)
+        self.about_label_body = QtWidgets.QLabel(self.about_scroll)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.about_label_bottom.sizePolicy().hasHeightForWidth())
-        self.about_label_bottom.setSizePolicy(sizePolicy)
-        self.about_label_bottom.setTextFormat(QtCore.Qt.MarkdownText)
-        self.about_label_bottom.setObjectName("about_label_bottom")
-        self.scroll_layout.addWidget(self.about_label_bottom)
+        sizePolicy.setHeightForWidth(self.about_label_body.sizePolicy().hasHeightForWidth())
+        self.about_label_body.setSizePolicy(sizePolicy)
+        self.about_label_body.setTextFormat(QtCore.Qt.MarkdownText)
+        self.about_label_body.setWordWrap(True)
+        self.about_label_body.setObjectName("about_label_body")
+        self.scroll_layout.addWidget(self.about_label_body)
         self.scroll_layout.setStretch(2, 1)
         self.scroll_area.setWidget(self.about_scroll)
         self.verticalLayout_2.addWidget(self.scroll_area)
@@ -265,28 +266,29 @@ class Ui_OptionsDialog(object):
         self.add_button.setText(_translate("OptionsDialog", "Add..."))
         self.remove_button.setText(_translate("OptionsDialog", "Remove"))
         self.tabs_widget.setTabText(self.tabs_widget.indexOf(self.decks_tab), _translate("OptionsDialog", "Excluded Decks"))
-        self.about_label_top.setText(_translate("OptionsDialog", "## Study Time Stats\n"
-"Adds total and custom-ranged study time stats to Anki\'s main window.  \n"
+        self.about_label_header.setText(_translate("OptionsDialog", "## Study Time Stats\n"
+"Adds a total and ranged study time statistic to Anki\'s main window.  \n"
 "\n"
 "Version 1.0.0  \n"
 "\n"
-"Have any issues or feedback? Feel free to post them on the project\'s [GitHub](https://github.com/iamjustkoi/StudyTimeStats/issues).  "))
+"Have any issues or feedback? Feel free to post on the project\'s issue section on [GitHub](https://github.com/iamjustkoi/StudyTimeStats/issues)!"))
         self.patreon_button.setText(_translate("OptionsDialog", "  Become a Patron"))
         self.kofi_button.setText(_translate("OptionsDialog", "  Buy me a coffee"))
-        self.about_label_bottom.setText(_translate("OptionsDialog", "### Macros\n"
-"Can be used in text inputs to show different variables given by the addon.  \n"
-"(e.g. \"Past %range\" -> \"Past Week\")\n"
+        self.about_label_body.setText(_translate("OptionsDialog", "### Text Macros\n"
+"The addon can filter text in the custom label inputs to show information based on what\'s set in its options (e.g. \"Past %range\" can filter to \"Past Week\"). These can be used multiple times and change based on the most recent update to the addon\'s config or the next time the Anki window reloads.\n"
+"\n"
+"##### Available Macros:\n"
 "+ **%range** - the currently selected range format (Week, 2 Weeks, Month, Year)\n"
 "+ **%from_date** - range filter\'s start date using the system\'s locale (2022-06-30)\n"
-"+ **%from_weekday** - range filter\'s starting day using a compact format (Sun)\n"
-"+ **%from_full_weekday** - range filter\'s full start day (Sunday)\n"
+"+ **%from_day** - range filter\'s starting day using a compact format (Sun)\n"
+"+ **%from_full_day** - range filter\'s full start day (Sunday)\n"
 "+ **%days** - total days the range filter checks against (17)\n"
 "+ **%%** - returns a single % symbol and doesn\'t apply the text macro (%, %range, etc)\n"
 "\n"
 "<br></br>\n"
 "Thanks for downloading and hope you enjoy!  \n"
 "-koi  \n"
-"<br></br>\n"
+"<br></br>  \n"
 "©2022 JustKoi (iamjustkoi)  \n"
 "Distributed under the MIT Liecense.  "))
         self.tabs_widget.setTabText(self.tabs_widget.indexOf(self.about_tab), _translate("OptionsDialog", "About"))
