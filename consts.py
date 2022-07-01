@@ -5,6 +5,12 @@ Full license text available in "LICENSE" file, located in the add-on's root dire
 
 
 UNIQUE_DATE = '2006-10-05'
+CMD_RANGE = '%range'
+CMD_DATE = '%from_date'
+CMD_YEAR = '%from_year'
+CMD_FULL_DAY = '%from_full_day'
+CMD_DAY = '%from_day'
+CMD_DAYS = '%days'
 ICON_PATH = 'raw/'
 KOFI_FILEPATH = 'raw\\kofilogo_blue.PNG'
 PATREON_FILEPATH = 'raw\\patreon.png'

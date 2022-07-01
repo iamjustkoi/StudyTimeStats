@@ -12,7 +12,7 @@ from aqt.deckbrowser import DeckBrowser
 from aqt.overview import Overview
 from datetime import timedelta, datetime, date
 from .config import TimeStatsConfigManager
-from .consts import String, Range, UNIQUE_DATE, Config
+from .consts import String, Range, UNIQUE_DATE, Config, CMD_RANGE, CMD_DATE, CMD_YEAR, CMD_FULL_DAY, CMD_DAY, CMD_DAYS
 from .options import TimeStatsOptionsDialog
 
 html_shell = '''
@@ -235,25 +235,32 @@ Currently uses the string identifiers: %range, %from_date, %from_year, %from_ful
     :return: the formatted html string object
     """
     addon_config = get_config_manager().config
-    if re.search(r'(?<!%)%range', html_string):
+    if re.search(fr'(?<!%){CMD_RANGE}', html_string):
         start = addon_config[Config.RANGE_TYPE]
         range_text = Range.LABEL[start] if start != Range.CUSTOM \
             else f'{addon_config[Config.CUSTOM_DAYS]} {String.DAYS}'
-        html_string = html_string.replace('%range', range_text)
-    if re.search(r'(?<!%)%from_date', html_string):
-        html_string = html_string.replace('%from_date', (date.today() - timedelta(days=days_ago)).strftime('%x'))
-    if re.search(r'(?<!%)%from_year', html_string):
-        html_string = html_string.replace('%from_year', (date.today() - timedelta(days=days_ago)).strftime('%Y'))
-    if re.search(r'(?<!%)%from_full_weekday', html_string):
-        html_string = html_string.replace('%from_full_weekday', (date.today() - timedelta(days=days_ago)).strftime(
+        html_string = html_string.replace(CMD_RANGE, range_text)
+
+    if re.search(fr'(?<!%){CMD_DATE}', html_string):
+        html_string = html_string.replace(CMD_DATE, (date.today() - timedelta(days=days_ago)).strftime('%x'))
+
+    if re.search(fr'(?<!%){CMD_YEAR}', html_string):
+        html_string = html_string.replace(CMD_YEAR, (date.today() - timedelta(days=days_ago)).strftime('%Y'))
+
+    if re.search(fr'(?<!%){CMD_FULL_DAY}', html_string):
+        html_string = html_string.replace(CMD_FULL_DAY, (date.today() - timedelta(days=days_ago)).strftime(
             '%A'))
-    if re.search(r'(?<!%)%from_weekday', html_string):
-        html_string = html_string.replace('%from_weekday', (date.today() - timedelta(days=days_ago)).strftime('%a'))
-    if re.search(r'(?<!%)%days', html_string):
-        html_string = html_string.replace('%days', f'{days_ago}')
+
+    if re.search(fr'(?<!%){CMD_DAY}', html_string):
+        html_string = html_string.replace(CMD_DAY, (date.today() - timedelta(days=days_ago)).strftime('%a'))
+
+    if re.search(fr'(?<!%){CMD_DAYS}', html_string):
+        html_string = html_string.replace(CMD_DAYS, f'{days_ago}')
         # if re.search(r'(?<!%)%date\(.*,+.*\)', html_string):  # future filter?
+
     if re.search(r'%%', html_string):
         html_string = html_string.replace('%%', '%')
+
     return html_string
 
 
