@@ -14,11 +14,11 @@ Or from Anki (Tools -> Add-ons -> Get Add-ons..)
 ## Options Menu  
 ### General
 These can be used to change the look/wording of the text and how the add-on should filter the total time studied.  
-<img align="center" src="https://github.com/iamjustkoi/StudyTimeStats/raw/main/github/options_general.png">
+<p align="center"><img src="https://github.com/iamjustkoi/StudyTimeStats/raw/main/github/options_general.png"></p>
 
 ### Excluded Decks
 Any decks added to this menu won't be considered when calculating how much time's been spent studying. It will also hide the UI on the selected deck's screens.  
-<img align="center" src="https://github.com/iamjustkoi/StudyTimeStats/raw/main/github/options_excluded.png">
+<p align="center"><img src="https://github.com/iamjustkoi/StudyTimeStats/raw/main/github/options_excluded.png"></p>
 
 ## Text Macros
 The add-on can also filter text in the custom labels input to show information based on what's set in the config (e.g. "Past %range" to "Past Week"). These can be used multiple times and will update whenever Anki's main window reloads.
