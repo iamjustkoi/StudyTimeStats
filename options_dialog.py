@@ -292,7 +292,7 @@ class Ui_OptionsDialog(object):
 "\n"
 "Version: {version}  \n"
 "[Releases/Changelog](https://github.com/iamjustkoi/StudyTimeStats/releases)  \n"
-"[View Source](https://github.com/iamjustkoi/StudyTimeStats)  \n"
+"[Source Code](https://github.com/iamjustkoi/StudyTimeStats)  \n"
 "\n"
 "Have any issues or feedback? Feel free to post on the project\'s issue section on [GitHub](https://github.com/iamjustkoi/StudyTimeStats/issues)!"))
         self.patreon_button.setText(_translate("OptionsDialog", "  Become a Patron"))
