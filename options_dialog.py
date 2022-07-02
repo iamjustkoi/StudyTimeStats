@@ -283,7 +283,7 @@ class Ui_OptionsDialog(object):
         self.about_label_header.setText(_translate("OptionsDialog", "## Study Time Stats\n"
 "Adds a total and ranged study time statistic to Anki\'s main window.  \n"
 "\n"
-"Version: 1.0.5  \n"
+"Version: {version}  \n"
 "[Releases/Changelog](https://github.com/iamjustkoi/StudyTimeStats/releases)  \n"
 "[View Source](https://github.com/iamjustkoi/StudyTimeStats)  \n"
 "\n"
