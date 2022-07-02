@@ -42,14 +42,14 @@ html_shell = '''
             }}
         </style>
         <center>
-            <div id=sts-table>
-                <div class="sts-col">
-                    <div class="sts-label">{total_label}</div>
-                    <div class="sts-data">{total_value} {total_unit}</div>
+            <div id={table_id}>
+                <div class="{col_id}">
+                    <div class="{label_id}">{total_label}</div>
+                    <div class="{data_id}">{total_value} {total_unit}</div>
                 </div>
                 <div class="sts-col">
-                    <div class="sts-label">{range_label}</div>
-                    <div class="sts-data">{range_value} {range_unit}</div>
+                    <div class="{label_id}">{range_label}</div>
+                    <div class="{data_id}">{range_value} {range_unit}</div>
                 </div>
             </div>
         </center>
