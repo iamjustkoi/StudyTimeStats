@@ -5,12 +5,13 @@ Full license text available in "LICENSE" file, located in the add-on's root dire
 Shows total study time and a ranged amount of study time in Anki's main window.
 """
 import re
-import aqt.webview
-from aqt import mw
-from aqt.qt import QAction
+from datetime import timedelta, datetime, date
+
+from aqt import mw, gui_hooks, webview
 from aqt.deckbrowser import DeckBrowser
 from aqt.overview import Overview
-from datetime import timedelta, datetime, date
+from aqt.qt import QAction
+
 from .config import TimeStatsConfigManager
 from .consts import String, Range, UNIQUE_DATE, Config, CMD_RANGE, CMD_DATE, CMD_YEAR, CMD_FULL_DAY, CMD_DAY, CMD_DAYS
 from .options import TimeStatsOptionsDialog
@@ -58,6 +59,8 @@ def initialize():
     """
 Initializer for add-on. Called at start for finer execution order and a bit of readability.
     """
+    print(f'{mw.addonManager.allAddons()}')
+    print(f'{mw.addonManager.all_addon_meta()}')
     build_hooks()
     build_actions()
 
@@ -66,7 +69,6 @@ def build_hooks():
     """
 Append addon hooks to Anki.
     """
-    from aqt import gui_hooks
     gui_hooks.webview_will_set_content.append(format_webview)
     gui_hooks.webview_did_inject_style_into_page.append(format_congrats)
 
@@ -96,7 +98,7 @@ Retrieves the addon's config manager.
     return TimeStatsConfigManager(mw, (date.today() - date.fromisoformat(UNIQUE_DATE)).days)
 
 
-def format_webview(content: aqt.webview.WebContent, context: object or None):
+def format_webview(content: webview.WebContent, context: object or None):
     """
 If the current deck screen isn't excluded, formats the Anki webview to include html with study time data,
 else does nothing.
@@ -115,10 +117,10 @@ else does nothing.
         content.body += formatted_html()
 
 
-def format_congrats(webview: aqt.webview.AnkiWebView):
+def format_congrats(web: webview.AnkiWebView):
     """
 Extra handler used for the congrats page since it can't be as easily retrieved with the existing hooks.
-    :param webview: AnkiWebView to check against and format.
+    :param web: AnkiWebView to check against and format.
     """
     if mw.col is None:
         # print(f'--Anki Window was NoneType')
@@ -126,9 +128,9 @@ Extra handler used for the congrats page since it can't be as easily retrieved w
 
     config_manager = get_config_manager()
 
-    if webview.page().url().path().find('congrats.html') != -1 and config_manager.config[Config.CONGRATS_ENABLED]:
+    if web.page().url().path().find('congrats.html') != -1 and config_manager.config[Config.CONGRATS_ENABLED]:
         if should_display_on_current_screen():
-            webview.eval(
+            web.eval(
                 f'if (document.getElementById("time_table") == null) document.body.innerHTML += `{formatted_html()}`'
             )
 

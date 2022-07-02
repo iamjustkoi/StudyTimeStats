@@ -2,11 +2,12 @@
 MIT License: Copyright (c) 2022 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
 Full license text available in "LICENSE" file, located in the add-on's root directory.
 """
-from pathlib import Path
 import webbrowser
+from pathlib import Path
+
 from aqt.qt import QDialog, QColorDialog, QColor, QLabel, QDialogButtonBox, QRect, QIcon, QMenu
-from aqt.qt.qt5 import Qt, QApplication
 from aqt.studydeck import StudyDeck
+
 from .config import TimeStatsConfigManager
 from .consts import *
 from .options_dialog import Ui_OptionsDialog
@@ -24,7 +25,7 @@ Addon options QDialog class for accessing and changing the addon's config values
 
         :param conf_manager: TimeStatsConfigManager used to reading and writing user input.
         """
-        super().__init__(flags=Qt.WindowFlags())
+        super().__init__(flags=conf_manager.mw.windowFlags())
         self.manager = conf_manager
         self.config = conf_manager.config
         self.ui = Ui_OptionsDialog()
@@ -85,7 +86,7 @@ Handles context menu actions for the input button.
 Copies a link to the clipboard based on the input button.
         :param button: button to use for determining which link to copy
         """
-        cb = QApplication.clipboard()
+        cb = self.manager.mw.app.clipboard()
         cb.clear(mode=cb.Clipboard)
 
         if button.objectName() == self.ui.patreon_button.objectName():
