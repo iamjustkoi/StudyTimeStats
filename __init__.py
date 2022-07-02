@@ -59,8 +59,6 @@ def initialize():
     """
 Initializer for add-on. Called at start for finer execution order and a bit of readability.
     """
-    print(f'{mw.addonManager.allAddons()}')
-    print(f'{mw.addonManager.all_addon_meta()}')
     build_hooks()
     build_actions()
 
@@ -78,7 +76,6 @@ def build_actions():
 Add and connect addon actions. Currently, adds an options menu action and sets the addon configuration action,
 found in Anki's addon window, to also open the options menu.
     """
-    # TODO: add key shortcut to alt menu (&[t]ime Stats)
     options_action = QAction(String.OPTIONS_ACTION, mw)
     options_action.triggered.connect(on_options_called)
     # Handle edge case where toolbar action already exists
@@ -215,8 +212,8 @@ Uses the addon config and current stats to retrieve the html to display on Anki'
 
     total_val = round(total_hrs, 2) if total_hrs > 1 else round(total_hrs * 60, 2)
     range_val = round(ranged_hrs, 2) if ranged_hrs > 1 else round(ranged_hrs * 60, 2)
-    total_unit = String.HRS if total_hrs > 1 else String.MIN
-    range_unit = String.HRS if ranged_hrs > 1 else String.MIN
+    total_unit = addon_config[Config.CUSTOM_HRS_TEXT] if total_hrs > 1 else addon_config[Config.CUSTOM_MIN_TEXT]
+    range_unit = addon_config[Config.CUSTOM_HRS_TEXT] if ranged_hrs > 1 else addon_config[Config.CUSTOM_MIN_TEXT]
 
     html_string = html_shell.format(total_label=addon_config[Config.CUSTOM_TOTAL_TEXT],
                                     range_label=addon_config[Config.CUSTOM_RANGE_TEXT],
