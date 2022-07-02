@@ -277,7 +277,7 @@ class Ui_OptionsDialog(object):
         self.ranged_label.setText(_translate("OptionsDialog", "Custom Ranged Text"))
         self.toolbar_checkbox.setToolTip(_translate("OptionsDialog", "Enables the Tools Menu shortcut for showing these options. \n"
 "This window can also be opened in the Add-ons menu using the Config button."))
-        self.toolbar_checkbox.setText(_translate("OptionsDialog", "Show Tools Menu Options Shortcut"))
+        self.toolbar_checkbox.setText(_translate("OptionsDialog", "Show Options in Tool Menu"))
         self.pages_group_box.setTitle(_translate("OptionsDialog", "Enabled Pages"))
         self.browser_checkbox.setText(_translate("OptionsDialog", "Deck Browser"))
         self.overview_checkbox.setText(_translate("OptionsDialog", "Overview"))
