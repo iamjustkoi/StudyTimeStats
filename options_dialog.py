@@ -158,7 +158,7 @@ class Ui_OptionsDialog(object):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setObjectName("scroll_area")
         self.about_scroll = QtWidgets.QWidget()
-        self.about_scroll.setGeometry(QtCore.QRect(0, -217, 470, 459))
+        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 470, 459))
         self.about_scroll.setObjectName("about_scroll")
         self.scroll_layout = QtWidgets.QVBoxLayout(self.about_scroll)
         self.scroll_layout.setSpacing(6)
@@ -230,7 +230,7 @@ class Ui_OptionsDialog(object):
 
     def retranslateUi(self, OptionsDialog):
         _translate = QtCore.QCoreApplication.translate
-        OptionsDialog.setWindowTitle(_translate("OptionsDialog", "Study TIme Stats Options"))
+        OptionsDialog.setWindowTitle(_translate("OptionsDialog", "Study Time Stats Options"))
         self.range_select_label.setText(_translate("OptionsDialog", "Selected Range"))
         self.range_select_dropdown.setToolTip(_translate("OptionsDialog", "Time range to filter through for the ranged total stat."))
         self.range_select_dropdown.setItemText(0, _translate("OptionsDialog", "Past Week"))
@@ -269,7 +269,7 @@ class Ui_OptionsDialog(object):
         self.about_label_header.setText(_translate("OptionsDialog", "## Study Time Stats\n"
 "Adds a total and ranged study time statistic to Anki\'s main window.  \n"
 "\n"
-"Version 1.0.0  \n"
+"Version 1.0.4  \n"
 "\n"
 "Have any issues or feedback? Feel free to post on the project\'s issue section on [GitHub](https://github.com/iamjustkoi/StudyTimeStats/issues)!"))
         self.patreon_button.setText(_translate("OptionsDialog", "  Become a Patron"))
