@@ -3,7 +3,7 @@ MIT License: Copyright (c) 2022 JustKoi (iamjustkoi) <https://github.com/iamjust
 Full license text available in "LICENSE" file, located in the add-on's root directory.
 """
 
-
+CURRENT_VERSION = '1.0.5'
 UNIQUE_DATE = '2006-10-05'
 CMD_RANGE = '%range'
 CMD_DATE = '%from_date'
@@ -23,14 +23,14 @@ class String:
     PAST_RANGE = 'Past %range'
     HRS = 'hrs'
     MIN = 'min'
-    OPTIONS_ACTION = 'Study Time Stats Options...'
+    OPTIONS_ACTION = 'Study &Time Stats Options...'
     USE_CALENDAR = 'Use Calendar'
     DAYS = 'Days'
     WEEK = 'Week'
     TWO_WEEKS = '2 Weeks'
     MONTH = 'Month'
     YEAR = 'Year'
-    COPY_LINK = 'Copy Link'
+    COPY_LINK_ACTION = 'Copy &Link Location'
 
 
 class Range:
@@ -50,6 +50,8 @@ class Config:
     CUSTOM_DAYS = 'Custom_Days'
     CUSTOM_TOTAL_TEXT = 'Custom_Total_Text'
     CUSTOM_RANGE_TEXT = 'Custom_Range_Text'
+    CUSTOM_HRS_TEXT = 'Custom_Hrs_Text'
+    CUSTOM_MIN_TEXT = 'Custom_Min_Text'
     PRIMARY_COLOR = 'Primary_Color'
     SECONDARY_COLOR = 'Secondary_Color'
     BROWSER_ENABLED = 'Browser_Enabled'
@@ -63,6 +65,8 @@ class Config:
         CUSTOM_DAYS: 7,
         CUSTOM_TOTAL_TEXT: String.TOTAL,
         CUSTOM_RANGE_TEXT: String.PAST_RANGE,
+        CUSTOM_HRS_TEXT: String.HRS,
+        CUSTOM_MIN_TEXT: String.MIN,
         PRIMARY_COLOR: 'white',
         SECONDARY_COLOR: '#76bfb4',
         BROWSER_ENABLED: True,
