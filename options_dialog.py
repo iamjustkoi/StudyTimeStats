@@ -15,7 +15,7 @@ class Ui_OptionsDialog(object):
     def setupUi(self, OptionsDialog):
         OptionsDialog.setObjectName("OptionsDialog")
         OptionsDialog.setWindowModality(QtCore.Qt.ApplicationModal)
-        OptionsDialog.resize(531, 330)
+        OptionsDialog.resize(531, 405)
         OptionsDialog.setModal(True)
         self.options_vert_layout = QtWidgets.QVBoxLayout(OptionsDialog)
         self.options_vert_layout.setObjectName("options_vert_layout")
@@ -174,7 +174,7 @@ class Ui_OptionsDialog(object):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setObjectName("scroll_area")
         self.about_scroll = QtWidgets.QWidget()
-        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 470, 495))
+        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 295, 625))
         self.about_scroll.setObjectName("about_scroll")
         self.scroll_layout = QtWidgets.QVBoxLayout(self.about_scroll)
         self.scroll_layout.setSpacing(6)
@@ -277,7 +277,7 @@ class Ui_OptionsDialog(object):
         self.ranged_label.setText(_translate("OptionsDialog", "Custom Ranged Text"))
         self.toolbar_checkbox.setToolTip(_translate("OptionsDialog", "Enables the Tools Menu shortcut for showing these options. \n"
 "This window can also be opened in the Add-ons menu using the Config button."))
-        self.toolbar_checkbox.setText(_translate("OptionsDialog", "Show Options in Tool Menu"))
+        self.toolbar_checkbox.setText(_translate("OptionsDialog", "Show Options in Tools Menu"))
         self.pages_group_box.setTitle(_translate("OptionsDialog", "Enabled Pages"))
         self.browser_checkbox.setText(_translate("OptionsDialog", "Deck Browser"))
         self.overview_checkbox.setText(_translate("OptionsDialog", "Overview"))
