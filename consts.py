@@ -3,7 +3,7 @@ MIT License: Copyright (c) 2022 JustKoi (iamjustkoi) <https://github.com/iamjust
 Full license text available in "LICENSE" file, located in the add-on's root directory.
 """
 
-CURRENT_VERSION = '1.1.0'
+CURRENT_VERSION = '1.1.1a'
 
 UNIQUE_DATE = '2006-10-05'
 CMD_RANGE = '%range'
