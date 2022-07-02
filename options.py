@@ -134,7 +134,6 @@ Opens a color picker dialog and updates the selected config color.
         """
 Opens a modified StudyDeck dialog that retrieves the user's input on which deck to add to the excluded decks list.
         """
-        from aqt.qt import QDialogButtonBox
 
         deck_dialog = StudyDeck(
             self.manager.mw,
