@@ -69,6 +69,12 @@ Addon options QDialog class for accessing and changing the addon's config values
         # Update custom range's max value
         self.ui.custom_range_spinbox.setMaximum(self.manager.max_range)
 
+        # Update about header text with the current version number
+        updated_about_header = self.ui.about_label_header.text().format(version=CURRENT_VERSION)
+        self.ui.about_label_header.setText(updated_about_header)
+
+        # Setting current index again to overwrite QTDesigner's auto-setting, just in case
+        self.ui.tabs_widget.setCurrentIndex(0)
         self._load()
 
     def on_context_menu(self, point, button):
@@ -78,7 +84,7 @@ Handles context menu actions for the input button.
         :param button: button being clicked/triggered
         """
         self.ui.context_menu = QMenu(self)
-        self.ui.context_menu.addAction(String.COPY_LINK).triggered.connect(lambda: self.on_copy_link(button))
+        self.ui.context_menu.addAction(String.COPY_LINK_ACTION).triggered.connect(lambda: self.on_copy_link(button))
         self.ui.context_menu.exec(button.mapToGlobal(point))
 
     def on_copy_link(self, button):
@@ -90,10 +96,8 @@ Copies a link to the clipboard based on the input button.
         cb.clear(mode=cb.Clipboard)
 
         if button.objectName() == self.ui.patreon_button.objectName():
-            print('pat')
             cb.setText(PATREON_URL, mode=cb.Clipboard)
         elif button.objectName() == self.ui.kofi_button.objectName():
-            print('kofi')
             cb.setText(KOFI_URL, mode=cb.Clipboard)
 
     def open_color_dialog(self, preview: QLabel):
@@ -240,6 +244,8 @@ Loads all config values to the options dialog.
         self.ui.custom_range_spinbox.setValue(self.config[Config.CUSTOM_DAYS])
         self.ui.total_line.setText(self.config[Config.CUSTOM_TOTAL_TEXT])
         self.ui.ranged_line.setText(self.config[Config.CUSTOM_RANGE_TEXT])
+        self.ui.hrs_line.setText(self.config[Config.CUSTOM_HRS_TEXT])
+        self.ui.min_line.setText(self.config[Config.CUSTOM_MIN_TEXT])
 
         # Color Pickers
         set_label_background(self.ui.primary_color_preview, self.config[Config.PRIMARY_COLOR])
@@ -265,9 +271,10 @@ window to update all the ui.
         self.config[Config.RANGE_TYPE] = self.ui.range_select_dropdown.currentIndex()
         self.config[Config.USE_CALENDAR_RANGE] = self.ui.use_calendar_checkbox.isChecked()
         self.config[Config.CUSTOM_DAYS] = self.ui.custom_range_spinbox.value()
-        print(f'custom val: {self.ui.custom_range_spinbox.value()}')
         self.config[Config.CUSTOM_TOTAL_TEXT] = self.ui.total_line.text()
         self.config[Config.CUSTOM_RANGE_TEXT] = self.ui.ranged_line.text()
+        self.config[Config.CUSTOM_HRS_TEXT] = self.ui.hrs_line.text()
+        self.config[Config.CUSTOM_MIN_TEXT] = self.ui.min_line.text()
 
         # Primary Color css stylesheet
         self.config[Config.PRIMARY_COLOR] = self._primary_color
