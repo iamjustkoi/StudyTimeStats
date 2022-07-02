@@ -20,11 +20,8 @@ Steps to reproduce:
 **Screenshots/Visuals**
 If necessary/applicable, add some screenshots to help explain the issue.
 
-**Platform/System Info:**
- - OS: [e.g. Windows 10/11]
- - Anki Version: [e.g. 2.1.49]
- - Add-on Version: [e.g. 1.2.0]
- - (Python Version: [e.g. 3.8/3.9])
+**System/Debug Info:**
+You can get this from Anki in Help -> About -> Copy Debug Info,
 
 **Additional context**
 Any other context that might seem important to the issue.
