@@ -22,7 +22,7 @@ html_shell = '''
             #{table_id} {{
                 display: table;
                 margin-top: .5em;
-                width: 50%%;
+                max-width: fit-content;
                 font-weight: normal;
             }}
             .{col_id} {{
