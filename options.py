@@ -22,7 +22,6 @@ class TimeStatsOptionsDialog(QDialog):
     def __init__(self, conf_manager: TimeStatsConfigManager):
         """
 Addon options QDialog class for accessing and changing the addon's config values.
-
         :param conf_manager: TimeStatsConfigManager used to reading and writing user input.
         """
         super().__init__(flags=conf_manager.mw.windowFlags())
