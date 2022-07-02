@@ -45,6 +45,7 @@ class Weekday:
 
 
 class Config:
+    TOOLBAR_ENABLED = 'Use_Toolbar_Options'
     WEEK_START = 'Week_Start'
     USE_CALENDAR_RANGE = 'Use_Calendar_Range'
     RANGE_TYPE = 'Range_Type'
@@ -60,6 +61,7 @@ class Config:
     CONGRATS_ENABLED = 'Congrats_Enabled'
     EXCLUDED_DIDS = "Excluded_Deck_IDs"
     DEFAULT_CONFIG = {
+        TOOLBAR_ENABLED: True,
         WEEK_START: Weekday.SUNDAY,
         USE_CALENDAR_RANGE: True,
         RANGE_TYPE: Range.WEEK,

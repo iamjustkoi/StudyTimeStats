@@ -233,6 +233,8 @@ Retrieves currently excluded deck id's.
         """
 Loads all config values to the options dialog.
         """
+        self.ui.toolbar_checkbox.setChecked(self.config[Config.TOOLBAR_ENABLED])
+
         self.ui.week_start_dropdown.setCurrentIndex(self.config[Config.WEEK_START])
 
         self.ui.range_select_dropdown.setCurrentIndex(self.config[Config.RANGE_TYPE])
@@ -267,6 +269,8 @@ Loads all config values to the options dialog.
 Retrieves values from options dialog window, updates/writes the values to the current config, then resets the main
 window to update all the ui.
         """
+        # Store options
+        self.config[Config.TOOLBAR_ENABLED] = self.ui.toolbar_checkbox.isChecked()
         self.config[Config.WEEK_START] = self.ui.week_start_dropdown.currentIndex()
         self.config[Config.RANGE_TYPE] = self.ui.range_select_dropdown.currentIndex()
         self.config[Config.USE_CALENDAR_RANGE] = self.ui.use_calendar_checkbox.isChecked()
@@ -276,7 +280,7 @@ window to update all the ui.
         self.config[Config.CUSTOM_HRS_TEXT] = self.ui.hrs_line.text()
         self.config[Config.CUSTOM_MIN_TEXT] = self.ui.min_line.text()
 
-        # Primary Color css stylesheet
+        # Store colors with saved hex info
         self.config[Config.PRIMARY_COLOR] = self._primary_color
         self.config[Config.SECONDARY_COLOR] = self._secondary_color
 

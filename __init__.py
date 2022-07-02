@@ -70,6 +70,7 @@ Append addon hooks to Anki.
     """
     gui_hooks.webview_will_set_content.append(format_webview)
     gui_hooks.webview_did_inject_style_into_page.append(format_congrats)
+    gui_hooks.operation_did_execute.append(update_toolbar)
 
 
 def build_actions():
@@ -77,14 +78,26 @@ def build_actions():
 Add and connect addon actions. Currently, adds an options menu action and sets the addon configuration action,
 found in Anki's addon window, to also open the options menu.
     """
-    options_action = QAction(String.OPTIONS_ACTION, mw)
-    options_action.triggered.connect(on_options_called)
-    # Handle edge case where toolbar action already exists
-    if options_action in mw.form.menuTools.actions():
-        mw.form.menuTools.removeAction(options_action)
-
-    mw.form.menuTools.addAction(options_action)
+    update_toolbar()
     mw.addonManager.setConfigAction(__name__, on_options_called)
+
+
+def update_toolbar(changes=None, obj=None):
+    """
+Updates the toolbar actions menu with the options shortcut. Expects an Operation Change hook,
+but can also be used as a general update push.
+    :param changes: Unused OpChanges object.
+    :param obj: Unused options object.
+    """
+    # Handle edge case where toolbar action already exists
+    for action in mw.form.menuTools.actions():
+        if action.text() == String.OPTIONS_ACTION:
+            mw.form.menuTools.removeAction(action)
+
+    if get_config_manager().config[Config.TOOLBAR_ENABLED]:
+        options_action = QAction(String.OPTIONS_ACTION, mw)
+        options_action.triggered.connect(on_options_called)
+        mw.form.menuTools.addAction(options_action)
 
 
 def get_config_manager() -> TimeStatsConfigManager:
@@ -161,6 +174,7 @@ the Anki database files.
     if mw.state == 'overview':
         dids = [str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))]
     else:
+        # TODO: Update from legacy code
         dids = mw.col.decks.all_ids()
 
     for excluded_did in addon_config[Config.EXCLUDED_DIDS]:
