@@ -4,6 +4,7 @@ Full license text available in "LICENSE" file, located in the add-on's root dire
 """
 
 CURRENT_VERSION = '1.1.0'
+
 UNIQUE_DATE = '2006-10-05'
 CMD_RANGE = '%range'
 CMD_DATE = '%from_date'
