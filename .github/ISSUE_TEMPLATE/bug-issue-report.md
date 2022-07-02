@@ -1,6 +1,6 @@
 ---
 name: Bug/Issue Report
-about: Create a report to help us improve
+about: Create a report to help with improving the add-on
 title: ''
 labels: ''
 assignees: iamjustkoi
