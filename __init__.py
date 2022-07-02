@@ -16,26 +16,27 @@ from .config import TimeStatsConfigManager
 from .consts import String, Range, UNIQUE_DATE, Config, CMD_RANGE, CMD_DATE, CMD_YEAR, CMD_FULL_DAY, CMD_DAY, CMD_DAYS
 from .options import TimeStatsOptionsDialog
 
+table_id, col_id, label_id, data_id = 'sts-table', 'sts-col', 'sts-label', 'sts-data'
 html_shell = '''
         <style>
-            #sts-table {{
+            #{table_id} {{
                 display: table;
                 margin-top: .5em;
                 width: 50%%;
                 font-weight: normal;
             }}
-            .sts-col {{
+            .{col_id} {{
                 display: table-cell;
                 word-break: break-all;
                 width: 30vh;
             }}
-            .sts-col > * {{
+            .{col_id} > * {{
                 display: table-row;
             }}
-            .sts-label {{
+            .{label_id} {{
                 color: {primary_color};
             }}
-            .sts-data {{
+            .{data_id} {{
                 color: {secondary_color};
                 font-weight: bold;
             }}
@@ -128,7 +129,7 @@ Extra handler used for the congrats page since it can't be as easily retrieved w
     if web.page().url().path().find('congrats.html') != -1 and config_manager.config[Config.CONGRATS_ENABLED]:
         if should_display_on_current_screen():
             web.eval(
-                f'if (document.getElementById("time_table") == null) document.body.innerHTML += `{formatted_html()}`'
+                f'if (document.getElementById("{table_id}") == null) document.body.innerHTML += `{formatted_html()}`'
             )
 
 
@@ -220,7 +221,8 @@ Uses the addon config and current stats to retrieve the html to display on Anki'
                                     total_value=total_val, range_value=range_val,
                                     total_unit=total_unit, range_unit=range_unit,
                                     primary_color=addon_config[Config.PRIMARY_COLOR],
-                                    secondary_color=addon_config[Config.SECONDARY_COLOR])
+                                    secondary_color=addon_config[Config.SECONDARY_COLOR],
+                                    table_id=table_id, col_id=col_id, label_id=label_id, data_id=data_id)
 
     return filter_html_ids(html_string, days_ago)
 
