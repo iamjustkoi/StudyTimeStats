@@ -181,7 +181,6 @@ the Anki database files.
     if mw.state == 'overview':
         dids = [str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))]
     else:
-        # TODO: Update from legacy code
         dids = [str(name_id.id) for name_id in mw.col.decks.all_names_and_ids()]
 
     for excluded_did in addon_config[Config.EXCLUDED_DIDS]:
@@ -204,12 +203,9 @@ the Anki database files.
         days_ago = Range.DAYS_IN[range_type]
         if addon_config[Config.USE_CALENDAR_RANGE]:
             if range_type == Range.WEEK or range_type == Range.TWO_WEEKS:
-                week_date = date.today() - timedelta(days=(Range.DAYS_IN[range_type] - 7))
+                total_weeks = Range.DAYS_IN[range_type] / 7
                 week_start_day = addon_config[Config.WEEK_START]
-                if week_date.weekday() >= week_start_day:
-                    days_ago = (week_date.weekday() - week_start_day) + (Range.DAYS_IN[range_type] - 7)
-                else:
-                    days_ago = (week_date.weekday() - week_start_day) + (Range.DAYS_IN[range_type])
+                days_ago = days_since_week_start(total_weeks, week_start_day)
             elif range_type == Range.MONTH:
                 days_ago = (date.today() - date.today().replace(day=1)).days
             elif range_type == Range.YEAR:
@@ -222,6 +218,24 @@ the Anki database files.
     filtered_rev_times_ms = [log[1] for log in filtered_revlog[0:]]
 
     return sum(all_rev_times_ms) / 1000 / 60 / 60, sum(filtered_rev_times_ms) / 1000 / 60 / 60, int(days_ago)
+
+
+def days_since_week_start(total_weeks: int, week_start_day: int):
+    """
+Gets days since the last week-start date based on a max of the total days.
+    :param total_weeks: Range of days to use as a reference point, should be divisible by 7
+    :param week_start_day: Start of the week to count from
+    :return: days since week start
+    """
+    # Get the days from the week start, minus the total weeks
+    #  (mon - tue = -1) + 7 = 6 days, etc
+    current_weekday = date.today().weekday()
+    if current_weekday >= week_start_day:
+        # If the week start value is lower than the current value, go back an extra week
+        days_ago = (current_weekday - week_start_day) + ((total_weeks * 7) - 7)
+    else:
+        days_ago = (current_weekday - week_start_day) + (total_weeks * 7)
+    return days_ago
 
 
 def formatted_html():
