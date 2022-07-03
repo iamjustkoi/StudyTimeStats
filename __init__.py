@@ -93,15 +93,16 @@ but can also be used as a general update push.
     :param changes: Unused OpChanges object.
     :param obj: Unused options object.
     """
-    # Handle edge case where toolbar action already exists
-    for action in mw.form.menuTools.actions():
-        if action.text() == String.OPTIONS_ACTION:
-            mw.form.menuTools.removeAction(action)
-
     if get_config_manager().config[Config.TOOLBAR_ENABLED]:
         options_action = QAction(String.OPTIONS_ACTION, mw)
         options_action.triggered.connect(on_options_called)
-        mw.form.menuTools.addAction(options_action)
+        # Handles edge cases where toolbar action already exists in the tools menu
+        if options_action.text() not in [action.text() for action in mw.form.menuTools.actions()]:
+            mw.form.menuTools.addAction(options_action)
+    else:
+        for action in mw.form.menuTools.actions():
+            if action.text() == String.OPTIONS_ACTION:
+                mw.form.menuTools.removeAction(action)
 
 
 def get_config_manager() -> TimeStatsConfigManager:
