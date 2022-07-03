@@ -1,13 +1,13 @@
 ---
-name: Bug/Issue Report
-about: Create a report to help improve the add-on
+name: Bug Report
+about: Create an error report to help improve the add-on
 title: ''
-labels: issue
+labels: bug
 assignees: ''
 
 ---
 
-**Bug/Issue Description**
+**Issue/Bug Description**
 A short description of the issue.
 
 **To Reproduce**
