@@ -7,18 +7,16 @@ Shows total study time and a ranged amount of study time in Anki's main window.
 import re
 from datetime import timedelta, datetime, date
 
-import anki.buildinfo
 from aqt import mw, gui_hooks, webview
 from aqt.deckbrowser import DeckBrowser
 from aqt.overview import Overview
 from aqt.qt import QAction
 
-from .config import TimeStatsConfigManager
+from .config import TimeStatsConfigManager, ANKI_VERSION
 from .consts import String, Range, Config
 from .consts import UNIQUE_DATE, CMD_RANGE, CMD_DATE, CMD_YEAR, CMD_FULL_DAY, CMD_DAY, CMD_DAYS, ANKI_LEGACY_VER
 from .options import TimeStatsOptionsDialog
 
-anki_version = int(anki.buildinfo.version.replace('2.1.', ''))
 table_id, col_id, label_id, data_id = 'sts-table', 'sts-col', 'sts-label', 'sts-data'
 html_shell = '''
         <style>
@@ -72,7 +70,7 @@ def build_hooks():
 Append addon hooks to Anki.
     """
     gui_hooks.webview_will_set_content.append(append_to_webview)
-    if anki_version > ANKI_LEGACY_VER:
+    if ANKI_VERSION > ANKI_LEGACY_VER:
         gui_hooks.webview_did_inject_style_into_page.append(inject_to_congrats)
         gui_hooks.operation_did_execute.append(update_toolbar)
     else:
@@ -129,7 +127,7 @@ else does nothing.
 
     show_on_deck_browser = isinstance(context, DeckBrowser) and addon_config[Config.BROWSER_ENABLED]
     #  handles legacy congrats
-    on_congrats = False if anki_version > ANKI_LEGACY_VER else content.body.find("Congratulations!") >= 0
+    on_congrats = False if ANKI_VERSION > ANKI_LEGACY_VER else content.body.find("Congratulations!") >= 0
     show_on_congrats = on_congrats and addon_config[Config.CONGRATS_ENABLED]
 
     show_on_overview = isinstance(context, Overview) and addon_config[Config.OVERVIEW_ENABLED] and not on_congrats
@@ -306,7 +304,7 @@ Retrieves a collection of review logs based on the input number of days to retri
     :param days_ago: number of days to filter through
     :return: a new list of review logs based on the input days to filter
     """
-    if anki_version > ANKI_LEGACY_VER:
+    if ANKI_VERSION > ANKI_LEGACY_VER:
         offset_hour = mw.col.get_preferences().scheduling.rollover
     else:
         offset_hour = mw.col.conf.get('rollover', 4)

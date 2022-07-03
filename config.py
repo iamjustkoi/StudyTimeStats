@@ -2,9 +2,12 @@
 MIT License: Copyright (c) 2022 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
 Full license text available in "LICENSE" file, located in the add-on's root directory.
 """
+from anki import buildinfo
 from aqt import AnkiQt
 
 from .consts import Config
+
+ANKI_VERSION = int(buildinfo.version.replace('2.1.', ''))
 
 
 class TimeStatsConfigManager:
