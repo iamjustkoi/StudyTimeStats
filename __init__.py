@@ -7,15 +7,18 @@ Shows total study time and a ranged amount of study time in Anki's main window.
 import re
 from datetime import timedelta, datetime, date
 
+import anki.buildinfo
 from aqt import mw, gui_hooks, webview
 from aqt.deckbrowser import DeckBrowser
 from aqt.overview import Overview
 from aqt.qt import QAction
 
 from .config import TimeStatsConfigManager
-from .consts import String, Range, UNIQUE_DATE, Config, CMD_RANGE, CMD_DATE, CMD_YEAR, CMD_FULL_DAY, CMD_DAY, CMD_DAYS
+from .consts import String, Range, Config
+from .consts import UNIQUE_DATE, CMD_RANGE, CMD_DATE, CMD_YEAR, CMD_FULL_DAY, CMD_DAY, CMD_DAYS, ANKI_LEGACY_VER
 from .options import TimeStatsOptionsDialog
 
+anki_version = int(anki.buildinfo.version.replace('2.1.', ''))
 table_id, col_id, label_id, data_id = 'sts-table', 'sts-col', 'sts-label', 'sts-data'
 html_shell = '''
         <style>
@@ -58,7 +61,7 @@ html_shell = '''
 
 def initialize():
     """
-Initializer for add-on. Called at start for finer execution order and a bit of readability.
+Initializer for the add-on. Called at the start for finer execution order and a bit of readability.
     """
     build_hooks()
     build_actions()
@@ -68,9 +71,12 @@ def build_hooks():
     """
 Append addon hooks to Anki.
     """
-    gui_hooks.webview_will_set_content.append(format_webview)
-    gui_hooks.webview_did_inject_style_into_page.append(format_congrats)
-    gui_hooks.operation_did_execute.append(update_toolbar)
+    gui_hooks.webview_will_set_content.append(append_to_webview)
+    if anki_version > ANKI_LEGACY_VER:
+        gui_hooks.webview_did_inject_style_into_page.append(inject_to_congrats)
+        gui_hooks.operation_did_execute.append(update_toolbar)
+    else:
+        gui_hooks.state_did_reset.append(update_toolbar)
 
 
 def build_actions():
@@ -109,7 +115,7 @@ Retrieves the addon's config manager.
     return TimeStatsConfigManager(mw, (date.today() - date.fromisoformat(UNIQUE_DATE)).days)
 
 
-def format_webview(content: webview.WebContent, context: object or None):
+def append_to_webview(content: webview.WebContent, context: object or None):
     """
 If the current deck screen isn't excluded, formats the Anki webview to include html with study time data,
 else does nothing.
@@ -119,16 +125,20 @@ else does nothing.
     if mw.col is None:
         # print(f'--Anki Window was NoneType')
         return
+    addon_config = get_config_manager().config
 
-    config_manager = get_config_manager()
+    show_on_deck_browser = isinstance(context, DeckBrowser) and addon_config[Config.BROWSER_ENABLED]
+    #  handles legacy congrats
+    on_congrats = False if anki_version > ANKI_LEGACY_VER else content.body.find("Congratulations!") >= 0
+    show_on_congrats = on_congrats and addon_config[Config.CONGRATS_ENABLED]
 
-    if (isinstance(context, DeckBrowser) and config_manager.config[Config.BROWSER_ENABLED]) or \
-            (isinstance(context, Overview) and config_manager.config[Config.OVERVIEW_ENABLED] and
-             should_display_on_current_screen()):
+    show_on_overview = isinstance(context, Overview) and addon_config[Config.OVERVIEW_ENABLED] and not on_congrats
+
+    if show_on_deck_browser or ((show_on_overview or show_on_congrats) and should_display_on_current_screen()):
         content.body += formatted_html()
 
 
-def format_congrats(web: webview.AnkiWebView):
+def inject_to_congrats(web: webview.AnkiWebView):
     """
 Extra handler used for the congrats page since it can't be as easily retrieved with the existing hooks.
     :param web: AnkiWebView to check against and format.
@@ -170,18 +180,17 @@ the Anki database files.
     """
     addon_config = get_config_manager().config
 
-    # print(f'mw state: {mw.state}')
     if mw.state == 'overview':
         dids = [str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))]
     else:
         # TODO: Update from legacy code
-        dids = mw.col.decks.all_ids()
+        dids = [str(name_id.id) for name_id in mw.col.decks.all_names_and_ids()]
 
     for excluded_did in addon_config[Config.EXCLUDED_DIDS]:
         if str(excluded_did) in dids:
             dids.remove(str(excluded_did))
 
-    # print(f'checking dids: {[mw.col.decks.name(i) for i in dids]}')
+    # print(f'checking decks: {[mw.col.decks.name(i) for i in dids]}')
 
     dids_as_args = '(' + ', '.join(dids) + ')'
     cids_cmd = f'SELECT id FROM cards WHERE did in {dids_as_args}\n'
@@ -297,7 +306,10 @@ Retrieves a collection of review logs based on the input number of days to retri
     :param days_ago: number of days to filter through
     :return: a new list of review logs based on the input days to filter
     """
-    offset_hour = mw.col.get_preferences().scheduling.rollover
+    if anki_version > ANKI_LEGACY_VER:
+        offset_hour = mw.col.get_preferences().scheduling.rollover
+    else:
+        offset_hour = mw.col.conf.get('rollover', 4)
     filtered_logs = []
     for log in rev_logs[0:]:
         log_epoch_seconds = log[0] / 1000

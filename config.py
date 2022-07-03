@@ -3,6 +3,7 @@ MIT License: Copyright (c) 2022 JustKoi (iamjustkoi) <https://github.com/iamjust
 Full license text available in "LICENSE" file, located in the add-on's root directory.
 """
 from aqt import AnkiQt
+
 from .consts import Config
 
 
@@ -31,6 +32,7 @@ Generic config manager for accessing and writing addon config values.
 
         self._meta['config'] = self.config
 
+    # TODO: Check if config is not default and write if config was changed to meta file
     def write_config(self):
         """
 Writes the config manager's current values to the addon meta file.
