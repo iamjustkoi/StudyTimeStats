@@ -8,7 +8,7 @@ from pathlib import Path
 from aqt.qt import QDialog, QColorDialog, QColor, QLabel, QDialogButtonBox, QRect, QIcon, QMenu
 from aqt.studydeck import StudyDeck
 
-from .config import TimeStatsConfigManager
+from .config import TimeStatsConfigManager, ANKI_VERSION
 from .consts import *
 from .options_dialog import Ui_OptionsDialog
 
@@ -16,6 +16,9 @@ from .options_dialog import Ui_OptionsDialog
 def set_label_background(label: QLabel, hex_arg: str):
     label.setStyleSheet(f'QWidget {{background-color: {hex_arg}}}')
 
+
+def custom_exec():
+    pass
 
 class TimeStatsOptionsDialog(QDialog):
 
@@ -137,21 +140,34 @@ Opens a color picker dialog and updates the selected config color.
         """
 Opens a modified StudyDeck dialog that retrieves the user's input on which deck to add to the excluded decks list.
         """
+        accept, title, parent, geom_key, buttons = 'Exclude', 'Select Excluded Deck', self, 'selectDeck', []
 
-        deck_dialog = StudyDeck(
-            self.manager.mw,
-            accept="Exclude",
-            title='Select Excluded Deck',
-            parent=self,
-            geomKey='selectDeck',
-            buttons=[],
-            callback=self.on_deck_excluded
-        )
+        if ANKI_VERSION > ANKI_LEGACY_VER:
+            deck_dialog = StudyDeck(
+                self.manager.mw,
+                accept=accept,
+                title=title,
+                parent=parent,
+                geomKey=geom_key,
+                buttons=buttons,
+                callback=self.on_deck_excluded
+            )
 
-        # Filter out currently excluded and redraw the study deck dialog
-        deck_dialog.form.buttonBox.removeButton(deck_dialog.form.buttonBox.button(QDialogButtonBox.Help))
-        deck_dialog.origNames = list(filter(lambda name: name not in self.excluded_deck_names, deck_dialog.names))
-        deck_dialog.redraw('')
+            # Filter out currently excluded and redraw the study deck dialog
+            deck_dialog.form.buttonBox.removeButton(deck_dialog.form.buttonBox.button(QDialogButtonBox.Help))
+            deck_dialog.origNames = list(filter(lambda name: name not in self.excluded_deck_names, deck_dialog.names))
+            deck_dialog.redraw('')
+        else:
+            deck_dialog = StudyDeck(
+                self.manager.mw,
+                accept=accept,
+                title=title,
+                parent=parent,
+                buttons=buttons,
+                help='',
+                geomKey=geom_key
+            )
+            self.on_deck_excluded(deck_dialog)
 
     def on_remove_clicked(self):
         """
