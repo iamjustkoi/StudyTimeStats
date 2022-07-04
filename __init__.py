@@ -48,7 +48,7 @@ html_shell = '''
                     <div class="{label_id}">{total_label}</div>
                     <div class="{data_id}">{total_value} {total_unit}</div>
                 </div>
-                <div class="sts-col">
+                <div class="{col_id}">
                     <div class="{label_id}">{range_label}</div>
                     <div class="{data_id}">{range_value} {range_unit}</div>
                 </div>
@@ -88,10 +88,10 @@ found in Anki's addon window, to also open the options menu.
 
 def update_toolbar(changes=None, obj=None):
     """
-Updates the toolbar actions menu with the options shortcut. Expects an Operation Change hook,
-but can also be used as a general update push.
-    :param changes: Unused OpChanges object.
-    :param obj: Unused options object.
+Updates the toolbar actions menu with the options shortcut. Expects an Operation Change hook call,
+but can also be used as a general update push, too.
+    :param changes: unused OpChanges object
+    :param obj: unused options object
     """
     if get_config_manager().config[Config.TOOLBAR_ENABLED]:
         options_action = QAction(String.OPTIONS_ACTION, mw)
@@ -223,9 +223,9 @@ the Anki database files.
 
 def days_since_week_start(total_weeks: int, week_start_day: int):
     """
-Gets days since the last week-start date based on a max of the total days.
-    :param total_weeks: Range of days to use as a reference point, should be divisible by 7
-    :param week_start_day: Start of the week to count from
+Gets days since the last week-start date based on a set number of weeks.
+    :param total_weeks: range of weeks to use as a reference point
+    :param week_start_day: start of the week to count total days from
     :return: days since week start
     """
     # Get the days from the week start, minus the total weeks
