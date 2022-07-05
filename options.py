@@ -20,6 +20,7 @@ def set_label_background(label: QLabel, hex_arg: str):
 def custom_exec():
     pass
 
+
 class TimeStatsOptionsDialog(QDialog):
 
     def __init__(self, conf_manager: TimeStatsConfigManager):
@@ -32,6 +33,8 @@ Addon options QDialog class for accessing and changing the addon's config values
         self.config = conf_manager.config
         self.ui = Ui_OptionsDialog()
         self.ui.setupUi(OptionsDialog=self)
+
+        self.setWindowIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{ICON_PATH}'))
 
         self._primary_color = self.config[Config.PRIMARY_COLOR]
         self._secondary_color = self.config[Config.SECONDARY_COLOR]
@@ -258,6 +261,9 @@ Loads all config values to the options dialog.
         self.ui.use_calendar_checkbox.setChecked(self.config[Config.USE_CALENDAR_RANGE])
         self.update_calendar_range_extras()
 
+        self.ui.show_total_checkbox.setChecked(self.config[Config.SHOW_TOTAL])
+        self.ui.show_ranged_checkbox.setChecked(self.config[Config.SHOW_RANGED])
+
         self.ui.custom_range_spinbox.setValue(self.config[Config.CUSTOM_DAYS])
         self.ui.total_line.setText(self.config[Config.CUSTOM_TOTAL_TEXT])
         self.ui.ranged_line.setText(self.config[Config.CUSTOM_RANGE_TEXT])
@@ -289,6 +295,8 @@ window to update all the ui.
         self.config[Config.WEEK_START] = self.ui.week_start_dropdown.currentIndex()
         self.config[Config.RANGE_TYPE] = self.ui.range_select_dropdown.currentIndex()
         self.config[Config.USE_CALENDAR_RANGE] = self.ui.use_calendar_checkbox.isChecked()
+        self.config[Config.SHOW_TOTAL] = self.ui.show_total_checkbox.isChecked()
+        self.config[Config.SHOW_RANGED] = self.ui.show_ranged_checkbox.isChecked()
         self.config[Config.CUSTOM_DAYS] = self.ui.custom_range_spinbox.value()
         self.config[Config.CUSTOM_TOTAL_TEXT] = self.ui.total_line.text()
         self.config[Config.CUSTOM_RANGE_TEXT] = self.ui.ranged_line.text()

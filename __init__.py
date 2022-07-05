@@ -44,11 +44,11 @@ html_shell = '''
         </style>
         <center>
             <div id={table_id}>
-                <div class="{col_id}">
+                <div class="{col_id}" style="{total_style}">
                     <div class="{label_id}">{total_label}</div>
                     <div class="{data_id}">{total_value} {total_unit}</div>
                 </div>
-                <div class="{col_id}">
+                <div class="{col_id}" style="{range_style}">
                     <div class="{label_id}">{range_label}</div>
                     <div class="{data_id}">{range_value} {range_unit}</div>
                 </div>
@@ -252,12 +252,16 @@ Uses the addon config and current stats to retrieve the html to display on Anki'
     total_unit = addon_config[Config.CUSTOM_HRS_TEXT] if total_hrs > 1 else addon_config[Config.CUSTOM_MIN_TEXT]
     range_unit = addon_config[Config.CUSTOM_HRS_TEXT] if ranged_hrs > 1 else addon_config[Config.CUSTOM_MIN_TEXT]
 
+    total_style = '' if addon_config[Config.SHOW_TOTAL] else 'display: none;'
+    range_style = '' if addon_config[Config.SHOW_RANGED] else 'display: none;'
+
     html_string = html_shell.format(total_label=addon_config[Config.CUSTOM_TOTAL_TEXT],
                                     range_label=addon_config[Config.CUSTOM_RANGE_TEXT],
                                     total_value=total_val, range_value=range_val,
                                     total_unit=total_unit, range_unit=range_unit,
                                     primary_color=addon_config[Config.PRIMARY_COLOR],
                                     secondary_color=addon_config[Config.SECONDARY_COLOR],
+                                    total_style=total_style, range_style=range_style,
                                     table_id=table_id, col_id=col_id, label_id=label_id, data_id=data_id)
 
     return filter_html_ids(html_string, days_ago)
