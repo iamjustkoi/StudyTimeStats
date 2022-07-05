@@ -29,7 +29,7 @@ html_shell = '''
             .{col_id} {{
                 display: table-cell;
                 word-break: break-all;
-                width: 30vh;
+                width: 30vw;
             }}
             .{col_id} > * {{
                 display: table-row;
