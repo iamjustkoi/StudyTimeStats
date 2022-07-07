@@ -71,10 +71,10 @@ Append addon hooks to Anki.
     """
     gui_hooks.webview_will_set_content.append(append_to_webview)
     if ANKI_VERSION > ANKI_LEGACY_VER:
-        gui_hooks.webview_did_inject_style_into_page.append(inject_to_congrats)
-        gui_hooks.operation_did_execute.append(update_toolbar)
+        gui_hooks.webview_did_inject_style_into_page.append(append_to_congrats)
+        gui_hooks.operation_did_execute.append(refresh_tools_menu_action)
     else:
-        gui_hooks.state_did_reset.append(update_toolbar)
+        gui_hooks.state_did_reset.append(refresh_tools_menu_action)
 
 
 def build_actions():
@@ -82,11 +82,11 @@ def build_actions():
 Add and connect addon actions. Currently, adds an options menu action and sets the addon configuration action,
 found in Anki's addon window, to also open the options menu.
     """
-    update_toolbar()
+    refresh_tools_menu_action()
     mw.addonManager.setConfigAction(__name__, on_options_called)
 
 
-def update_toolbar(changes=None, obj=None):
+def refresh_tools_menu_action(changes=None, obj=None):
     """
 Updates the toolbar actions menu with the options shortcut. Expects an Operation Change hook call,
 but can also be used as a general update push, too.
@@ -103,6 +103,14 @@ but can also be used as a general update push, too.
         for action in mw.form.menuTools.actions():
             if action.text() == String.OPTIONS_ACTION:
                 mw.form.menuTools.removeAction(action)
+
+
+def on_options_called():
+    """
+Initializes and opens the options dialog.
+    """
+    dialog = TimeStatsOptionsDialog(get_config_manager())
+    dialog.show()
 
 
 def get_config_manager() -> TimeStatsConfigManager:
@@ -133,11 +141,11 @@ else does nothing.
 
     show_on_overview = isinstance(context, Overview) and addon_config[Config.OVERVIEW_ENABLED] and not on_congrats
 
-    if show_on_deck_browser or ((show_on_overview or show_on_congrats) and should_display_on_current_screen()):
-        content.body += formatted_html()
+    if show_on_deck_browser or ((show_on_overview or show_on_congrats) and is_enabled_for_current_deck()):
+        content.body += get_stats_html()
 
 
-def inject_to_congrats(web: webview.AnkiWebView):
+def append_to_congrats(web: webview.AnkiWebView):
     """
 Extra handler used for the congrats page since it can't be as easily retrieved with the existing hooks.
     :param web: AnkiWebView to check against and format.
@@ -146,106 +154,30 @@ Extra handler used for the congrats page since it can't be as easily retrieved w
         # print(f'--Anki Window was NoneType')
         return
 
-    config_manager = get_config_manager()
+    addon_config = get_config_manager().config
 
-    if web.page().url().path().find('congrats.html') != -1 and config_manager.config[Config.CONGRATS_ENABLED]:
-        if should_display_on_current_screen():
+    if web.page().url().path().find('congrats.html') != -1 and addon_config[Config.CONGRATS_ENABLED]:
+        if is_enabled_for_current_deck():
             web.eval(
-                f'if (document.getElementById("{table_id}") == null) document.body.innerHTML += `{formatted_html()}`'
+                f'if (document.getElementById("{table_id}") == null) document.body.innerHTML += `{get_stats_html()}`'
             )
 
 
-def on_options_called():
+def is_enabled_for_current_deck() -> bool:
     """
-Initializes and opens the options dialog.
-    """
-    dialog = TimeStatsOptionsDialog(get_config_manager())
-    dialog.show()
-
-
-def should_display_on_current_screen():
-    """
-Determines whether the current screen's selection should display stats based on user's excluded deck ID's.
-    :return: True if current selection isn't excluded, otherwise false.
+Determines whether the current screen's selection should display get_time_stats based on user's excluded deck ID's.
+    :return: true if current selection isn't excluded, otherwise false.
     """
     return mw.col.decks.current().get('id') not in get_config_manager().config[Config.EXCLUDED_DIDS]
 
 
-def get_review_stats() -> (float, float, int):
+def get_stats_html():
     """
-Retrieves Anki review data needed for formatting using the currently visible decks and SQL commands filtering through
-the Anki database files.
-    :return: Tuple: (total review time, filtered review time, total days filtered)
-    """
-    addon_config = get_config_manager().config
-
-    if mw.state == 'overview':
-        dids = [str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))]
-    else:
-        dids = [str(name_id.id) for name_id in mw.col.decks.all_names_and_ids()]
-
-    for excluded_did in addon_config[Config.EXCLUDED_DIDS]:
-        if str(excluded_did) in dids:
-            dids.remove(str(excluded_did))
-
-    # print(f'checking decks: {[mw.col.decks.name(i) for i in dids]}')
-
-    dids_as_args = '(' + ', '.join(dids) + ')'
-    cids_cmd = f'SELECT id FROM cards WHERE did in {dids_as_args}\n'
-    cids = mw.col.db.all(cids_cmd)
-    formatted_cids = '(' + (str(cids).replace('[', '').replace(']', '')) + ')'
-    revlog_cmd = f'SELECT id, time FROM revlog WHERE cid in {formatted_cids}'
-
-    rev_log = mw.col.db.all(revlog_cmd)
-
-    # Calendar Range Math!
-    range_type = addon_config[Config.RANGE_TYPE]
-    if range_type != Range.CUSTOM:
-        days_ago = Range.DAYS_IN[range_type]
-        if addon_config[Config.USE_CALENDAR_RANGE]:
-            if range_type == Range.WEEK or range_type == Range.TWO_WEEKS:
-                total_weeks = Range.DAYS_IN[range_type] / 7
-                week_start_day = addon_config[Config.WEEK_START]
-                days_ago = days_since_week_start(total_weeks, week_start_day)
-            elif range_type == Range.MONTH:
-                days_ago = (date.today() - date.today().replace(day=1)).days
-            elif range_type == Range.YEAR:
-                days_ago = (date.today() - date.today().replace(month=1, day=1)).days
-    else:
-        days_ago = addon_config[Config.CUSTOM_DAYS]
-    filtered_revlog = filter_revlog(rev_log, days_ago=days_ago)
-
-    all_rev_times_ms = [log[1] for log in rev_log[0:]]
-    filtered_rev_times_ms = [log[1] for log in filtered_revlog[0:]]
-
-    return sum(all_rev_times_ms) / 1000 / 60 / 60, sum(filtered_rev_times_ms) / 1000 / 60 / 60, int(days_ago)
-
-
-def days_since_week_start(total_weeks: int, week_start_day: int):
-    """
-Gets days since the last week-start date based on a set number of weeks.
-    :param total_weeks: range of weeks to use as a reference point
-    :param week_start_day: start of the week to count total days from
-    :return: days since week start
-    """
-    # Get the days from the week start, minus the total weeks
-    #  (mon - tue = -1) + 7 = 6 days, etc
-    current_weekday = date.today().weekday()
-    if current_weekday >= week_start_day:
-        # If the week start value is lower than the current value, go back an extra week
-        days_ago = (current_weekday - week_start_day) + ((total_weeks * 7) - 7)
-    else:
-        days_ago = (current_weekday - week_start_day) + (total_weeks * 7)
-    return days_ago
-
-
-def formatted_html():
-    """
-Uses the addon config and current stats to retrieve the html to display on Anki's main window.
+Uses the addon config and current get_time_stats to retrieve the html to display on Anki's main window.
     :return: html string containing review configured review information
     """
     addon_config = get_config_manager().config
-    total_hrs, ranged_hrs, days_ago = get_review_stats()
+    total_hrs, ranged_hrs, days_ago = get_time_stats()
 
     total_val = round(total_hrs, 2) if total_hrs > 1 else round(total_hrs * 60, 2)
     range_val = round(ranged_hrs, 2) if ranged_hrs > 1 else round(ranged_hrs * 60, 2)
@@ -264,10 +196,10 @@ Uses the addon config and current stats to retrieve the html to display on Anki'
                                     total_style=total_style, range_style=range_style,
                                     table_id=table_id, col_id=col_id, label_id=label_id, data_id=data_id)
 
-    return filter_html_ids(html_string, days_ago)
+    return get_formatted_html_macros(html_string, days_ago)
 
 
-def filter_html_ids(html_string: str, days_ago: int):
+def get_formatted_html_macros(html_string: str, days_ago: int):
     """
 Replaces the input html string with some basic formatted text based on identifier codes.
 Currently uses the string identifiers: %range, %from_date, %from_year, %from_full_weekday, %from_weekday, and %days.
@@ -305,18 +237,72 @@ Currently uses the string identifiers: %range, %from_date, %from_year, %from_ful
     return html_string
 
 
-# def offset_date(dt: datetime, hours: int = 0):
-#     """
-# Offsets a datetime object using a set amount of hours. Mainly for adjusting times based on the rollover/day-end hour
-# in Anki.
-#     :param dt: datetime object to offset
-#     :param hours: number of hours to offset the date
-#     :return: an offset datetime object
-#     """
-#     return dt + timedelta(hours=hours)
+def get_time_stats() -> (float, float, int):
+    """
+Retrieves Anki review data needed for formatting using the currently visible decks and SQL commands filtering through
+the Anki database files.
+    :return: Tuple:
+    <br> total review hours
+    <br> total ranged review hours
+    <br> total days in range
+    """
+    addon_config = get_config_manager().config
+
+    if mw.state == 'overview':
+        dids = [str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))]
+    else:
+        dids = [str(name_id.id) for name_id in mw.col.decks.all_names_and_ids()]
+
+    for excluded_did in addon_config[Config.EXCLUDED_DIDS]:
+        if str(excluded_did) in dids:
+            dids.remove(str(excluded_did))
+
+    # print(f'checking decks: {[mw.col.decks.name(i) for i in dids]}')
+
+    dids_as_args = '(' + ', '.join(dids) + ')'
+    cids_cmd = f'SELECT id FROM cards WHERE did in {dids_as_args}\n'
+    cids = mw.col.db.all(cids_cmd)
+    formatted_cids = '(' + (str(cids).replace('[', '').replace(']', '')) + ')'
+    revlog_cmd = f'SELECT id, time FROM revlog WHERE cid in {formatted_cids}'
+
+    rev_log = mw.col.db.all(revlog_cmd)
+
+    # Calendar Range Math!
+    range_type = addon_config[Config.RANGE_TYPE]
+    if range_type != Range.CUSTOM:
+        days_ago = Range.DAYS_IN[range_type]
+        if addon_config[Config.USE_CALENDAR_RANGE]:
+            if range_type == Range.WEEK or range_type == Range.TWO_WEEKS:
+                total_weeks = Range.DAYS_IN[range_type] / 7
+                week_start_day = addon_config[Config.WEEK_START]
+                days_ago = get_days_since_week_start(total_weeks, week_start_day)
+            elif range_type == Range.MONTH:
+                days_ago = (date.today() - date.today().replace(day=1)).days
+            elif range_type == Range.YEAR:
+                days_ago = (date.today() - date.today().replace(month=1, day=1)).days
+    else:
+        days_ago = addon_config[Config.CUSTOM_DAYS]
+    filtered_revlog = get_logs_in_range(rev_log, days_ago=days_ago)
+
+    all_rev_times_ms = [log[1] for log in rev_log[0:]]
+    filtered_rev_times_ms = [log[1] for log in filtered_revlog[0:]]
+
+    return sum(all_rev_times_ms) / 1000 / 60 / 60, sum(filtered_rev_times_ms) / 1000 / 60 / 60, int(days_ago)
 
 
-def filter_revlog(rev_logs: [[int, int]], days_ago: int = None) -> [[int, int]]:
+def get_days_since_week_start(total_weeks: int, week_start_day: int):
+    """
+Gets days since the last week-start date based on a set number of weeks.
+    :param total_weeks: range of weeks to use as a reference point
+    :param week_start_day: start of the week to count total days from
+    :return: days since week start
+    """
+    current_weekday = date.today().weekday()
+    # Adds an extra week if the current day is already past the week start
+    return (total_weeks * 7) + ((current_weekday - week_start_day) - (7 * (current_weekday >= week_start_day)))
+
+
+def get_logs_in_range(rev_logs: [[int, int]], days_ago: int = None) -> [[int, int]]:
     """
 Retrieves a collection of review logs based on the input number of days to retrieve from today.
     :param rev_logs: list of review logs containing an array with [log time-identifier, log time spent]
