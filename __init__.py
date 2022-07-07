@@ -274,8 +274,7 @@ the Anki database files.
         if addon_config[Config.USE_CALENDAR_RANGE]:
             if range_type == Range.WEEK or range_type == Range.TWO_WEEKS:
                 total_weeks = Range.DAYS_IN[range_type] / 7
-                week_start_day = addon_config[Config.WEEK_START]
-                days_ago = get_days_since_week_start(total_weeks, week_start_day)
+                days_ago = get_days_since_week_start(total_weeks, week_start_day=addon_config[Config.WEEK_START])
             elif range_type == Range.MONTH:
                 days_ago = (date.today() - date.today().replace(day=1)).days
             elif range_type == Range.YEAR:
