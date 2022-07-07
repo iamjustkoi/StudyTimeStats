@@ -13,7 +13,7 @@ from aqt.overview import Overview
 from aqt.qt import QAction
 
 from .config import TimeStatsConfigManager, ANKI_VERSION
-from .consts import String, Range, Config
+from .consts import String, Range, Config, ANKI_DEFAULT_ROLLOVER
 from .consts import UNIQUE_DATE, CMD_RANGE, CMD_DATE, CMD_YEAR, CMD_FULL_DAY, CMD_DAY, CMD_DAYS, ANKI_LEGACY_VER
 from .options import TimeStatsOptionsDialog
 
@@ -311,7 +311,7 @@ Retrieves a collection of review logs based on the input number of days to retri
     if ANKI_VERSION > ANKI_LEGACY_VER:
         offset_hour = mw.col.get_preferences().scheduling.rollover
     else:
-        offset_hour = mw.col.conf.get('rollover', 4)
+        offset_hour = mw.col.conf.get('rollover', ANKI_DEFAULT_ROLLOVER)
     filtered_logs = []
     for log in rev_logs[0:]:
         log_epoch_seconds = log[0] / 1000
