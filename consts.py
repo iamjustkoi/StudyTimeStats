@@ -6,6 +6,7 @@ Full license text available in "LICENSE" file, located in the add-on's root dire
 CURRENT_VERSION = '1.2.1a'
 
 ANKI_LEGACY_VER = 35
+ANKI_DEFAULT_ROLLOVER = 4
 UNIQUE_DATE = '2006-10-05'
 CMD_RANGE = '%range'
 CMD_DATE = '%from_date'
