@@ -1,6 +1,6 @@
 """
 MIT License: Copyright (c) 2022 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
-Full license text available in "LICENSE" file, located in the add-on's root directory.
+Full license text available in the "LICENSE" file, packaged with the add-on.
 
 Shows total study time and a ranged amount of study time in Anki's main window.
 """

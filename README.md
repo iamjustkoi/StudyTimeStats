@@ -1,5 +1,5 @@
-# Study Time Stats
-Adds some total and ranged study time statistics to Anki's main window.  
+# <p align="center"><img src="raw/stats_icon.svg"> Study Time Stats</p>
+<p align="center">Add some total study time and ranged study time statistics to Anki's main window!</p>  
 <p align="center"><img src=".github/main_ui.png"></p>
 
 ## Installation  
@@ -9,12 +9,12 @@ Or from Anki (Tools -> Add-ons -> Get Add-ons..)
 
 ## Options Menu  
 ### General
-These can be used to change the look/wording of the text and how the add-on should filter the total time studied.  
+These settings can be used to change the visibility, look, and text of the rendered stats, as well as how the add-on should filter the total review time.  
 <p align="center"><img src=".github/options_general.png"></p>
 
-### Excluded Decks
-Any decks added to this menu won't be considered when calculating how much time's been spent studying. It will also hide the UI on the selected deck's screens.  
-<p align="center"><img src=".github/options_excluded.png"></p>
+### Advanced
+These settings can change other UI options, whether the add-on should filter out or include deleted card reviews, and which decks it should consider when counting review time.
+<p align="center"><img src=".github/options_advanced.png"></p>
 
 ## Text Macros
 The add-on can also filter text in the custom labels input to show information based on what's set in the config (e.g. "Past %range" to "Past Week"). These can be used multiple times and will update whenever Anki's main window reloads.
@@ -33,5 +33,5 @@ Please post any issues or feedback you might have on [GitHub](https://github.com
 
 Wish you the best! -koi
 
+MIT License  
 ©2022 JustKoi (iamjustkoi)  
-Under the MIT License.  
