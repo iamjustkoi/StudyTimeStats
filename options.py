@@ -122,6 +122,8 @@ Loads all config values to the options dialog.
         self.ui.overview_checkbox.setChecked(self.config[Config.OVERVIEW_ENABLED])
         self.ui.congrats_checkbox.setChecked(self.config[Config.CONGRATS_ENABLED])
 
+        self.ui.include_deleted_checkbox.setChecked(self.config[Config.INCLUDE_DELETED])
+
         # Excluded Decks
         self._load_excluded_decks()
 
@@ -150,6 +152,8 @@ window to update all the ui.
         self.config[Config.BROWSER_ENABLED] = self.ui.browser_checkbox.isChecked()
         self.config[Config.OVERVIEW_ENABLED] = self.ui.overview_checkbox.isChecked()
         self.config[Config.CONGRATS_ENABLED] = self.ui.congrats_checkbox.isChecked()
+
+        self.config[Config.INCLUDE_DELETED] = self.ui.include_deleted_checkbox.isChecked()
 
         self.config[Config.EXCLUDED_DIDS] = self._get_excluded_dids()
 
