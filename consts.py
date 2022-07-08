@@ -65,6 +65,7 @@ class Config:
     BROWSER_ENABLED = 'Browser_Enabled'
     OVERVIEW_ENABLED = 'Overview_Enabled'
     CONGRATS_ENABLED = 'Congrats_Enabled'
+    INCLUDE_DELETED = 'Include_Deleted_Reviews'
     EXCLUDED_DIDS = "Excluded_Deck_IDs"
     DEFAULT_CONFIG = {
         TOOLBAR_ENABLED: True,
@@ -83,5 +84,6 @@ class Config:
         BROWSER_ENABLED: True,
         OVERVIEW_ENABLED: True,
         CONGRATS_ENABLED: True,
+        INCLUDE_DELETED: True,
         EXCLUDED_DIDS: [1]
     }
