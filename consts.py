@@ -3,7 +3,7 @@ MIT License: Copyright (c) 2022 JustKoi (iamjustkoi) <https://github.com/iamjust
 Full license text available in "LICENSE" file, located in the add-on's root directory.
 """
 
-CURRENT_VERSION = '1.2.2a'
+CURRENT_VERSION = '1.2.3b'
 
 ANKI_LEGACY_VER = 35
 ANKI_DEFAULT_ROLLOVER = 4
