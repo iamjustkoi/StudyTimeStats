@@ -15,7 +15,7 @@ class Ui_OptionsDialog(object):
     def setupUi(self, OptionsDialog):
         OptionsDialog.setObjectName("OptionsDialog")
         OptionsDialog.setWindowModality(QtCore.Qt.ApplicationModal)
-        OptionsDialog.resize(511, 485)
+        OptionsDialog.resize(531, 485)
         OptionsDialog.setMinimumSize(QtCore.QSize(484, 0))
         OptionsDialog.setModal(True)
         self.options_vert_layout = QtWidgets.QVBoxLayout(OptionsDialog)
@@ -219,7 +219,7 @@ class Ui_OptionsDialog(object):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setObjectName("scroll_area")
         self.about_scroll = QtWidgets.QWidget()
-        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 450, 526))
+        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 470, 526))
         self.about_scroll.setObjectName("about_scroll")
         self.scroll_layout = QtWidgets.QVBoxLayout(self.about_scroll)
         self.scroll_layout.setSpacing(6)
@@ -358,9 +358,10 @@ class Ui_OptionsDialog(object):
 "Have any issues or feedback? Feel free to post on the project\'s issue section on [GitHub](https://github.com/iamjustkoi/StudyTimeStats/issues)!  \n"
 "\n"
 "[Releases/Changelog](https://github.com/iamjustkoi/StudyTimeStats/releases)  \n"
-"[Source Code](https://github.com/iamjustkoi/StudyTimeStats)  \n"
-"\n"
-"If you like the add-on and want to consider supporting my stuff:"))
+"[Source Code](https://github.com/iamjustkoi/StudyTimeStats)\n"
+"<br></br>  \n"
+"If you like the add-on and want to consider supporting my stuff:  \n"
+""))
         self.like_button.setText(_translate("OptionsDialog", "Review on AnkiWeb "))
         self.kofi_button.setText(_translate("OptionsDialog", "  Buy me a coffee "))
         self.patreon_button.setText(_translate("OptionsDialog", "  Become a patron "))
