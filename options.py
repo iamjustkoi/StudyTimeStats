@@ -321,11 +321,22 @@ class DeckItem(QWidget):
         self.item_layout.addWidget(self.label)
         self.setLayout(self.item_layout)
 
+        self.enabled = False
+
     def is_enabled(self):
-        return self.label.isEnabled()
+        """
+Returns enabled state of the current DeckItem.
+        :return: True if the DeckItem is enabled, otherwise false
+        """
+        return self.enabled
 
     def set_enabled(self, enable: bool):
-        return self.label.setEnabled(enable)
+        """
+Sets the enabled state of the current DeckItem and updates its label to represent that.
+        :param enable: value the DeckItem should be set to
+        """
+        self.label.setEnabled(enable)
+        self.enabled = enable
 
     def from_widget(self):
         return self if isinstance(self, DeckItem) else None
