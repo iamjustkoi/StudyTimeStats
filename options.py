@@ -49,6 +49,7 @@ Addon options QDialog class for accessing and changing the addon's config values
         self.ui.deck_enable_button.released.connect(lambda: self.set_selected_enabled(True))
         self.ui.deck_disable_button.released.connect(lambda: self.set_selected_enabled(False))
         self.ui.excluded_decks_list.itemDoubleClicked.connect(self.on_item_double_clicked)
+        self.ui.excluded_decks_list.setSortingEnabled(True)
 
         # About page buttons
         self.ui.context_menu = QMenu(self)
@@ -165,13 +166,16 @@ Loads deck names to list and sets label to enabled if not in current config's ex
 
         for deck in self.manager.mw.col.decks.all_names_and_ids():
             deck_item = DeckItem(deck.name, self)
-            deck_item.set_enabled(deck_item.label.text() not in self.excluded_deck_names)
+            deck_item.set_included(deck_item.label.text() not in self.excluded_deck_names)
 
-            list_item = QListWidgetItem(decks_list)
+            list_item = DeckListItem(decks_list)
+            # list_item.__lt__ = lambda
             list_item.setSizeHint(deck_item.sizeHint())
 
             decks_list.addItem(list_item)
             decks_list.setItemWidget(list_item, deck_item)
+
+        decks_list.sortItems()
 
     def _get_excluded_dids(self):
         """
@@ -181,8 +185,8 @@ Retrieves currently excluded deck id's.
         dids = []
         for i in range(self.ui.excluded_decks_list.count()):
             item = self.ui.excluded_decks_list.item(i)
-            deck_item = DeckItem.from_item(self, item)
-            if not deck_item.is_enabled():
+            deck_item = DeckItem.from_list_widget(self, item)
+            if not deck_item.is_included():
                 dids.append(self.manager.decks.id(deck_item.label.text(), create=False))
         return dids
 
@@ -206,12 +210,12 @@ Saves all user config values and closes the window.
 
     def set_selected_enabled(self, should_enable: bool):
         for item in self.ui.excluded_decks_list.selectedItems():
-            deck_item = DeckItem.from_item(self, item)
-            deck_item.set_enabled(should_enable)
+            deck_item = DeckItem.from_list_widget(self, item)
+            deck_item.set_included(should_enable)
             # self.on_selection_change()
 
     def on_item_double_clicked(self, item: QListWidgetItem):
-        self.set_selected_enabled(not DeckItem.from_item(self, item).is_enabled())
+        self.set_selected_enabled(not DeckItem.from_list_widget(self, item).is_included())
         # self.set_selected_enabled()
         pass
 
@@ -323,26 +327,39 @@ class DeckItem(QWidget):
 
         self.enabled = False
 
-    def is_enabled(self):
+    def __lt__(self: DeckItem, other: DeckItem):
+        print(f'ITEM: self: {type(self)}, other: {type(other)}')
+
+        if not isinstance(self, DeckItem):
+            return True
+        elif not isinstance(other, DeckItem):
+            return False
+
+        if self.is_included() != other.is_included():
+            return self.is_included() and not other.is_included()
+        else:
+            return self.label.text() < other.label.text()
+
+    def from_widget(self: QWidget):
+        return self if isinstance(self, DeckItem) else QWidget(self)
+
+    def from_list_widget(self: TimeStatsOptionsDialog, item: QListWidgetItem) -> DeckItem:
+        return self.ui.excluded_decks_list.itemWidget(item)
+
+    def is_included(self):
         """
 Returns enabled state of the current DeckItem.
         :return: True if the DeckItem is enabled, otherwise false
         """
         return self.enabled
 
-    def set_enabled(self, enable: bool):
+    def set_included(self, enable: bool):
         """
 Sets the enabled state of the current DeckItem and updates its label to represent that.
         :param enable: value the DeckItem should be set to
         """
         self.label.setEnabled(enable)
         self.enabled = enable
-
-    def from_widget(self):
-        return self if isinstance(self, DeckItem) else None
-
-    def from_item(self: TimeStatsOptionsDialog, item: QListWidgetItem) -> DeckItem:
-        return self.ui.excluded_decks_list.itemWidget(item)
 
     def mousePressEvent(self, mouse_event: aqt.QMouseEvent) -> None:
         super(DeckItem, self).mousePressEvent(mouse_event)
@@ -362,3 +379,11 @@ Opens a context menu for modifying deck list info.
             lambda: self.dialog.set_selected_enabled(False)
         )
         self.context_menu.exec(self.mapToGlobal(point))
+
+
+class DeckListItem(QListWidgetItem):
+    def __lt__(self: DeckListItem, other: DeckListItem):
+        print(f'WIDGET: self: {type(self)}, other: {type(other)}')
+        this_item = DeckItem.from_widget(self.listWidget().itemWidget(self))
+        other_item = DeckItem.from_widget(other.listWidget().itemWidget(other))
+        return this_item < other_item
