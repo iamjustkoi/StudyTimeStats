@@ -237,6 +237,10 @@ Currently uses the string identifiers: %range, %from_date, %from_year, %from_ful
     return html_string
 
 
+def get_args_from_ids(cids: list):
+    return '(' + (str(cids).replace('[', '').replace(']', '')) + ')'
+
+
 def get_time_stats() -> (float, float, int):
     """
 Retrieves Anki review data needed for formatting using the currently visible decks and SQL commands filtering through
@@ -248,23 +252,32 @@ the Anki database files.
     """
     addon_config = get_config_manager().config
 
-    if mw.state == 'overview':
-        dids = [str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))]
+    excluded_dids = get_args_from_ids(addon_config[Config.EXCLUDED_DIDS])
+
+    # Get deleted cards on overview, otherwise use standard known-cards per-deck
+    if addon_config[Config.INCLUDE_DELETED] and mw.state != 'overview':
+        print(f'excluded: {excluded_dids}')
+        excluded_cids_cmd = f'SELECT id FROM cards WHERE did in {excluded_dids}'
+        excluded_cids = mw.col.db.all(excluded_cids_cmd)
+        cids_cmd = f'SELECT cid FROM revlog WHERE cid not in {get_args_from_ids(excluded_cids)}'
     else:
-        dids = [str(name_id.id) for name_id in mw.col.decks.all_names_and_ids()]
+        if mw.state == 'overview':
+            dids = [str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))]
+        else:
+            dids = [str(name_id.id) for name_id in mw.col.decks.all_names_and_ids()]
 
-    for excluded_did in addon_config[Config.EXCLUDED_DIDS]:
-        if str(excluded_did) in dids:
-            dids.remove(str(excluded_did))
+        for excluded_did in excluded_dids:
+            if excluded_did in dids:
+                dids.remove(excluded_did)
+        cids_cmd = f'SELECT id FROM cards WHERE did in {get_args_from_ids(dids)}'
 
-    # print(f'checking decks: {[mw.col.decks.name(i) for i in dids]}')
+        # print(f'checking decks: {[mw.col.decks.name(i) for i in dids]}')
 
-    dids_as_args = '(' + ', '.join(dids) + ')'
-    cids_cmd = f'SELECT id FROM cards WHERE did in {dids_as_args}\n'
-    cids = mw.col.db.all(cids_cmd)
-    formatted_cids = '(' + (str(cids).replace('[', '').replace(']', '')) + ')'
-    revlog_cmd = f'SELECT id, time FROM revlog WHERE cid in {formatted_cids}'
+    all_cids = mw.col.db.all(cids_cmd)
+    # Remove duplicates via set-builder syntax
+    unique_cids = {cid[0] for cid in all_cids}
 
+    revlog_cmd = f'SELECT id, time FROM revlog WHERE cid in {get_args_from_ids(list(unique_cids))}'
     rev_log = mw.col.db.all(revlog_cmd)
 
     # Calendar Range Math!
