@@ -34,6 +34,8 @@ class String:
     MONTH = 'Month'
     YEAR = 'Year'
     COPY_LINK_ACTION = 'Copy &Link Location'
+    ENABLE_ACTION = '&Enable'
+    DISABLE_ACTION = '&Disable'
 
 
 class Range:

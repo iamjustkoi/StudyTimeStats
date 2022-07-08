@@ -25,22 +25,6 @@ def custom_exec():
     pass
 
 
-class DeckItem(QWidget):
-    def __init__(self, text: str, decks_list: aqt.QListWidget):
-        super().__init__()
-        self.label = QLabel(text)
-        self.label.setFixedHeight(18)
-
-        self.item_layout = QHBoxLayout()
-        self.item_layout.setContentsMargins(4, 0, 0, 0)
-
-        self.item_layout.addWidget(self.label)
-        self.setLayout(self.item_layout)
-
-    def from_widget(self):
-        return self
-
-
 class TimeStatsOptionsDialog(QDialog):
 
     def __init__(self, conf_manager: TimeStatsConfigManager):
@@ -60,9 +44,8 @@ Addon options QDialog class for accessing and changing the addon's config values
         self._secondary_color = self.config[Config.SECONDARY_COLOR]
 
         # Deck list items
-        self.ui.deck_enable_button.released.connect(lambda: self.on_list_button_clicked(self.ui.deck_enable_button))
-        self.ui.deck_disable_button.released.connect(lambda: self.on_list_button_clicked(self.ui.deck_disable_button))
-        # self.ui.excluded_decks_list.itemSelectionChanged.connect(self.on_selection_change)
+        self.ui.deck_enable_button.released.connect(lambda: self.set_selected_enabled(True))
+        self.ui.deck_disable_button.released.connect(lambda: self.set_selected_enabled(False))
 
         # About page buttons
         self.ui.context_menu = QMenu(self)
@@ -178,7 +161,7 @@ Loads deck names to list and sets label to enabled if not in current config's ex
         decks_list.clear()
 
         for deck in self.manager.mw.col.decks.all_names_and_ids():
-            deck_item = DeckItem(deck.name, decks_list)
+            deck_item = DeckItem(deck.name, self)
             deck_item.label.setEnabled(deck_item.label.text() not in self.excluded_deck_names)
 
             list_item = QListWidgetItem(decks_list)
@@ -218,79 +201,78 @@ Saves all user config values and closes the window.
         self._save()
         self.close()
 
-    def on_list_button_clicked(self, button: aqt.QPushButton):
+    def set_selected_enabled(self, should_enable: bool):
         for item in self.ui.excluded_decks_list.selectedItems():
             deck_item = DeckItem.from_widget(self.ui.excluded_decks_list.itemWidget(item))
-            deck_item.label.setEnabled(button.objectName() == self.ui.deck_enable_button.objectName())
+            deck_item.label.setEnabled(should_enable)
             # self.on_selection_change()
 
-#     def on_selection_change(self):
-#         """
-# Handles selection changes to deck items in the deck exclusion list. Updates enable/disable buttons based on selection.
-#         """
-#         items = self.ui.excluded_decks_list.selectedItems()
-#         if len(items) == 1:
-#             deck_item = DeckItem.from_widget(self.ui.excluded_decks_list.itemWidget(items[0]))
-#             self.ui.deck_enable_button.setEnabled(not deck_item.label.isEnabled())
-#             self.ui.deck_disable_button.setEnabled(deck_item.label.isEnabled())
-#         else:
-#             self.ui.deck_enable_button.setEnabled(len(items) != 0)
-#             self.ui.deck_disable_button.setEnabled(len(items) != 0)
+    #     def on_selection_change(self):
+    #         """
+    # Handles selection changes to deck items in the deck exclusion list. Updates enable/disable buttons based on selection.
+    #         """
+    #         items = self.ui.excluded_decks_list.selectedItems()
+    #         if len(items) == 1:
+    #             deck_item = DeckItem.from_widget(self.ui.excluded_decks_list.itemWidget(items[0]))
+    #             self.ui.deck_enable_button.setEnabled(not deck_item.label.isEnabled())
+    #             self.ui.deck_disable_button.setEnabled(deck_item.label.isEnabled())
+    #         else:
+    #             self.ui.deck_enable_button.setEnabled(len(items) != 0)
+    #             self.ui.deck_disable_button.setEnabled(len(items) != 0)
 
+    #     def on_add_clicked(self):
+    #         """
+    # Opens a modified StudyDeck dialog that retrieves the user's input on which deck to add to the excluded decks list.
+    #         """
+    #         accept, title, parent, geom_key, buttons = 'Exclude', 'Select Excluded Deck', self, 'selectDeck', []
+    #
+    #         if ANKI_VERSION > ANKI_LEGACY_VER:
+    #             deck_dialog = StudyDeck(
+    #                 self.manager.mw,
+    #                 accept=accept,
+    #                 title=title,
+    #                 parent=parent,
+    #                 geomKey=geom_key,
+    #                 buttons=buttons,
+    #                 callback=self.on_deck_excluded
+    #             )
+    #
+    #             # Filter out currently excluded and redraw the study deck dialog
+    #             deck_dialog.form.buttonBox.removeButton(deck_dialog.form.buttonBox.button(QDialogButtonBox.Help))
+    #             deck_dialog.origNames = list(filter(lambda name: name not in self.excluded_deck_names, deck_dialog.names))
+    #             deck_dialog.redraw('')
+    #         else:
+    #             deck_dialog = StudyDeck(
+    #                 self.manager.mw,
+    #                 accept=accept,
+    #                 title=title,
+    #                 parent=parent,
+    #                 buttons=buttons,
+    #                 help='',
+    #                 geomKey=geom_key
+    #             )
+    #             self.on_deck_excluded(deck_dialog)
+    #
+    #     def on_remove_clicked(self):
+    #         """
+    # Removes the currently selected decks in the excluded decks list view.
+    #         """
+    #         for item in self.ui.excluded_decks_list.selectedItems():
+    #             self.excluded_deck_names.remove(item.text())
+    #             list(self.config[Config.EXCLUDED_DIDS]).remove(self.manager.decks.id(name=item.text(), create=False))
+    #
+    #         self.ui.excluded_decks_list.clear()
+    #         self.ui.excluded_decks_list.addItems(self.excluded_deck_names)
 
-#     def on_add_clicked(self):
-#         """
-# Opens a modified StudyDeck dialog that retrieves the user's input on which deck to add to the excluded decks list.
-#         """
-#         accept, title, parent, geom_key, buttons = 'Exclude', 'Select Excluded Deck', self, 'selectDeck', []
-#
-#         if ANKI_VERSION > ANKI_LEGACY_VER:
-#             deck_dialog = StudyDeck(
-#                 self.manager.mw,
-#                 accept=accept,
-#                 title=title,
-#                 parent=parent,
-#                 geomKey=geom_key,
-#                 buttons=buttons,
-#                 callback=self.on_deck_excluded
-#             )
-#
-#             # Filter out currently excluded and redraw the study deck dialog
-#             deck_dialog.form.buttonBox.removeButton(deck_dialog.form.buttonBox.button(QDialogButtonBox.Help))
-#             deck_dialog.origNames = list(filter(lambda name: name not in self.excluded_deck_names, deck_dialog.names))
-#             deck_dialog.redraw('')
-#         else:
-#             deck_dialog = StudyDeck(
-#                 self.manager.mw,
-#                 accept=accept,
-#                 title=title,
-#                 parent=parent,
-#                 buttons=buttons,
-#                 help='',
-#                 geomKey=geom_key
-#             )
-#             self.on_deck_excluded(deck_dialog)
-#
-#     def on_remove_clicked(self):
-#         """
-# Removes the currently selected decks in the excluded decks list view.
-#         """
-#         for item in self.ui.excluded_decks_list.selectedItems():
-#             self.excluded_deck_names.remove(item.text())
-#             list(self.config[Config.EXCLUDED_DIDS]).remove(self.manager.decks.id(name=item.text(), create=False))
-#
-#         self.ui.excluded_decks_list.clear()
-#         self.ui.excluded_decks_list.addItems(self.excluded_deck_names)
-
-#     def on_deck_excluded(self, study_deck: StudyDeck):
-#         """
-# Handles the return value for adding a deck to the excluded decks list.
-#         :param study_deck: StudyDeck dialog to retrieve the added deck from
-#         """
-#         excluded_deck_name = study_deck.name
-#         self.excluded_deck_names += [excluded_deck_name]
-#         self.config[Config.EXCLUDED_DIDS] += [self.manager.decks.id(name=excluded_deck_name, create=False)]
-#         self.ui.excluded_decks_list.addItem(excluded_deck_name)
+    #     def on_deck_excluded(self, study_deck: StudyDeck):
+    #         """
+    # Handles the return value for adding a deck to the excluded decks list.
+    #         :param study_deck: StudyDeck dialog to retrieve the added deck from
+    #         """
+    #         excluded_deck_name = study_deck.name
+    #         self.excluded_deck_names += [excluded_deck_name]
+    #         self.config[Config.EXCLUDED_DIDS] += [self.manager.decks.id(name=excluded_deck_name, create=False)]
+    #         self.ui.excluded_decks_list.addItem(excluded_deck_name)
 
     def on_context_menu(self, point, button):
         """
@@ -342,11 +324,13 @@ Opens a color picker dialog and updates the selected config color.
             self.ui.custom_range_spinbox.show()
             self.ui.use_calendar_checkbox.hide()
             # self.ui.appearance_grid_layout.replaceWidget(self.ui.use_calendar_checkbox, self.ui.custom_range_spinbox)
-            self.ui.range_select_layout.layout().replaceWidget(self.ui.use_calendar_checkbox, self.ui.custom_range_spinbox)
+            self.ui.range_select_layout.layout().replaceWidget(self.ui.use_calendar_checkbox,
+                                                               self.ui.custom_range_spinbox)
         else:
             self.ui.custom_range_spinbox.hide()
             self.ui.use_calendar_checkbox.show()
-            self.ui.range_select_layout.layout().replaceWidget(self.ui.custom_range_spinbox, self.ui.use_calendar_checkbox)
+            self.ui.range_select_layout.layout().replaceWidget(self.ui.custom_range_spinbox,
+                                                               self.ui.use_calendar_checkbox)
 
         self.update_calendar_range_extras()
 
@@ -378,3 +362,41 @@ range-type index.
             self.ui.week_start_dropdown.hide()
             self.ui.week_start_label.hide()
             self.ui.week_start_label.hide()
+
+
+class DeckItem(QWidget):
+    def __init__(self, text: str, dialog: TimeStatsOptionsDialog):
+        super().__init__()
+        self.context_menu = QMenu(self)
+        self.dialog = dialog
+
+        self.label = QLabel(text)
+        self.label.setFixedHeight(18)
+
+        self.item_layout = QHBoxLayout()
+        self.item_layout.setContentsMargins(4, 0, 0, 0)
+
+        self.item_layout.addWidget(self.label)
+        self.setLayout(self.item_layout)
+
+    def from_widget(self):
+        return self if isinstance(self, DeckItem) else None
+
+    def mousePressEvent(self, mouse_event: aqt.QMouseEvent) -> None:
+        super(DeckItem, self).mousePressEvent(mouse_event)
+        if mouse_event.button() == aqt.qt.Qt.RightButton:
+            self.on_context_menu(mouse_event.pos())
+
+    def on_context_menu(self, point):
+        """
+Opens a context menu for modifying deck list info.
+        :param point: input coordinate to display the menu
+        """
+        self.context_menu = QMenu(self)
+        self.context_menu.addAction(String.ENABLE_ACTION).triggered.connect(
+            lambda: self.dialog.set_selected_enabled(True)
+        )
+        self.context_menu.addAction(String.DISABLE_ACTION).triggered.connect(
+            lambda: self.dialog.set_selected_enabled(False)
+        )
+        self.context_menu.exec(self.mapToGlobal(point))
