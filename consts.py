@@ -17,8 +17,10 @@ CMD_DAYS = '%days'
 ICON_PATH = 'raw/stats_icon.svg'
 KOFI_FILEPATH = 'raw\\kofilogo_blue.PNG'
 PATREON_FILEPATH = 'raw\\patreon.png'
+ANKI_FILEPATH = 'raw\\anki_like.png.png'
 PATREON_URL = 'https://www.patreon.com/iamjustkoi'
 KOFI_URL = 'https://ko-fi.com/iamjustkoi'
+ANKI_URL = 'https://ankiweb.net/shared/info/1247171202'
 
 
 class String:

@@ -57,12 +57,23 @@ Addon options QDialog class for accessing and changing the addon's config values
         kofi_button = self.ui.kofi_button
         kofi_button.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{KOFI_FILEPATH}'))
         kofi_button.released.connect(lambda: webbrowser.open(KOFI_URL))
-        kofi_button.customContextMenuRequested.connect(lambda point: self.on_context_menu(point, kofi_button))
+        kofi_button.customContextMenuRequested.connect(
+            lambda point: self.on_line_context_menu(point, kofi_button)
+        )
 
         patreon_button = self.ui.patreon_button
         patreon_button.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{PATREON_FILEPATH}'))
         patreon_button.released.connect(lambda: webbrowser.open(PATREON_URL))
-        patreon_button.customContextMenuRequested.connect(lambda point: self.on_context_menu(point, patreon_button))
+        patreon_button.customContextMenuRequested.connect(
+            lambda point: self.on_line_context_menu(point, patreon_button)
+        )
+
+        ankiweb_button = self.ui.like_button
+        ankiweb_button.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{ANKI_FILEPATH}'))
+        ankiweb_button.released.connect(lambda: webbrowser.open(ANKI_URL))
+        ankiweb_button.customContextMenuRequested.connect(
+            lambda point: self.on_line_context_menu(point, ankiweb_button)
+        )
 
         # Restore Defaults Button
         self.ui.confirm_button_box.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.on_restore_defaults)
@@ -223,7 +234,7 @@ Saves all user config values and closes the window.
         # self.set_selected_enabled()
         pass
 
-    def on_context_menu(self, point, button):
+    def on_line_context_menu(self, point, button):
         """
 Handles context menu actions for the input button.
         :param point: input coordinate to display the menu
@@ -245,6 +256,8 @@ Copies a link to the clipboard based on the input button.
             cb.setText(PATREON_URL, mode=cb.Clipboard)
         elif button.objectName() == self.ui.kofi_button.objectName():
             cb.setText(KOFI_URL, mode=cb.Clipboard)
+        elif button.objectName() == self.ui.like_button.objectName():
+            cb.setText(ANKI_URL, mode=cb.Clipboard)
 
     def open_color_dialog(self, preview: QLabel):
         """

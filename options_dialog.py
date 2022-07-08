@@ -15,7 +15,7 @@ class Ui_OptionsDialog(object):
     def setupUi(self, OptionsDialog):
         OptionsDialog.setObjectName("OptionsDialog")
         OptionsDialog.setWindowModality(QtCore.Qt.ApplicationModal)
-        OptionsDialog.resize(502, 485)
+        OptionsDialog.resize(511, 485)
         OptionsDialog.setMinimumSize(QtCore.QSize(484, 0))
         OptionsDialog.setModal(True)
         self.options_vert_layout = QtWidgets.QVBoxLayout(OptionsDialog)
@@ -219,7 +219,7 @@ class Ui_OptionsDialog(object):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setObjectName("scroll_area")
         self.about_scroll = QtWidgets.QWidget()
-        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 441, 508))
+        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 450, 526))
         self.about_scroll.setObjectName("about_scroll")
         self.scroll_layout = QtWidgets.QVBoxLayout(self.about_scroll)
         self.scroll_layout.setSpacing(6)
@@ -237,18 +237,15 @@ class Ui_OptionsDialog(object):
         self.support_buttons = QtWidgets.QHBoxLayout()
         self.support_buttons.setContentsMargins(6, 6, 6, 6)
         self.support_buttons.setObjectName("support_buttons")
-        self.patreon_button = QtWidgets.QPushButton(self.about_scroll)
-        self.patreon_button.setMinimumSize(QtCore.QSize(0, 42))
-        self.patreon_button.setMaximumSize(QtCore.QSize(200, 16777215))
-        self.patreon_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.patreon_button.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.patreon_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.like_button = QtWidgets.QPushButton(self.about_scroll)
+        self.like_button.setMinimumSize(QtCore.QSize(0, 42))
+        self.like_button.setMaximumSize(QtCore.QSize(200, 16777215))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("raw/patreon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.patreon_button.setIcon(icon)
-        self.patreon_button.setIconSize(QtCore.QSize(32, 32))
-        self.patreon_button.setObjectName("patreon_button")
-        self.support_buttons.addWidget(self.patreon_button)
+        icon.addPixmap(QtGui.QPixmap("raw/anki_like.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.like_button.setIcon(icon)
+        self.like_button.setIconSize(QtCore.QSize(32, 32))
+        self.like_button.setObjectName("like_button")
+        self.support_buttons.addWidget(self.like_button)
         self.kofi_button = QtWidgets.QPushButton(self.about_scroll)
         self.kofi_button.setMinimumSize(QtCore.QSize(0, 42))
         self.kofi_button.setMaximumSize(QtCore.QSize(200, 16777215))
@@ -261,6 +258,18 @@ class Ui_OptionsDialog(object):
         self.kofi_button.setIconSize(QtCore.QSize(32, 32))
         self.kofi_button.setObjectName("kofi_button")
         self.support_buttons.addWidget(self.kofi_button)
+        self.patreon_button = QtWidgets.QPushButton(self.about_scroll)
+        self.patreon_button.setMinimumSize(QtCore.QSize(0, 42))
+        self.patreon_button.setMaximumSize(QtCore.QSize(200, 16777215))
+        self.patreon_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.patreon_button.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.patreon_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap("raw/patreon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.patreon_button.setIcon(icon2)
+        self.patreon_button.setIconSize(QtCore.QSize(32, 32))
+        self.patreon_button.setObjectName("patreon_button")
+        self.support_buttons.addWidget(self.patreon_button)
         self.scroll_layout.addLayout(self.support_buttons)
         self.about_label_body = QtWidgets.QLabel(self.about_scroll)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
@@ -350,9 +359,11 @@ class Ui_OptionsDialog(object):
 "\n"
 "[Releases/Changelog](https://github.com/iamjustkoi/StudyTimeStats/releases)  \n"
 "[Source Code](https://github.com/iamjustkoi/StudyTimeStats)  \n"
-""))
-        self.patreon_button.setText(_translate("OptionsDialog", "  Become a Patron"))
-        self.kofi_button.setText(_translate("OptionsDialog", "  Buy me a coffee"))
+"\n"
+"If you like the add-on and want to consider supporting my stuff:"))
+        self.like_button.setText(_translate("OptionsDialog", "Review on AnkiWeb "))
+        self.kofi_button.setText(_translate("OptionsDialog", "  Buy me a coffee "))
+        self.patreon_button.setText(_translate("OptionsDialog", "  Become a patron "))
         self.about_label_body.setText(_translate("OptionsDialog", "### Text Macros\n"
 "The add-on can also filter text in the custom labels input to show information based on what\'s set in the config (e.g. \"Past %range\" to \"Past Week\"). These can be used multiple times and will update whenever Anki\'s main window reloads.\n"
 "\n"
@@ -368,8 +379,8 @@ class Ui_OptionsDialog(object):
 "Thanks for downloading and hope you enjoy!  \n"
 "-koi  \n"
 "<br></br>  \n"
-"©2022 JustKoi (iamjustkoi)  \n"
-"Distributed under the MIT Liecense.  "))
+"MIT Liecense  \n"
+"©2022 JustKoi (iamjustkoi)  "))
         self.tabs_widget.setTabText(self.tabs_widget.indexOf(self.about_tab), _translate("OptionsDialog", "About"))
 
 
