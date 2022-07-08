@@ -312,6 +312,11 @@ range-type index.
 class DeckItem(QWidget):
 
     def __init__(self, text: str, dialog: TimeStatsOptionsDialog):
+        """
+DeckItem used for DeckListItems to give more options to interaction between the list and the enabled decks.
+        :param text: string value to use for the label of the list item
+        :param dialog: reference to the base class to use for context menu actions
+        """
         super().__init__()
         self.context_menu = QMenu(self)
         self.dialog = dialog
@@ -328,8 +333,11 @@ class DeckItem(QWidget):
         self.enabled = False
 
     def __lt__(self: DeckItem, other: DeckItem):
-        print(f'ITEM: self: {type(self)}, other: {type(other)}')
-
+        """
+Uses the DeckItems enabled/disabled values, otherwise label text, to sort the items in descending order.
+        :param other: comparable DeckItem
+        :return: True if the current DeckItem is less than the other DeckItem
+        """
         if not isinstance(self, DeckItem):
             return True
         elif not isinstance(other, DeckItem):
@@ -383,7 +391,11 @@ Opens a context menu for modifying deck list info.
 
 class DeckListItem(QListWidgetItem):
     def __lt__(self: DeckListItem, other: DeckListItem):
-        print(f'WIDGET: self: {type(self)}, other: {type(other)}')
+        """
+Uses the base DeckItem to sort its value less than the other DeckItem.
+        :param other: comparable DeckListItem
+        :return: True if this item is less than ther other DeckItem
+        """
         this_item = DeckItem.from_widget(self.listWidget().itemWidget(self))
         other_item = DeckItem.from_widget(other.listWidget().itemWidget(other))
         return this_item < other_item
