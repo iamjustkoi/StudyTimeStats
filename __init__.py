@@ -256,7 +256,7 @@ the Anki database files.
 
     # Get deleted cards on overview, otherwise use standard known-cards per-deck
     if addon_config[Config.INCLUDE_DELETED] and mw.state != 'overview':
-        print(f'excluded: {excluded_dids}')
+        # print(f'excluded: {excluded_dids}')
         excluded_cids_cmd = f'SELECT id FROM cards WHERE did in {excluded_dids}'
         excluded_cids = mw.col.db.all(excluded_cids_cmd)
         cids_cmd = f'SELECT cid FROM revlog WHERE cid not in {get_args_from_ids(excluded_cids)}'
