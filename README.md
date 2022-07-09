@@ -4,7 +4,7 @@
 
 ## Installation  
 Install from [Anki-Web](https://ankiweb.net/shared/info/1247171202)  
-Or from Anki (Tools -> Add-ons -> Get Add-ons..)
+Or inside Anki (Tools -> Add-ons -> Get Add-ons...)
 > 1247171202
 
 ## Options Menu  
@@ -13,8 +13,11 @@ These settings can be used to change the visibility, look, and text of the rende
 <p align="center"><img src=".github/options_general.png"></p>
 
 ### Advanced
-These settings can change other UI options, whether the add-on should filter out or include deleted card reviews, and which decks it should consider when counting review time.
+These settings can change other options outside of the UI.
 <p align="center"><img src=".github/options_advanced.png"></p>
+The output text-entries can also be used to customize what information is displayed based on the available text macros:
+<p align="center"><img src=".github/custom_stat.png"></p>
+
 
 ## Text Macros
 The add-on can also filter text in the custom labels input to show information based on what's set in the config (e.g. "Past %range" to "Past Week"). These can be used multiple times and will update whenever Anki's main window reloads.
