@@ -14,6 +14,7 @@ CMD_YEAR = '%from_year'
 CMD_FULL_DAY = '%from_full_day'
 CMD_DAY = '%from_day'
 CMD_DAYS = '%days'
+
 CMD_MONTH = '%from_month'
 CMD_FULL_MONTH = '%from_full_month'
 
