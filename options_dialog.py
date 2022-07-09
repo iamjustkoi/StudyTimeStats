@@ -15,11 +15,12 @@ class Ui_OptionsDialog(object):
     def setupUi(self, OptionsDialog):
         OptionsDialog.setObjectName("OptionsDialog")
         OptionsDialog.setWindowModality(QtCore.Qt.ApplicationModal)
-        OptionsDialog.resize(531, 485)
+        OptionsDialog.resize(508, 485)
         OptionsDialog.setMinimumSize(QtCore.QSize(484, 0))
         OptionsDialog.setModal(True)
+        self.verticalLayout_4 = QtWidgets.QVBoxLayout(OptionsDialog)
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
         self.tabs_widget = QtWidgets.QTabWidget(OptionsDialog)
-        self.tabs_widget.setGeometry(QtCore.QRect(9, 9, 492, 415))
         self.tabs_widget.setObjectName("tabs_widget")
         self.appearance_tab = QtWidgets.QWidget()
         self.appearance_tab.setEnabled(True)
@@ -154,6 +155,8 @@ class Ui_OptionsDialog(object):
         self.show_ranged_checkbox.setObjectName("show_ranged_checkbox")
         self.horizontalLayout_2.addWidget(self.show_ranged_checkbox)
         self.general_form.setLayout(3, QtWidgets.QFormLayout.FieldRole, self.horizontalLayout_2)
+        spacerItem = QtWidgets.QSpacerItem(100, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.general_form.setItem(11, QtWidgets.QFormLayout.LabelRole, spacerItem)
         self.general_layout.addLayout(self.general_form)
         self.pages_group = QtWidgets.QGroupBox(self.appearance_tab)
         self.pages_group.setObjectName("pages_group")
@@ -217,8 +220,8 @@ class Ui_OptionsDialog(object):
         self.deck_disable_button.setFocusPolicy(QtCore.Qt.TabFocus)
         self.deck_disable_button.setObjectName("deck_disable_button")
         self.exclude_layout.addWidget(self.deck_disable_button)
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.exclude_layout.addItem(spacerItem)
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.exclude_layout.addItem(spacerItem1)
         self.enabled_decks_layout.addLayout(self.exclude_layout)
         self.excluded_decks_list = QtWidgets.QListWidget(self.enabled_decks_group)
         self.excluded_decks_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
@@ -235,7 +238,7 @@ class Ui_OptionsDialog(object):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setObjectName("scroll_area")
         self.about_scroll = QtWidgets.QWidget()
-        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 449, 539))
+        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 449, 738))
         self.about_scroll.setObjectName("about_scroll")
         self.scroll_layout = QtWidgets.QVBoxLayout(self.about_scroll)
         self.scroll_layout.setSpacing(6)
@@ -304,11 +307,12 @@ class Ui_OptionsDialog(object):
         self.scroll_area.setWidget(self.about_scroll)
         self.verticalLayout_2.addWidget(self.scroll_area)
         self.tabs_widget.addTab(self.about_tab, "")
+        self.verticalLayout_4.addWidget(self.tabs_widget)
         self.confirm_button_box = QtWidgets.QDialogButtonBox(OptionsDialog)
-        self.confirm_button_box.setGeometry(QtCore.QRect(9, 453, 251, 23))
         self.confirm_button_box.setOrientation(QtCore.Qt.Horizontal)
         self.confirm_button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok|QtWidgets.QDialogButtonBox.RestoreDefaults)
         self.confirm_button_box.setObjectName("confirm_button_box")
+        self.verticalLayout_4.addWidget(self.confirm_button_box)
 
         self.retranslateUi(OptionsDialog)
         self.tabs_widget.setCurrentIndex(0)
@@ -340,9 +344,13 @@ class Ui_OptionsDialog(object):
         self.custom_range_spinbox.setToolTip(_translate("OptionsDialog", "Amount of days to filter the custom range."))
         self.custom_range_spinbox.setSuffix(_translate("OptionsDialog", " days"))
         self.total_label.setText(_translate("OptionsDialog", "Total Title"))
+        self.total_line.setToolTip(_translate("OptionsDialog", "Text that displays above the total statistic."))
         self.ranged_label.setText(_translate("OptionsDialog", "Range Title"))
+        self.ranged_line.setToolTip(_translate("OptionsDialog", "Text that displays above the ranged statistic."))
         self.hrs_label.setText(_translate("OptionsDialog", "Hours Label"))
+        self.hrs_line.setToolTip(_translate("OptionsDialog", "Unit text appended to hours."))
         self.min_label.setText(_translate("OptionsDialog", "Minutes Label"))
+        self.min_line.setToolTip(_translate("OptionsDialog", "Unit text appended to minutes."))
         self.primary_color_label.setText(_translate("OptionsDialog", "Primary Color"))
         self.primary_color_button.setText(_translate("OptionsDialog", "Select"))
         self.secondary_color_label.setText(_translate("OptionsDialog", "Secondary Color"))
@@ -364,11 +372,11 @@ class Ui_OptionsDialog(object):
         self.toolbar_checkbox.setText(_translate("OptionsDialog", "Show options shortcut in the Tools Menu"))
         self.include_deleted_checkbox.setToolTip(_translate("OptionsDialog", "Include review times from cards that were deleted."))
         self.include_deleted_checkbox.setText(_translate("OptionsDialog", "Include reviews from deleted cards"))
-        self.total_hrs_line.setToolTip(_translate("OptionsDialog", "Controls the formatting and statistics the total text should use.\n"
+        self.total_hrs_line.setToolTip(_translate("OptionsDialog", "Custom output filter to use for the total statistics value.\n"
 "See: About -> Text Macros"))
         self.total_hrs_label.setText(_translate("OptionsDialog", "Total Text Output"))
         self.range_hrs_label.setText(_translate("OptionsDialog", "Range Text Output"))
-        self.range_hrs_line.setToolTip(_translate("OptionsDialog", "Controls the formatting and statistics the range text should use.\n"
+        self.range_hrs_line.setToolTip(_translate("OptionsDialog", "Custom output filter to use for the ranged statistics value.\n"
 "See: About -> Text Macros"))
         self.enabled_decks_group.setTitle(_translate("OptionsDialog", "Enabled Decks"))
         self.deck_enable_button.setToolTip(_translate("OptionsDialog", "Enable stats for the selected deck(s)."))
@@ -393,13 +401,23 @@ class Ui_OptionsDialog(object):
         self.about_label_body.setText(_translate("OptionsDialog", "### Text Macros\n"
 "The add-on can also filter text in the custom labels input to show information based on what\'s set in the config (e.g. \"Past %range\" to \"Past Week\"). These can be used multiple times and will update whenever Anki\'s main window reloads.\n"
 "\n"
-"##### Available Macros:\n"
-"+ **%range** - the currently selected range format (Week, 2 Weeks, Month, Year)\n"
-"+ **%from_date** - range filter\'s start date using the system\'s locale (2022-06-30)\n"
-"+ **%from_day** - range filter\'s starting day using a compact format (Sun)\n"
-"+ **%from_full_day** - range filter\'s full start day (Sunday)\n"
-"+ **%days** - total days the range filter checks against (17)\n"
-"+ **%%** - returns a single % symbol and doesn\'t apply the text macro (%, %range, etc)\n"
+"### Available Macros:\n"
+"##### General\n"
+"+ `%range` - the currently selected range format (Week, 2 Weeks, Month, Year)\n"
+"+ `%from_date` - range filter\'s start date using the system\'s locale (2022-06-30)\n"
+"+ `%from_day` - range filter\'s starting day using a compact format (Sun)\n"
+"+ `%from_full_day` - range filter\'s full start day (Sunday)\n"
+"+ `%from_month` - range filter\'s month name using a compact format (Sep)\n"
+"+ `%from_full_month` - range filter\'s full month name (September)\n"
+"+ `%days` - total days the range filter checks against (17)\n"
+"##### Advanced\n"
+"These macros will each index the received review logs and output its individual value-unit combination (e.g. \"%total_hrs\" -> \"3.14 hrs\").\n"
+"+ `%total_hrs` - total study time\n"
+"+ `%range_hrs` - ranged study time\n"
+"+ `%last_cal_hrs` - total study time of the last calendar range\n"
+"+ `%last_day_hrs` - total study time of the previous day\n"
+"##### Misc\n"
+"+ `%%` - returns a single % symbol and doesn\'t apply the text macro (%, %range, etc)\n"
 "\n"
 "<br></br>\n"
 "Thanks for downloading and hope you enjoy!  \n"
