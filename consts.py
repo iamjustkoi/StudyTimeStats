@@ -19,9 +19,8 @@ CMD_FULL_MONTH = '%from_full_month'
 
 CMD_TOTAL_HRS = '%total_hrs'
 CMD_RANGE_HRS = '%range_hrs'
-CMD_LAST_CAL = '%last_cal_hrs'
-CMD_LAST_DAY = '%last_day_hrs'
-CMD_UNIT = '%unit'
+CMD_LAST_CAL_HRS = '%last_cal_hrs'
+CMD_LAST_DAY_HRS = '%last_day_hrs'
 
 ICON_PATH = 'raw/stats_icon.svg'
 KOFI_FILEPATH = 'raw\\kofilogo_blue.PNG'
@@ -35,8 +34,8 @@ ANKI_URL = 'https://ankiweb.net/shared/info/1247171202'
 class String:
     TOTAL = 'Total'
     PAST_RANGE = 'Past %range'
-    TOTAL_HRS = '%total_hrs %unit'
-    PAST_HRS = '%range_hrs %unit'
+    TOTAL_HRS = '%total_hrs'
+    PAST_HRS = '%range_hrs'
     HRS = 'hrs'
     MIN = 'min'
     OPTIONS_ACTION = 'Study &Time Stats Options...'
@@ -69,8 +68,8 @@ class Config:
     CUSTOM_DAYS = 'Custom_Days'
     CUSTOM_TOTAL_TEXT = 'Custom_Total_Text'
     CUSTOM_RANGE_TEXT = 'Custom_Range_Text'
-    CUSTOM_TOTAL_HRS = 'Custom_Total_Text'
-    CUSTOM_RANGE_HRS = 'Custom_Range_Text'
+    CUSTOM_TOTAL_HRS = 'Custom_Total_Hrs'
+    CUSTOM_RANGE_HRS = 'Custom_Range_Hrs'
     CUSTOM_HRS_TEXT = 'Custom_Hrs_Text'
     CUSTOM_MIN_TEXT = 'Custom_Min_Text'
     SHOW_TOTAL = 'Hide_Total_Stat'
@@ -90,8 +89,8 @@ class Config:
         CUSTOM_DAYS: 7,
         CUSTOM_TOTAL_TEXT: String.TOTAL,
         CUSTOM_RANGE_TEXT: String.PAST_RANGE,
-        CUSTOM_TOTAL_HRS: String.TOTAL,
-        CUSTOM_RANGE_HRS: String.PAST_RANGE,
+        CUSTOM_TOTAL_HRS: String.TOTAL_HRS,
+        CUSTOM_RANGE_HRS: String.PAST_HRS,
         CUSTOM_HRS_TEXT: String.HRS,
         CUSTOM_MIN_TEXT: String.MIN,
         SHOW_TOTAL: True,

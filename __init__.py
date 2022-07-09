@@ -13,9 +13,10 @@ from aqt.overview import Overview
 from aqt.qt import QAction
 
 from .config import TimeStatsConfigManager, ANKI_VERSION
-from .consts import CMD_MONTH, CMD_FULL_MONTH, CMD_LAST_CAL, CMD_LAST_DAY
-from .consts import String, Range, Config, ANKI_DEFAULT_ROLLOVER
-from .consts import UNIQUE_DATE, CMD_RANGE, CMD_DATE, CMD_YEAR, CMD_FULL_DAY, CMD_DAY, CMD_DAYS, ANKI_LEGACY_VER
+# from .consts import CMD_MONTH, CMD_FULL_MONTH, CMD_LAST_CAL, CMD_LAST_DAY
+# from .consts import String, Range, Config, ANKI_DEFAULT_ROLLOVER
+# from .consts import UNIQUE_DATE, CMD_RANGE, CMD_DATE, CMD_YEAR, CMD_FULL_DAY, CMD_DAY, CMD_DAYS, ANKI_LEGACY_VER
+from .consts import *
 from .options import TimeStatsOptionsDialog
 
 table_id, col_id, label_id, data_id = 'sts-table', 'sts-col', 'sts-label', 'sts-data'
@@ -47,11 +48,11 @@ html_shell = '''
             <div id={table_id}>
                 <div class="{col_id}" style="{total_style}">
                     <div class="{label_id}">{total_label}</div>
-                    <div class="{data_id}">{total_value} {total_unit}</div>
+                    <div class="{data_id}">{total_hrs}</div>
                 </div>
                 <div class="{col_id}" style="{range_style}">
                     <div class="{label_id}">{range_label}</div>
-                    <div class="{data_id}">{range_value} {range_unit}</div>
+                    <div class="{data_id}">{range_hrs}</div>
                 </div>
             </div>
         </center>
@@ -186,44 +187,69 @@ Uses the addon config and current get_time_stats to retrieve the html to display
     :return: html string containing review configured review information
     """
     addon_config = get_config_manager().config
-    revlog = get_revlog(addon_config)
-    # total_hrs, ranged_hrs, days_ago = get_time_stats(revlog=revlog)
-
-    days_ago = get_days_ago(datetime.today(), addon_config[Config.RANGE_TYPE], addon_config)
-    total_hrs = get_hrs_in_revlog(revlog)
-    ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago))
-
-    total_val = get_hrs_or_min(total_hrs)
-    range_val = get_hrs_or_min(ranged_hrs)
-    total_unit = addon_config[get_unit_type(total_hrs)]
-    range_unit = addon_config[get_unit_type(ranged_hrs)]
 
     total_style = '' if addon_config[Config.SHOW_TOTAL] else 'display: none;'
     range_style = '' if addon_config[Config.SHOW_RANGED] else 'display: none;'
 
     html_string = html_shell.format(total_label=addon_config[Config.CUSTOM_TOTAL_TEXT],
                                     range_label=addon_config[Config.CUSTOM_RANGE_TEXT],
-                                    total_value=total_val, range_value=range_val,
-                                    total_unit=total_unit, range_unit=range_unit,
+                                    total_hrs=addon_config[Config.CUSTOM_TOTAL_HRS],
+                                    range_hrs=addon_config[Config.CUSTOM_RANGE_HRS],
                                     primary_color=addon_config[Config.PRIMARY_COLOR],
                                     secondary_color=addon_config[Config.SECONDARY_COLOR],
                                     total_style=total_style, range_style=range_style,
                                     table_id=table_id, col_id=col_id, label_id=label_id, data_id=data_id)
 
-    return get_formatted_html_macros(html_string, days_ago, revlog)
+    return get_formatted_html_macros(html_string)
 
 
-def get_formatted_html_macros(html_string: str, days_ago: int, revlog: [[int], [int]]):
+def get_formatted_html_macros(html_string: str):
     """
-Replaces the input html string with some basic formatted text based on identifier codes.
-Currently uses the string identifiers: %range, %from_date, %from_year, %from_full_weekday, %from_weekday, and %days.
+Replaces the input html string with formatted text based on input codes.
+Currently, uses the string identifiers: %range, %from_date, %from_year, %from_full_weekday, %from_weekday, and %days.
     :param html_string: html string to be formatted
-    :param days_ago: days to use when replacing date-type identifiers
-    :param revlog: referencable revlog for custom formats that use it as a reference
     :return: the formatted html string object
     """
     addon_config = get_config_manager().config
     range_type = addon_config[Config.RANGE_TYPE]
+
+    revlog = get_revlog(addon_config)
+    days_ago = get_days_ago(datetime.today(), addon_config[Config.RANGE_TYPE], addon_config)
+    # total_hrs, ranged_hrs, days_ago = get_time_stats(revlog=revlog)
+
+    # total_val = get_hrs_or_min(total_hrs)
+    # range_val = get_hrs_or_min(ranged_hrs)
+    # total_unit = addon_config[get_unit_type(total_hrs)]
+    # range_unit = addon_config[get_unit_type(ranged_hrs)]
+
+    if re.search(fr'(?<!%){CMD_TOTAL_HRS}', html_string):
+        total_hrs = get_hrs_in_revlog(revlog)
+        total_val = get_hrs_or_min(total_hrs)
+        total_unit = addon_config[get_unit_type(total_hrs)]
+        html_string = html_string.replace(CMD_TOTAL_HRS, f'{total_val} {total_unit}')
+
+    if re.search(fr'(?<!%){CMD_RANGE_HRS}', html_string):
+        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago))
+        range_val = get_hrs_or_min(ranged_hrs)
+        range_unit = addon_config[get_unit_type(ranged_hrs)]
+        html_string = html_string.replace(CMD_RANGE_HRS, f'{range_val} {range_unit}')
+
+    if re.search(fr'(?<!%){CMD_LAST_CAL_HRS}', html_string):
+        ref_days_ago = get_days_ago(datetime.today(), range_type, addon_config)
+        ref_date = datetime.today() - timedelta(days=ref_days_ago + 1)
+        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, Range.DAYS_IN[range_type], ref_date))
+        unit = addon_config[get_unit_type(ranged_hrs)]
+        disp_hrs = get_hrs_or_min(ranged_hrs)
+        html_string = html_string.replace(CMD_LAST_CAL_HRS, f'{disp_hrs} {unit}')
+
+    # Use for not returning duplicates in double-passed variables:
+    # match = re.search(fr'(?<!%){CMD_LAST_DAY}', html_string)
+    # len(match.regs)
+    if re.search(fr'(?<!%){CMD_LAST_DAY_HRS}', html_string):
+        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days=1, from_date=datetime.today() - timedelta(1)))
+        unit = addon_config[get_unit_type(ranged_hrs)]
+        disp_hrs = get_hrs_or_min(ranged_hrs)
+        html_string = html_string.replace(CMD_LAST_CAL_HRS, f'{disp_hrs} {unit}')
 
     if re.search(fr'(?<!%){CMD_RANGE}', html_string):
         if range_type != Range.CUSTOM:
@@ -261,27 +287,6 @@ Currently uses the string identifiers: %range, %from_date, %from_year, %from_ful
         html_string = html_string.replace(
             CMD_FULL_MONTH, (date.today() - timedelta(days=days_ago)).strftime('%B')
         )
-
-    if re.search(fr'(?<!%){CMD_LAST_CAL}', html_string):
-        ref_days_ago = get_days_ago(datetime.today(), range_type, addon_config)
-        ref_date = datetime.today() - timedelta(days=ref_days_ago + 1)
-        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, Range.DAYS_IN[range_type], ref_date))
-
-        unit = addon_config[get_unit_type(ranged_hrs)]
-        disp_hrs = get_hrs_or_min(ranged_hrs)
-
-        html_string = html_string.replace(CMD_LAST_CAL, f'{disp_hrs} {unit}')
-
-    # Use for not returning duplicates in double-passed variables:
-    # match = re.search(fr'(?<!%){CMD_LAST_DAY}', html_string)
-    # len(match.regs)
-    if re.search(fr'(?<!%){CMD_LAST_DAY}', html_string):
-        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days=1, from_date=datetime.today() - timedelta(1)))
-
-        unit = addon_config[get_unit_type(ranged_hrs)]
-        disp_hrs = get_hrs_or_min(ranged_hrs)
-
-        html_string = html_string.replace(CMD_LAST_CAL, f'{disp_hrs} {unit}')
 
     if re.search(fr'(?<!%){CMD_DAYS}', html_string):
         html_string = html_string.replace(
