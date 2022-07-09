@@ -14,7 +14,7 @@ from aqt.qt import QAction
 
 from .config import TimeStatsConfigManager, ANKI_VERSION
 from .consts import CMD_MONTH, CMD_FULL_MONTH, CMD_LAST_CAL, CMD_LAST_DAY
-from .consts import String, Range, Config, ANKI_DEFAULT_ROLLOVER, Weekday
+from .consts import String, Range, Config, ANKI_DEFAULT_ROLLOVER
 from .consts import UNIQUE_DATE, CMD_RANGE, CMD_DATE, CMD_YEAR, CMD_FULL_DAY, CMD_DAY, CMD_DAYS, ANKI_LEGACY_VER
 from .options import TimeStatsOptionsDialog
 
@@ -187,7 +187,11 @@ Uses the addon config and current get_time_stats to retrieve the html to display
     """
     addon_config = get_config_manager().config
     revlog = get_revlog(addon_config)
-    total_hrs, ranged_hrs, days_ago = get_time_stats(revlog=revlog)
+    # total_hrs, ranged_hrs, days_ago = get_time_stats(revlog=revlog)
+
+    days_ago = get_days_ago(datetime.today(), addon_config[Config.RANGE_TYPE], addon_config)
+    total_hrs = get_hrs_in_revlog(revlog)
+    ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago))
 
     total_val = get_hrs_or_min(total_hrs)
     range_val = get_hrs_or_min(ranged_hrs)
@@ -259,22 +263,25 @@ Currently uses the string identifiers: %range, %from_date, %from_year, %from_ful
         )
 
     if re.search(fr'(?<!%){CMD_LAST_CAL}', html_string):
-        cal_days_ago = get_cal_days_ago(datetime.today(), range_type, addon_config[Config.WEEK_START])
-        reference_date = datetime.today() - timedelta(days=cal_days_ago + 1)
-        prev_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, cal_days_ago, reference_date))
-        unit = addon_config[get_unit_type(prev_hrs)]
-        disp_hrs = get_hrs_or_min(prev_hrs)
+        ref_days_ago = get_days_ago(datetime.today(), range_type, addon_config)
+        ref_date = datetime.today() - timedelta(days=ref_days_ago + 1)
+        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, Range.DAYS_IN[range_type], ref_date))
+
+        unit = addon_config[get_unit_type(ranged_hrs)]
+        disp_hrs = get_hrs_or_min(ranged_hrs)
+
         html_string = html_string.replace(CMD_LAST_CAL, f'{disp_hrs} {unit}')
 
     # Use for not returning duplicates in double-passed variables:
     # match = re.search(fr'(?<!%){CMD_LAST_DAY}', html_string)
     # len(match.regs)
     if re.search(fr'(?<!%){CMD_LAST_DAY}', html_string):
-        reference_date = datetime.today() - timedelta(days=1)
-        prev_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, 1, reference_date))
-        unit = addon_config[get_unit_type(prev_hrs)]
-        disp_hrs = get_hrs_or_min(prev_hrs)
-        html_string = html_string.replace(CMD_LAST_DAY, f'{disp_hrs} {unit}')
+        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days=1, from_date=datetime.today() - timedelta(1)))
+
+        unit = addon_config[get_unit_type(ranged_hrs)]
+        disp_hrs = get_hrs_or_min(ranged_hrs)
+
+        html_string = html_string.replace(CMD_LAST_CAL, f'{disp_hrs} {unit}')
 
     if re.search(fr'(?<!%){CMD_DAYS}', html_string):
         html_string = html_string.replace(
@@ -326,12 +333,17 @@ Retrieves Anki review data using the currently displayed decks and excluded deck
     return mw.col.db.all(revlog_cmd)
 
 
-def get_cal_days_ago(reference_date: datetime, range_type: int, week_start=Weekday.SUNDAY):
+def get_days_ago(reference_date: datetime, range_type: int, addon_config):
     # Calendar Range Math!
+    if range_type == Range.CUSTOM:
+        return addon_config[Config.CUSTOM_DAYS]
+
     days_ago = Range.DAYS_IN[range_type]
     if range_type == Range.WEEK or range_type == Range.TWO_WEEKS:
         total_weeks = Range.DAYS_IN[range_type] / 7
-        days_ago = get_days_since_week_start(total_weeks, week_start_day=week_start, reference_date=reference_date)
+        days_ago = get_days_since_week_start(total_weeks,
+                                             week_start_day=addon_config[Config.WEEK_START],
+                                             reference_date=reference_date)
     else:
         if range_type == Range.MONTH:
             days_ago = (reference_date.date() - reference_date.date().replace(day=1)).days
@@ -344,40 +356,40 @@ def get_hrs_in_revlog(revlog: [[int, int]]):
     return sum([log[1] for log in revlog[0:]]) / 1000 / 60 / 60
 
 
-def get_time_stats(reference_date=datetime.today(), revlog: [[int, int]] = None) -> (float, float, int):
-    """
-Retrieves the total review times based on the current config's range type. If the range_index argument is set,
-will use that, instead.
-    :param revlog: alternative rev_log to use in place of retrieving a new one
-    :param reference_date: changes the reference date to this datetime
-    :return: Tuple:
-    <br> total review hours
-    <br> total ranged review hours
-    <br> total days in range
-    """
-    addon_config = get_config_manager().config
-    range_type = addon_config[Config.RANGE_TYPE]
-    revlog = get_revlog(addon_config) if revlog is None else revlog
-
-    # if reference_date != datetime.today():
-    # print(f'rev_len: {len(revlog)}')
-
-    if range_type != Range.CUSTOM:
-        days_ago = get_cal_days_ago(reference_date, range_type, addon_config[Config.WEEK_START])
-    else:
-        days_ago = addon_config[Config.CUSTOM_DAYS]
-
-    filtered_revlog = get_logs_in_range(revlog, days_ago=days_ago, reference_date=reference_date)
-    # print(f'days_ago: {days_ago}')
-    #
-    # # if reference_date != datetime.today():
-    # print(f'({(reference_date - timedelta(days=days_ago)).strftime("%x")}->{reference_date.strftime("%x")})')
-    # print(f'fil_len: {len(filtered_revlog)}')
-
-    # all_rev_times_ms = [log[1] for log in revlog[0:]]
-    # filtered_rev_times_ms = [log[1] for log in filtered_revlog[0:]]
-
-    return get_hrs_in_revlog(revlog), get_hrs_in_revlog(filtered_revlog), days_ago
+# def get_time_stats(reference_date=datetime.today(), revlog: [[int, int]] = None) -> (float, float, int):
+#     """
+# Retrieves the total review times based on the current config's range type. If the range_index argument is set,
+# will use that, instead.
+#     :param revlog: alternative rev_log to use in place of retrieving a new one
+#     :param reference_date: changes the reference date to this datetime
+#     :return: Tuple:
+#     <br> total review hours
+#     <br> total ranged review hours
+#     <br> total days in range
+#     """
+#     addon_config = get_config_manager().config
+#     range_type = addon_config[Config.RANGE_TYPE]
+#     revlog = get_revlog(addon_config) if revlog is None else revlog
+#
+#     # if reference_date != datetime.today():
+#     # print(f'rev_len: {len(revlog)}')
+#
+#     if range_type != Range.CUSTOM:
+#         days_ago = get_days_ago(reference_date, range_type, addon_config[Config.WEEK_START])
+#     else:
+#         days_ago = addon_config[Config.CUSTOM_DAYS]
+#
+#     filtered_revlog = get_logs_in_range(revlog, days=days_ago, from_date=reference_date)
+#     # print(f'days_ago: {days_ago}')
+#     #
+#     # # if reference_date != datetime.today():
+#     # print(f'({(reference_date - timedelta(days=days_ago)).strftime("%x")}->{reference_date.strftime("%x")})')
+#     # print(f'fil_len: {len(filtered_revlog)}')
+#
+#     # all_rev_times_ms = [log[1] for log in revlog[0:]]
+#     # filtered_rev_times_ms = [log[1] for log in filtered_revlog[0:]]
+#
+#     return get_hrs_in_revlog(revlog), get_hrs_in_revlog(filtered_revlog), days_ago
 
 
 def get_days_since_week_start(total_weeks: int, week_start_day: int, reference_date=date.today()):
@@ -394,15 +406,15 @@ Gets days since the last week-start date based on a set number of weeks.
 
 
 def get_logs_in_range(
-        rev_logs: [[int, int]],
-        days_ago: int = None,
-        reference_date: datetime = datetime.now()
+        revlog: [[int, int]],
+        days: int = None,
+        from_date: datetime = datetime.now()
 ) -> [[int, int]]:
     """
 Retrieves a collection of review logs based on the input number of days to retrieve from today.
-    :param rev_logs: list of review logs containing an array with [log time-identifier, log time spent]
-    :param days_ago: number of days to filter through
-    :param reference_date: changes the reference date to this datetime
+    :param revlog: list of review logs containing an array with [log time-identifier, log time spent]
+    :param days: number of days to filter through
+    :param from_date: changes the reference date to this datetime
     :return: a new list of review logs based on the input days to filter
     """
     if ANKI_VERSION > ANKI_LEGACY_VER:
@@ -410,13 +422,13 @@ Retrieves a collection of review logs based on the input number of days to retri
     else:
         offset_hour = mw.col.conf.get('rollover', ANKI_DEFAULT_ROLLOVER)
     filtered_logs = []
-    for log in rev_logs[0:]:
+    for log in revlog[0:]:
         log_epoch_seconds = log[0] / 1000
         log_date = datetime.fromtimestamp(log_epoch_seconds)
 
         # log_delta = offset_date(datetime.now(), offset_hour) - log_date
-        log_delta = (reference_date + timedelta(hours=offset_hour)) - log_date
-        if log_delta.days <= days_ago:
+        log_delta = (from_date + timedelta(hours=offset_hour)) - log_date
+        if log_delta.days <= days:
             filtered_logs.append(log)
 
     return filtered_logs
