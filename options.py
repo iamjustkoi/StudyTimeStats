@@ -122,6 +122,8 @@ Loads all config values to the options dialog.
         self.ui.ranged_line.setText(self.config[Config.CUSTOM_RANGE_TEXT])
         self.ui.hrs_line.setText(self.config[Config.CUSTOM_HRS_TEXT])
         self.ui.min_line.setText(self.config[Config.CUSTOM_MIN_TEXT])
+        self.ui.total_hrs_line.setText(self.config[Config.CUSTOM_TOTAL_HRS])
+        self.ui.range_hrs_line.setText(self.config[Config.CUSTOM_RANGE_HRS])
 
         # Color Pickers
         set_label_background(self.ui.primary_color_preview, self.config[Config.PRIMARY_COLOR])
@@ -155,6 +157,8 @@ window to update all the ui.
         self.config[Config.CUSTOM_RANGE_TEXT] = self.ui.ranged_line.text()
         self.config[Config.CUSTOM_HRS_TEXT] = self.ui.hrs_line.text()
         self.config[Config.CUSTOM_MIN_TEXT] = self.ui.min_line.text()
+        self.config[Config.CUSTOM_TOTAL_HRS] = self.ui.total_hrs_line.text()
+        self.config[Config.CUSTOM_RANGE_HRS] = self.ui.range_hrs_line.text()
 
         # Store colors with saved hex info
         self.config[Config.PRIMARY_COLOR] = self._primary_color
