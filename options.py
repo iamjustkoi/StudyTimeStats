@@ -155,10 +155,10 @@ window to update all the ui.
         self.config[Config.CUSTOM_DAYS] = self.ui.custom_range_spinbox.value()
         self.config[Config.CUSTOM_TOTAL_TEXT] = self.ui.total_line.text()
         self.config[Config.CUSTOM_RANGE_TEXT] = self.ui.ranged_line.text()
-        self.config[Config.CUSTOM_HRS_TEXT] = self.ui.hrs_line.text()
-        self.config[Config.CUSTOM_MIN_TEXT] = self.ui.min_line.text()
         self.config[Config.CUSTOM_TOTAL_HRS] = self.ui.total_hrs_line.text()
         self.config[Config.CUSTOM_RANGE_HRS] = self.ui.range_hrs_line.text()
+        self.config[Config.CUSTOM_HRS_TEXT] = self.ui.hrs_line.text()
+        self.config[Config.CUSTOM_MIN_TEXT] = self.ui.min_line.text()
 
         # Store colors with saved hex info
         self.config[Config.PRIMARY_COLOR] = self._primary_color
