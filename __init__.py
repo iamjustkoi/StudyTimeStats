@@ -32,6 +32,7 @@ html_shell = '''
                 display: table-cell;
                 word-break: break-all;
                 width: 30vw;
+                max-width: 200px;
             }}
             .{col_id} > * {{
                 display: table-row;
