@@ -1,5 +1,5 @@
 # <p align="center"><img src="raw/stats_icon.svg"> Study Time Stats</p>
-<p align="center">Add some total study time and ranged study time statistics to Anki's main window!</p>  
+<p align="center">Add some customizable total study time and ranged study time statistics to Anki's main window!</p>  
 <p align="center"><img src=".github/main_ui.png"></p>
 
 ## Installation  
