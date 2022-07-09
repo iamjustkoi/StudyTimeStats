@@ -238,7 +238,7 @@ class Ui_OptionsDialog(object):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setObjectName("scroll_area")
         self.about_scroll = QtWidgets.QWidget()
-        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 449, 738))
+        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 449, 766))
         self.about_scroll.setObjectName("about_scroll")
         self.scroll_layout = QtWidgets.QVBoxLayout(self.about_scroll)
         self.scroll_layout.setSpacing(6)
@@ -315,7 +315,7 @@ class Ui_OptionsDialog(object):
         self.verticalLayout_4.addWidget(self.confirm_button_box)
 
         self.retranslateUi(OptionsDialog)
-        self.tabs_widget.setCurrentIndex(0)
+        self.tabs_widget.setCurrentIndex(2)
         self.confirm_button_box.accepted.connect(OptionsDialog.accept)
         self.confirm_button_box.rejected.connect(OptionsDialog.reject)
         QtCore.QMetaObject.connectSlotsByName(OptionsDialog)
@@ -385,7 +385,7 @@ class Ui_OptionsDialog(object):
         self.deck_disable_button.setText(_translate("OptionsDialog", "Disable"))
         self.tabs_widget.setTabText(self.tabs_widget.indexOf(self.decks_tab), _translate("OptionsDialog", "Advanced"))
         self.about_label_header.setText(_translate("OptionsDialog", "## Study Time Stats\n"
-"Adds a total and ranged study time statistic to Anki\'s main window.  \n"
+"Add some customizable total and ranged study time statistics to Anki\'s main window!  \n"
 "\n"
 "Version: {version}  \n"
 "Have any issues or feedback? Feel free to post on the project\'s issue section on [GitHub](https://github.com/iamjustkoi/StudyTimeStats/issues)!  \n"
@@ -402,6 +402,7 @@ class Ui_OptionsDialog(object):
 "The add-on can also filter text in the custom labels input to show information based on what\'s set in the config (e.g. \"Past %range\" to \"Past Week\"). These can be used multiple times and will update whenever Anki\'s main window reloads.\n"
 "\n"
 "### Available Macros:\n"
+"\n"
 "##### General\n"
 "+ `%range` - the currently selected range format (Week, 2 Weeks, Month, Year)\n"
 "+ `%from_date` - range filter\'s start date using the system\'s locale (2022-06-30)\n"
@@ -410,12 +411,14 @@ class Ui_OptionsDialog(object):
 "+ `%from_month` - range filter\'s month name using a compact format (Sep)\n"
 "+ `%from_full_month` - range filter\'s full month name (September)\n"
 "+ `%days` - total days the range filter checks against (17)\n"
+"<br></br>\n"
 "##### Advanced\n"
 "These macros will each index the received review logs and output its individual value-unit combination (e.g. \"%total_hrs\" -> \"3.14 hrs\").\n"
 "+ `%total_hrs` - total study time\n"
 "+ `%range_hrs` - ranged study time\n"
 "+ `%last_cal_hrs` - total study time of the last calendar range\n"
 "+ `%last_day_hrs` - total study time of the previous day\n"
+"<br></br>\n"
 "##### Misc\n"
 "+ `%%` - returns a single % symbol and doesn\'t apply the text macro (%, %range, etc)\n"
 "\n"
