@@ -238,7 +238,7 @@ class Ui_OptionsDialog(object):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setObjectName("scroll_area")
         self.about_scroll = QtWidgets.QWidget()
-        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 449, 766))
+        self.about_scroll.setGeometry(QtCore.QRect(0, -391, 449, 766))
         self.about_scroll.setObjectName("about_scroll")
         self.scroll_layout = QtWidgets.QVBoxLayout(self.about_scroll)
         self.scroll_layout.setSpacing(6)
@@ -315,7 +315,7 @@ class Ui_OptionsDialog(object):
         self.verticalLayout_4.addWidget(self.confirm_button_box)
 
         self.retranslateUi(OptionsDialog)
-        self.tabs_widget.setCurrentIndex(2)
+        self.tabs_widget.setCurrentIndex(0)
         self.confirm_button_box.accepted.connect(OptionsDialog.accept)
         self.confirm_button_box.rejected.connect(OptionsDialog.reject)
         QtCore.QMetaObject.connectSlotsByName(OptionsDialog)
@@ -426,7 +426,7 @@ class Ui_OptionsDialog(object):
 "Thanks for downloading and hope you enjoy!  \n"
 "-koi  \n"
 "<br></br>  \n"
-"MIT Liecense  \n"
+"MIT License    \n"
 "©2022 JustKoi (iamjustkoi)  "))
         self.tabs_widget.setTabText(self.tabs_widget.indexOf(self.about_tab), _translate("OptionsDialog", "About"))
 
