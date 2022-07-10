@@ -237,7 +237,7 @@ Currently, uses the string identifiers: %range, %from_date, %from_year, %from_fu
 
     if re.search(fr'(?<!%){CMD_LAST_CAL_HRS}', html_string):
         days_since_last_start = get_days_ago(datetime.today(), range_type, addon_config)
-        ref_date = datetime.today() - timedelta(days=(days_since_last_start + 1))
+        ref_date = datetime.today() - timedelta(days=days_since_last_start)
         ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago=Range.DAYS_IN[range_type], from_date=ref_date))
         cal_val = get_hrs_or_min(ranged_hrs)
         cal_unit = addon_config[get_unit_type(ranged_hrs)]
@@ -247,7 +247,7 @@ Currently, uses the string identifiers: %range, %from_date, %from_year, %from_fu
     # match = re.search(fr'(?<!%){CMD_LAST_DAY}', html_string)
     # len(match.regs)
     if re.search(fr'(?<!%){CMD_LAST_DAY_HRS}', html_string):
-        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago=1, from_date=datetime.today() - timedelta(1)))
+        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago=1))
         day_val = get_hrs_or_min(ranged_hrs)
         day_unit = addon_config[get_unit_type(ranged_hrs)]
         html_string = html_string.replace(CMD_LAST_DAY_HRS, f'{day_val} {day_unit}')
