@@ -238,7 +238,7 @@ Currently, uses the string identifiers: %range, %from_date, %from_year, %from_fu
     if re.search(fr'(?<!%){CMD_LAST_CAL_HRS}', html_string):
         days_since_last_start = get_days_ago(datetime.today(), range_type, addon_config)
         ref_date = datetime.today() - timedelta(days=(days_since_last_start + 1))
-        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days=Range.DAYS_IN[range_type], from_date=ref_date))
+        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago=Range.DAYS_IN[range_type], from_date=ref_date))
         cal_val = get_hrs_or_min(ranged_hrs)
         cal_unit = addon_config[get_unit_type(ranged_hrs)]
         html_string = html_string.replace(CMD_LAST_CAL_HRS, f'{cal_val} {cal_unit}')
@@ -247,7 +247,7 @@ Currently, uses the string identifiers: %range, %from_date, %from_year, %from_fu
     # match = re.search(fr'(?<!%){CMD_LAST_DAY}', html_string)
     # len(match.regs)
     if re.search(fr'(?<!%){CMD_LAST_DAY_HRS}', html_string):
-        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days=1, from_date=datetime.today() - timedelta(1)))
+        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago=1, from_date=datetime.today() - timedelta(1)))
         day_val = get_hrs_or_min(ranged_hrs)
         day_unit = addon_config[get_unit_type(ranged_hrs)]
         html_string = html_string.replace(CMD_LAST_DAY_HRS, f'{day_val} {day_unit}')
@@ -362,42 +362,6 @@ def get_hrs_in_revlog(revlog: [[int, int]]):
     return sum([log[1] for log in revlog[0:]]) / 1000 / 60 / 60
 
 
-# def get_time_stats(reference_date=datetime.today(), revlog: [[int, int]] = None) -> (float, float, int):
-#     """
-# Retrieves the total review times based on the current config's range type. If the range_index argument is set,
-# will use that, instead.
-#     :param revlog: alternative rev_log to use in place of retrieving a new one
-#     :param reference_date: changes the reference date to this datetime
-#     :return: Tuple:
-#     <br> total review hours
-#     <br> total ranged review hours
-#     <br> total days in range
-#     """
-#     addon_config = get_config_manager().config
-#     range_type = addon_config[Config.RANGE_TYPE]
-#     revlog = get_revlog(addon_config) if revlog is None else revlog
-#
-#     # if reference_date != datetime.today():
-#     # print(f'rev_len: {len(revlog)}')
-#
-#     if range_type != Range.CUSTOM:
-#         days_ago = get_days_ago(reference_date, range_type, addon_config[Config.WEEK_START])
-#     else:
-#         days_ago = addon_config[Config.CUSTOM_DAYS]
-#
-#     filtered_revlog = get_logs_in_range(revlog, days=days_ago, from_date=reference_date)
-#     # print(f'days_ago: {days_ago}')
-#     #
-#     # # if reference_date != datetime.today():
-#     # print(f'({(reference_date - timedelta(days=days_ago)).strftime("%x")}->{reference_date.strftime("%x")})')
-#     # print(f'fil_len: {len(filtered_revlog)}')
-#
-#     # all_rev_times_ms = [log[1] for log in revlog[0:]]
-#     # filtered_rev_times_ms = [log[1] for log in filtered_revlog[0:]]
-#
-#     return get_hrs_in_revlog(revlog), get_hrs_in_revlog(filtered_revlog), days_ago
-
-
 def get_days_since_week_start(total_weeks: int, week_start_day: int, reference_date=date.today()):
     """
 Gets days since the last week-start date based on a set number of weeks.
@@ -411,11 +375,11 @@ Gets days since the last week-start date based on a set number of weeks.
     return (total_weeks * 7) + ((referenced_weekday - week_start_day) - (7 * (referenced_weekday >= week_start_day)))
 
 
-def get_logs_in_range(revlog: [[int, int]], days: int = None, from_date: datetime = datetime.now()) -> [[int, int]]:
+def get_logs_in_range(revlog: [[int, int]], days_ago: int = None, from_date: datetime = datetime.now()) -> [[int, int]]:
     """
 Retrieves a collection of review logs based on the input number of days to retrieve from today.
     :param revlog: list of review logs containing an array with [log time-identifier, log time spent]
-    :param days: number of days to filter through
+    :param days_ago: number of days to filter back through
     :param from_date: changes the reference date to this datetime
     :return: a new list of review logs based on the input days to filter
     """
@@ -429,10 +393,9 @@ Retrieves a collection of review logs based on the input number of days to retri
         log_date = datetime.fromtimestamp(log_epoch_seconds)
 
         log_delta = (from_date + timedelta(hours=offset_hour)) - log_date
-        if 0 <= log_delta.days <= days:
+        if 0 <= log_delta.days < days_ago:
             filtered_logs.append(log)
 
-    print(f'')
     return filtered_logs
 
 
