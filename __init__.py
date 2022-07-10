@@ -230,7 +230,7 @@ Currently, uses the string identifiers: %range, %from_date, %from_year, %from_fu
         html_string = html_string.replace(CMD_TOTAL_HRS, f'{total_val} {total_unit}')
 
     if re.search(fr'(?<!%){CMD_RANGE_HRS}', html_string):
-        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago))
+        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago, datetime.today() + timedelta(days=1)))
         range_val = get_hrs_or_min(ranged_hrs)
         range_unit = addon_config[get_unit_type(ranged_hrs)]
         html_string = html_string.replace(CMD_RANGE_HRS, f'{range_val} {range_unit}')
@@ -238,7 +238,8 @@ Currently, uses the string identifiers: %range, %from_date, %from_year, %from_fu
     if re.search(fr'(?<!%){CMD_LAST_CAL_HRS}', html_string):
         days_since_last_start = get_days_ago(datetime.today(), range_type, addon_config)
         ref_date = datetime.today() - timedelta(days=days_since_last_start)
-        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago=Range.DAYS_IN[range_type], from_date=ref_date))
+        ranged_logs = get_logs_in_range(revlog, Range.DAYS_IN[range_type] - 1, ref_date)
+        ranged_hrs = get_hrs_in_revlog(ranged_logs)
         cal_val = get_hrs_or_min(ranged_hrs)
         cal_unit = addon_config[get_unit_type(ranged_hrs)]
         html_string = html_string.replace(CMD_LAST_CAL_HRS, f'{cal_val} {cal_unit}')
@@ -247,7 +248,7 @@ Currently, uses the string identifiers: %range, %from_date, %from_year, %from_fu
     # match = re.search(fr'(?<!%){CMD_LAST_DAY}', html_string)
     # len(match.regs)
     if re.search(fr'(?<!%){CMD_LAST_DAY_HRS}', html_string):
-        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago=1))
+        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago=0))
         day_val = get_hrs_or_min(ranged_hrs)
         day_unit = addon_config[get_unit_type(ranged_hrs)]
         html_string = html_string.replace(CMD_LAST_DAY_HRS, f'{day_val} {day_unit}')
@@ -375,7 +376,11 @@ Gets days since the last week-start date based on a set number of weeks.
     return (total_weeks * 7) + ((referenced_weekday - week_start_day) - (7 * (referenced_weekday >= week_start_day)))
 
 
-def get_logs_in_range(revlog: [[int, int]], days_ago: int = None, from_date: datetime = datetime.now()) -> [[int, int]]:
+def get_logs_in_range(
+        revlog: [[int, int]],
+        days_ago: int = None,
+        from_date: datetime = datetime.today()
+) -> [[int, int]]:
     """
 Retrieves a collection of review logs based on the input number of days to retrieve from today.
     :param revlog: list of review logs containing an array with [log time-identifier, log time spent]
@@ -392,8 +397,8 @@ Retrieves a collection of review logs based on the input number of days to retri
         log_epoch_seconds = log[0] / 1000
         log_date = datetime.fromtimestamp(log_epoch_seconds)
 
-        log_delta = (from_date + timedelta(hours=offset_hour)) - log_date
-        if 0 <= log_delta.days < days_ago:
+        log_delta = (from_date - timedelta(hours=offset_hour)) - log_date
+        if 0 <= log_delta.days <= days_ago:
             filtered_logs.append(log)
 
     return filtered_logs
