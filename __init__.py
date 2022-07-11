@@ -46,7 +46,7 @@ html_shell = '''
             }}
         </style>
         <center>
-            <div id={table_id}>
+            <div id="{table_id}">
                 <div class="{col_id}" style="{total_style}">
                     <div class="{label_id}">{total_label}</div>
                     <div class="{data_id}">{total_hrs}</div>
@@ -135,6 +135,7 @@ else does nothing.
     if mw.col is None:
         # print(f'--Anki Window was NoneType')
         return
+
     addon_config = get_config_manager().config
 
     show_on_deck_browser = isinstance(context, DeckBrowser) and addon_config[Config.BROWSER_ENABLED]
