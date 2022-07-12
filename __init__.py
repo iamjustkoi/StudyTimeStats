@@ -13,9 +13,6 @@ from aqt.overview import Overview
 from aqt.qt import QAction
 
 from .config import TimeStatsConfigManager, ANKI_VERSION
-# from .consts import CMD_MONTH, CMD_FULL_MONTH, CMD_LAST_CAL, CMD_LAST_DAY
-# from .consts import String, Range, Config, ANKI_DEFAULT_ROLLOVER
-# from .consts import UNIQUE_DATE, CMD_RANGE, CMD_DATE, CMD_YEAR, CMD_FULL_DAY, CMD_DAY, CMD_DAYS, ANKI_LEGACY_VER
 from .consts import *
 from .options import TimeStatsOptionsDialog
 
@@ -113,7 +110,7 @@ def on_options_called():
 Initializes and opens the options dialog.
     """
     dialog = TimeStatsOptionsDialog(get_config_manager())
-    dialog.show()
+    dialog.exec()
 
 
 def get_config_manager() -> TimeStatsConfigManager:
