@@ -172,12 +172,24 @@ Determines whether the current screen's selection should display get_time_stats 
     return mw.col.decks.current().get('id') not in get_config_manager().config[Config.EXCLUDED_DIDS]
 
 
-def get_unit_type(hours: int):
+def get_unit_type(hours: float):
+    """
+Returns the given unit type for the given amount of time.
+    :param hours: referenced time
+    :return: the hours unit if given a value larger than 1, otherwise the minutes unit
+    """
     return Config.CUSTOM_HRS_TEXT if hours > 1 else Config.CUSTOM_MIN_TEXT
 
 
-def get_hrs_or_min(hours: int, digits=2):
-    return round(hours, digits) if hours > 1 else round(hours * 60, digits)
+def get_formatted_hrs_or_min(hours: float, precision=2):
+    """
+Returns a locale-formatted length of time.
+    :param hours: referenced time
+    :param precision: total digits to show after a decimal
+    :return: hours if given a value larger than 1, otherwise minutes
+    """
+    val = round(hours, precision) if hours > 1 else round(hours * 60, precision)
+    return f'{val:n}'
 
 
 def get_stats_html():
@@ -216,20 +228,20 @@ Currently, uses the string identifiers: %range, %from_date, %from_year, %from_fu
     days_ago = get_days_ago(addon_config[Config.RANGE_TYPE], addon_config)
     # total_hrs, ranged_hrs, days_ago = get_time_stats(revlog=revlog)
 
-    # total_val = get_hrs_or_min(total_hrs)
-    # range_val = get_hrs_or_min(ranged_hrs)
+    # total_val = get_formatted_hrs_or_min(total_hrs)
+    # range_val = get_formatted_hrs_or_min(ranged_hrs)
     # total_unit = addon_config[get_unit_type(total_hrs)]
     # range_unit = addon_config[get_unit_type(ranged_hrs)]
 
     if re.search(fr'(?<!%){CMD_TOTAL_HRS}', html_string):
         total_hrs = get_hrs_in_revlog(revlog)
-        total_val = get_hrs_or_min(total_hrs)
+        total_val = get_formatted_hrs_or_min(total_hrs)
         total_unit = addon_config[get_unit_type(total_hrs)]
         html_string = html_string.replace(CMD_TOTAL_HRS, f'{total_val} {total_unit}')
 
     if re.search(fr'(?<!%){CMD_RANGE_HRS}', html_string):
         ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago))
-        range_val = get_hrs_or_min(ranged_hrs)
+        range_val = get_formatted_hrs_or_min(ranged_hrs)
         range_unit = addon_config[get_unit_type(ranged_hrs)]
         html_string = html_string.replace(CMD_RANGE_HRS, f'{range_val} {range_unit}')
 
@@ -238,7 +250,7 @@ Currently, uses the string identifiers: %range, %from_date, %from_year, %from_fu
         from_date = datetime.today() - timedelta(days=get_days_ago(range_type, addon_config) + 1)
         # = 1 accounts for extra day
         ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, Range.DAYS_IN[range_type] - 1, from_date=from_date))
-        cal_val = get_hrs_or_min(ranged_hrs)
+        cal_val = get_formatted_hrs_or_min(ranged_hrs)
         cal_unit = addon_config[get_unit_type(ranged_hrs)]
         html_string = html_string.replace(CMD_LAST_CAL_HRS, f'{cal_val} {cal_unit}')
 
@@ -249,7 +261,7 @@ Currently, uses the string identifiers: %range, %from_date, %from_year, %from_fu
         ref_date = (datetime.today() - timedelta(days=1)).replace(hour=23, minute=59, second=59)
         # ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago=0, from_date=ref_date))
         ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, 0, ref_date))
-        day_val = get_hrs_or_min(ranged_hrs)
+        day_val = get_formatted_hrs_or_min(ranged_hrs)
         day_unit = addon_config[get_unit_type(ranged_hrs)]
         html_string = html_string.replace(CMD_LAST_DAY_HRS, f'{day_val} {day_unit}')
 
@@ -341,6 +353,13 @@ Retrieves Anki review data using the currently displayed decks and excluded deck
 
 
 def get_days_ago(range_type: int, addon_config, from_date=datetime.today()):
+    """
+Returns the total number of days since the start of a ranged time length.
+    :param range_type: range to use as a reference
+    :param addon_config: add-on config for retrieving user values
+    :param from_date: input date to check distance of start from
+    :return: total days away the range is from the referenced date-time
+    """
     # Calendar Range Math!
     if range_type == Range.CUSTOM:
         return addon_config[Config.CUSTOM_DAYS]
@@ -361,6 +380,11 @@ def get_days_ago(range_type: int, addon_config, from_date=datetime.today()):
 
 
 def get_hrs_in_revlog(revlog: [[int, int]]):
+    """
+Returns the total review time within a sequence of reviews.
+    :param revlog: referenced log sequence
+    :return: total hours in the sequence
+    """
     return sum([log[1] for log in revlog[0:]]) / 1000 / 60 / 60
 
 
