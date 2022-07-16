@@ -226,12 +226,6 @@ Currently, uses the string identifiers: %range, %from_date, %from_year, %from_fu
 
     revlog = get_revlog(addon_config)
     days_ago = get_days_ago(addon_config[Config.RANGE_TYPE], addon_config)
-    # total_hrs, ranged_hrs, days_ago = get_time_stats(revlog=revlog)
-
-    # total_val = get_formatted_hrs_or_min(total_hrs)
-    # range_val = get_formatted_hrs_or_min(ranged_hrs)
-    # total_unit = addon_config[get_unit_type(total_hrs)]
-    # range_unit = addon_config[get_unit_type(ranged_hrs)]
 
     if re.search(fr'(?<!%){CMD_TOTAL_HRS}', html_string):
         total_hrs = get_hrs_in_revlog(revlog)
