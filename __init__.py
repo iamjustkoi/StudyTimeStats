@@ -199,17 +199,20 @@ Uses the addon config and current get_time_stats to retrieve the html to display
     """
     addon_config = get_config_manager().config
 
-    total_style = '' if addon_config[Config.SHOW_TOTAL] else 'display: none;'
-    range_style = '' if addon_config[Config.SHOW_RANGED] else 'display: none;'
-
-    html_string = html_shell.format(total_label=addon_config[Config.CUSTOM_TOTAL_TEXT],
-                                    range_label=addon_config[Config.CUSTOM_RANGE_TEXT],
-                                    total_hrs=addon_config[Config.CUSTOM_TOTAL_HRS],
-                                    range_hrs=addon_config[Config.CUSTOM_RANGE_HRS],
-                                    primary_color=addon_config[Config.PRIMARY_COLOR],
-                                    secondary_color=addon_config[Config.SECONDARY_COLOR],
-                                    total_style=total_style, range_style=range_style,
-                                    table_id=table_id, col_id=col_id, label_id=label_id, data_id=data_id)
+    html_string = html_shell.format(
+        total_label=addon_config[Config.CUSTOM_TOTAL_TEXT],
+        range_label=addon_config[Config.CUSTOM_RANGE_TEXT],
+        total_hrs=addon_config[Config.CUSTOM_TOTAL_HRS],
+        range_hrs=addon_config[Config.CUSTOM_RANGE_HRS],
+        primary_color=addon_config[Config.PRIMARY_COLOR],
+        secondary_color=addon_config[Config.SECONDARY_COLOR],
+        total_style='' if addon_config[Config.SHOW_TOTAL] else 'display: none;',
+        range_style='' if addon_config[Config.SHOW_RANGED] else 'display: none;',
+        table_id=table_id,
+        col_id=col_id,
+        label_id=label_id,
+        data_id=data_id
+    )
 
     return get_formatted_html_macros(html_string)
 
