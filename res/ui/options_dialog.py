@@ -237,7 +237,7 @@ class Ui_OptionsDialog(object):
         self.scroll_area = QtWidgets.QScrollArea(self.about_tab)
         self.scroll_area.setObjectName("scroll_area")
         self.about_scroll = QtWidgets.QWidget()
-        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 449, 802))
+        self.about_scroll.setGeometry(QtCore.QRect(0, -427, 449, 802))
         self.about_scroll.setObjectName("about_scroll")
         self.scroll_layout = QtWidgets.QVBoxLayout(self.about_scroll)
         self.scroll_layout.setSpacing(6)
@@ -418,7 +418,7 @@ class Ui_OptionsDialog(object):
 "These macros will each index the received review logs and output its individual value-unit combination (e.g. \"%total_hrs\" -> \"3.14 hrs\").\n"
 "+ `%total_hrs` - total study time\n"
 "+ `%range_hrs` - ranged study time\n"
-"+ `%prev_rangel_hrs` - total study time of the last calendar range\n"
+"+ `%prev_range_hrs` - total study time of the last calendar range\n"
 "<br></br>\n"
 "\n"
 "Total time for a specific range (current week, current month, etc):\n"
