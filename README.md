@@ -36,15 +36,16 @@ The add-on can also filter text in the custom labels input to show information b
 These macros will each index the received review logs and output its individual value-unit combination (e.g. "%total_hrs" -> "3.14 hrs").
 + `%total_hrs` - total study time
 + `%range_hrs` - ranged study time
-+ `%last_cal_hrs` - total study time of the last calendar range
-+ `%last_day_hrs` - total study time of the previous day
++ `%prev_cal_hrs` - total study time of the last calendar range
+
+Current times for specific ranges:
++ `%week_hrs`, `%two_week_hrs`, `%month_hrs`, `%year_hrs`
+
+Previous times for specific ranges:
++ `%prev_day_hrs`, `%prev_week_hrs`, `%prev_two_week_hrs`, `%prev_month_hrs`, `%prev_year_hrs` 
+
 ##### Misc
 + `%%` - returns a single % symbol and doesn't apply the text macro (%, %range, etc)
-
-#### How It Works
-The add-on uses Anki's built-in review logs and queries how much time's been spent on each card and tallies the results based on the selected filter.
-
-Using the built-in logs also means that all reviews done before downloading will also be fetched!
 
 #### Bugs/Issues:
 Please post any issues or feedback you might have on [GitHub](https://github.com/iamjustkoi/StudyTimeStats/issues).
