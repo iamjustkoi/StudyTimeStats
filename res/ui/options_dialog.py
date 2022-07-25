@@ -235,10 +235,9 @@ class Ui_OptionsDialog(object):
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.about_tab)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.scroll_area = QtWidgets.QScrollArea(self.about_tab)
-        self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setObjectName("scroll_area")
         self.about_scroll = QtWidgets.QWidget()
-        self.about_scroll.setGeometry(QtCore.QRect(0, -391, 449, 766))
+        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 449, 802))
         self.about_scroll.setObjectName("about_scroll")
         self.scroll_layout = QtWidgets.QVBoxLayout(self.about_scroll)
         self.scroll_layout.setSpacing(6)
@@ -250,6 +249,7 @@ class Ui_OptionsDialog(object):
         sizePolicy.setHeightForWidth(self.about_label_header.sizePolicy().hasHeightForWidth())
         self.about_label_header.setSizePolicy(sizePolicy)
         self.about_label_header.setTextFormat(QtCore.Qt.MarkdownText)
+        self.about_label_header.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.about_label_header.setWordWrap(True)
         self.about_label_header.setObjectName("about_label_header")
         self.scroll_layout.addWidget(self.about_label_header)
@@ -300,6 +300,7 @@ class Ui_OptionsDialog(object):
         sizePolicy.setHeightForWidth(self.about_label_body.sizePolicy().hasHeightForWidth())
         self.about_label_body.setSizePolicy(sizePolicy)
         self.about_label_body.setTextFormat(QtCore.Qt.MarkdownText)
+        self.about_label_body.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.about_label_body.setWordWrap(True)
         self.about_label_body.setObjectName("about_label_body")
         self.scroll_layout.addWidget(self.about_label_body)
@@ -385,20 +386,20 @@ class Ui_OptionsDialog(object):
         self.deck_disable_button.setText(_translate("OptionsDialog", "Disable"))
         self.tabs_widget.setTabText(self.tabs_widget.indexOf(self.decks_tab), _translate("OptionsDialog", "Advanced"))
         self.about_label_header.setText(_translate("OptionsDialog", "## Study Time Stats\n"
-"Add some customizable total and ranged study time statistics to Anki\'s main window!  \n"
+"Adds a total and ranged study time statistic to Anki\'s main window.  \n"
 "\n"
 "Version: {version}  \n"
 "Have any issues or feedback? Feel free to post on the project\'s issue section on [GitHub](https://github.com/iamjustkoi/StudyTimeStats/issues)!  \n"
 "\n"
 "[Releases/Changelog](https://github.com/iamjustkoi/StudyTimeStats/releases)  \n"
-"[Source Code](https://github.com/iamjustkoi/StudyTimeStats)\n"
-"<br></br>  \n"
-"If you like the add-on and want to consider supporting my stuff:  \n"
-""))
+"[Source Code](https://github.com/iamjustkoi/StudyTimeStats)  \n"
+"\n"
+"If you like the add-on and want to consider supporting my stuff:"))
         self.like_button.setText(_translate("OptionsDialog", "Review on AnkiWeb "))
         self.kofi_button.setText(_translate("OptionsDialog", "  Buy me a coffee "))
         self.patreon_button.setText(_translate("OptionsDialog", "  Become a patron "))
-        self.about_label_body.setText(_translate("OptionsDialog", "### Text Macros\n"
+        self.about_label_body.setText(_translate("OptionsDialog", "Every bit helps with maintaining and developing the add-on and is greatly appreciated!\n"
+"### Text Macros\n"
 "The add-on can also filter text in the custom labels input to show information based on what\'s set in the config (e.g. \"Past %range\" to \"Past Week\"). These can be used multiple times and will update whenever Anki\'s main window reloads.\n"
 "\n"
 "### Available Macros:\n"
