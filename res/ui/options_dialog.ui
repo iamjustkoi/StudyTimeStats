@@ -136,6 +136,9 @@
              <property name="toolTip">
               <string>The day a new week should start on.</string>
              </property>
+             <property name="currentText">
+              <string>Sunday</string>
+             </property>
              <property name="sizeAdjustPolicy">
               <enum>QComboBox::AdjustToContents</enum>
              </property>
@@ -575,7 +578,7 @@ See: About -&gt; Text Macros</string>
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
+            <y>-427</y>
             <width>449</width>
             <height>802</height>
            </rect>
@@ -773,8 +776,15 @@ The add-on can also filter text in the custom labels input to show information b
 These macros will each index the received review logs and output its individual value-unit combination (e.g. &quot;%total_hrs&quot; -&gt; &quot;3.14 hrs&quot;).
 + `%total_hrs` - total study time
 + `%range_hrs` - ranged study time
-+ `%last_cal_hrs` - total study time of the last calendar range
-+ `%last_day_hrs` - total study time of the previous day
++ `%prev_cal_hrs` - total study time of the last calendar range
+&lt;br&gt;&lt;/br&gt;
+
+Times for a specific range (current week, current month, etc):
++ `%week_hrs`, `%two_week_hrs`, `%month_hrs`, `%year_hrs`
+&lt;br&gt;&lt;/br&gt;
+
+Times for a specific, previous range (previous week, previous month, etc):
++ `%prev_day_hrs`, `%prev_week_hrs`, `%prev_two_week_hrs`, `%prev_month_hrs`, `%prev_year_hrs`
 &lt;br&gt;&lt;/br&gt;
 ##### Misc
 + `%%` - returns a single % symbol and doesn't apply the text macro (%, %range, etc)
