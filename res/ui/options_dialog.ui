@@ -657,7 +657,7 @@ If you like the add-on and want to consider supporting my stuff:</string>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>raw/anki_like.png</normaloff>raw/anki_like.png</iconset>
+                 <normaloff>res/img/anki_like.png</normaloff>res/img/anki_like.png</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -695,7 +695,7 @@ If you like the add-on and want to consider supporting my stuff:</string>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>raw/kofilogo_blue.PNG</normaloff>raw/kofilogo_blue.PNG</iconset>
+                 <normaloff>res/img/kofilogo_blue.PNG</normaloff>res/img/kofilogo_blue.PNG</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -733,7 +733,7 @@ If you like the add-on and want to consider supporting my stuff:</string>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>raw/patreon.png</normaloff>raw/patreon.png</iconset>
+                 <normaloff>res/img/patreon.png</normaloff>res/img/patreon.png</iconset>
                </property>
                <property name="iconSize">
                 <size>
