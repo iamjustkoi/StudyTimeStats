@@ -8,8 +8,8 @@ import re
 from datetime import timedelta, datetime, date
 
 from aqt import mw, gui_hooks, webview
-from aqt.deckbrowser import DeckBrowser
-from aqt.overview import Overview
+from aqt.deckbrowser import DeckBrowser, DeckBrowserContent
+from aqt.overview import Overview, OverviewContent
 from aqt.qt import QAction
 
 from src.config import TimeStatsConfigManager, ANKI_VERSION
@@ -69,7 +69,8 @@ def build_hooks():
     """
 Append addon hooks to Anki.
     """
-    gui_hooks.webview_will_set_content.append(append_to_webview)
+    gui_hooks.deck_browser_will_render_content.append(append_to_browser)
+    gui_hooks.overview_will_render_content.append(append_to_overview)
     if ANKI_VERSION > ANKI_LEGACY_VER:
         gui_hooks.webview_did_inject_style_into_page.append(append_to_congrats)
         gui_hooks.operation_did_execute.append(refresh_tools_menu_action)
@@ -122,28 +123,42 @@ Retrieves the addon's config manager.
     return TimeStatsConfigManager(mw, (date.today() - date.fromisoformat(UNIQUE_DATE)).days)
 
 
-def append_to_webview(content: webview.WebContent, context: object or None):
-    """
-If the current deck screen isn't excluded, formats the Anki webview to include html with study time data,
-else does nothing.
-    :param content: WebContent to be formatted
-    :param context: object used to check if the current view can/should be formatted
-    """
-    if mw.col is None:
-        # print(f'--Anki Window was NoneType')
-        return
+def append_to_browser(deck_browser: DeckBrowser, content: DeckBrowserContent):
+    if get_config_manager().config[Config.BROWSER_ENABLED]:
+        content.stats += get_stats_html()
 
-    addon_config = get_config_manager().config
 
-    show_on_deck_browser = isinstance(context, DeckBrowser) and addon_config[Config.BROWSER_ENABLED]
-    #  handles legacy congrats
-    on_congrats = False if ANKI_VERSION > ANKI_LEGACY_VER else content.body.find("Congratulations!") >= 0
-    show_on_congrats = on_congrats and addon_config[Config.CONGRATS_ENABLED]
+def append_to_overview(overview: Overview, content: OverviewContent):
+    # on_legacy_congrats = False if ANKI_VERSION > ANKI_LEGACY_VER else content.body.find("Congratulations!") >= 0
+    if get_config_manager().config[Config.OVERVIEW_ENABLED] and is_enabled_for_current_deck():
+        content.table += get_stats_html()
 
-    show_on_overview = isinstance(context, Overview) and addon_config[Config.OVERVIEW_ENABLED] and not on_congrats
 
-    if show_on_deck_browser or ((show_on_overview or show_on_congrats) and is_enabled_for_current_deck()):
-        content.body += get_stats_html()
+# def append_to_webview(content: webview.WebContent, context: object or None):
+#     """
+# If the current deck screen isn't excluded, formats the Anki webview to include html with study time data,
+# else does nothing.
+#     :param content: WebContent to be formatted
+#     :param context: object used to check if the current view can/should be formatted
+#     """
+#     if mw.col is None:
+#         # print(f'--Anki Window was NoneType')
+#         return
+#
+#     addon_config = get_config_manager().config
+#     #
+#     # if isinstance(context, DeckBrowser) and addon_config[Config.BROWSER_ENABLED]:
+#     #     content.stats += get_stats_html()
+#     # else:
+#
+#     #  handles legacy congrats
+#     on_congrats = False if ANKI_VERSION > ANKI_LEGACY_VER else content.body.find("Congratulations!") >= 0
+#     show_on_congrats = on_congrats and addon_config[Config.CONGRATS_ENABLED]
+#
+#     show_on_overview = isinstance(context, Overview) and addon_config[Config.OVERVIEW_ENABLED] and not on_congrats
+#
+#     if (show_on_overview or show_on_congrats) and is_enabled_for_current_deck():
+#         content.body += get_stats_html()
 
 
 def append_to_congrats(web: webview.AnkiWebView):
@@ -155,13 +170,10 @@ Extra handler used for the congrats page since it can't be as easily retrieved w
         # print(f'--Anki Window was NoneType')
         return
 
-    addon_config = get_config_manager().config
-
-    if web.page().url().path().find('congrats.html') != -1 and addon_config[Config.CONGRATS_ENABLED]:
-        if is_enabled_for_current_deck():
-            web.eval(
-                f'if (document.getElementById("{table_id}") == null) document.body.innerHTML += `{get_stats_html()}`'
-            )
+    if web.page().url().path().find('congrats.html') != -1:
+        if get_config_manager().config[Config.CONGRATS_ENABLED] and is_enabled_for_current_deck():
+            js = f'if (document.getElementById("{table_id}") == null) document.body.innerHTML += `{get_stats_html()}`'
+            web.eval(js)
 
 
 def is_enabled_for_current_deck() -> bool:
