@@ -240,8 +240,6 @@ Currently, uses the string identifiers: %range, %from_date, %from_year, %from_fu
     if re.search(fr'(?<!%){CMD_RANGE_HRS}', html_string):
         html_string = html_string.replace(CMD_RANGE_HRS, get_formatted_range_hrs(revlog, days_ago))
 
-    #     -------------
-
     if re.search(fr'(?<!%){CMD_WEEK_HRS}', html_string):
         html_string = html_string.replace(
             CMD_WEEK_HRS, get_formatted_range_hrs(revlog, get_days_ago(Range.WEEK))
@@ -261,8 +259,6 @@ Currently, uses the string identifiers: %range, %from_date, %from_year, %from_fu
         html_string = html_string.replace(
             CMD_YEAR_HRS, get_formatted_range_hrs(revlog, get_days_ago(Range.YEAR))
         )
-
-    #     -------------
 
     if re.search(fr'(?<!%){CMD_PREV_RANGE_HRS}', html_string):
         html_string = html_string.replace(CMD_PREV_RANGE_HRS, get_formatted_prev_range_hrs(revlog, range_type))
