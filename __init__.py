@@ -12,9 +12,9 @@ from aqt.deckbrowser import DeckBrowser
 from aqt.overview import Overview
 from aqt.qt import QAction
 
-from .config import TimeStatsConfigManager, ANKI_VERSION
-from .consts import *
-from .options import TimeStatsOptionsDialog
+from src.config import TimeStatsConfigManager, ANKI_VERSION
+from src.consts import *
+from src.options import TimeStatsOptionsDialog
 
 table_id, col_id, label_id, data_id = 'sts-table', 'sts-col', 'sts-label', 'sts-data'
 html_shell = '''

@@ -1,0 +1,855 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <author>JustKoi</author>
+ <class>OptionsDialog</class>
+ <widget class="QDialog" name="OptionsDialog">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>508</width>
+    <height>485</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>484</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Study Time Stats Options</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_4">
+   <item>
+    <widget class="QTabWidget" name="tabs_widget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="appearance_tab">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <attribute name="title">
+       <string>General</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <layout class="QVBoxLayout" name="general_layout">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetMinimumSize</enum>
+         </property>
+         <property name="leftMargin">
+          <number>12</number>
+         </property>
+         <property name="topMargin">
+          <number>12</number>
+         </property>
+         <property name="rightMargin">
+          <number>12</number>
+         </property>
+         <property name="bottomMargin">
+          <number>12</number>
+         </property>
+         <item>
+          <layout class="QFormLayout" name="general_form">
+           <property name="bottomMargin">
+            <number>20</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="range_select_label">
+             <property name="text">
+              <string>Selected Range</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <layout class="QHBoxLayout" name="range_select_layout" stretch="1,0">
+             <property name="sizeConstraint">
+              <enum>QLayout::SetMinimumSize</enum>
+             </property>
+             <item>
+              <widget class="QComboBox" name="range_select_dropdown">
+               <property name="toolTip">
+                <string>Time range to filter through for the ranged total stat.</string>
+               </property>
+               <property name="sizeAdjustPolicy">
+                <enum>QComboBox::AdjustToContents</enum>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Past Week</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Past 2 Weeks</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Past Month</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Past Year</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Custom</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="use_calendar_checkbox">
+               <property name="toolTip">
+                <string>Use the start of the selected range instead of using its timespan.</string>
+               </property>
+               <property name="text">
+                <string>Use Calendar Week</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="week_start_label">
+             <property name="text">
+              <string>Week-Start Day</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="week_start_dropdown">
+             <property name="toolTip">
+              <string>The day a new week should start on.</string>
+             </property>
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContents</enum>
+             </property>
+             <item>
+              <property name="text">
+               <string>Monday</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Tuesday</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Wednesday</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Thursday</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Friday</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Saturday</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Sunday</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QSpinBox" name="custom_range_spinbox">
+             <property name="toolTip">
+              <string>Amount of days to filter the custom range.</string>
+             </property>
+             <property name="suffix">
+              <string> days</string>
+             </property>
+             <property name="maximum">
+              <number>5690</number>
+             </property>
+             <property name="value">
+              <number>14</number>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="total_label">
+             <property name="text">
+              <string>Total Title</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="QLineEdit" name="total_line">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Text that displays above the total statistic.</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="ranged_label">
+             <property name="text">
+              <string>Range Title</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QLineEdit" name="ranged_line">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Text that displays above the ranged statistic.</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="hrs_label">
+             <property name="text">
+              <string>Hours Label</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <widget class="QLineEdit" name="hrs_line">
+             <property name="toolTip">
+              <string>Unit text appended to hours.</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="0">
+            <widget class="QLabel" name="min_label">
+             <property name="text">
+              <string>Minutes Label</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="1">
+            <widget class="QLineEdit" name="min_line">
+             <property name="toolTip">
+              <string>Unit text appended to minutes.</string>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="0">
+            <widget class="QLabel" name="primary_color_label">
+             <property name="text">
+              <string>Primary Color</string>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="1">
+            <layout class="QHBoxLayout" name="primary_color_layout">
+             <item>
+              <widget class="QPushButton" name="primary_color_button">
+               <property name="text">
+                <string>Select</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="primary_color_preview">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="10" column="0">
+            <widget class="QLabel" name="secondary_color_label">
+             <property name="text">
+              <string>Secondary Color</string>
+             </property>
+            </widget>
+           </item>
+           <item row="10" column="1">
+            <layout class="QHBoxLayout" name="secondary_color_layut">
+             <item>
+              <widget class="QPushButton" name="seconday_color_button">
+               <property name="text">
+                <string>Select</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="secondary_color_preview">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="3" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QCheckBox" name="show_total_checkbox">
+               <property name="toolTip">
+                <string>Enables the total stat.</string>
+               </property>
+               <property name="text">
+                <string>Show Total Stat</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="show_ranged_checkbox">
+               <property name="toolTip">
+                <string>Enables the ranged stat.</string>
+               </property>
+               <property name="text">
+                <string>Show Range Stat</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="11" column="0">
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="pages_group">
+           <property name="title">
+            <string>Enabled Pages</string>
+           </property>
+           <layout class="QHBoxLayout" name="pages_vertical_layout">
+            <item>
+             <widget class="QCheckBox" name="browser_checkbox">
+              <property name="toolTip">
+               <string>The main Anki screen for browsing decks.</string>
+              </property>
+              <property name="text">
+               <string>Deck Browser</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="overview_checkbox">
+              <property name="toolTip">
+               <string>The screen that shows when viewing a deck.</string>
+              </property>
+              <property name="text">
+               <string>Overview</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="congrats_checkbox">
+              <property name="toolTip">
+               <string>The screen that shows up on the Deck Overview when all reviews are finished for the day.</string>
+              </property>
+              <property name="text">
+               <string>Congrats Screen</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="decks_tab">
+      <attribute name="title">
+       <string>Advanced</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QCheckBox" name="toolbar_checkbox">
+         <property name="toolTip">
+          <string>Enables the Tools Menu shortcut for showing these options. 
+This window can also be opened in the Add-ons menu using the Config button.</string>
+         </property>
+         <property name="text">
+          <string>Show options shortcut in the Tools Menu</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="include_deleted_checkbox">
+         <property name="toolTip">
+          <string>Include review times from cards that were deleted.</string>
+         </property>
+         <property name="text">
+          <string>Include reviews from deleted cards</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QFormLayout" name="formLayout">
+         <property name="bottomMargin">
+          <number>20</number>
+         </property>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="total_hrs_line">
+           <property name="toolTip">
+            <string>Custom output filter to use for the total statistics value.
+See: About -&gt; Text Macros</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="total_hrs_label">
+           <property name="text">
+            <string>Total Text Output</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="range_hrs_label">
+           <property name="text">
+            <string>Range Text Output</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="range_hrs_line">
+           <property name="toolTip">
+            <string>Custom output filter to use for the ranged statistics value.
+See: About -&gt; Text Macros</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="enabled_decks_group">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>Enabled Decks</string>
+         </property>
+         <layout class="QVBoxLayout" name="enabled_decks_layout">
+          <item>
+           <layout class="QHBoxLayout" name="exclude_layout">
+            <item>
+             <widget class="QPushButton" name="deck_enable_button">
+              <property name="focusPolicy">
+               <enum>Qt::TabFocus</enum>
+              </property>
+              <property name="toolTip">
+               <string>Enable stats for the selected deck(s).</string>
+              </property>
+              <property name="text">
+               <string>Enable</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="deck_disable_button">
+              <property name="focusPolicy">
+               <enum>Qt::TabFocus</enum>
+              </property>
+              <property name="toolTip">
+               <string>Disable stats for the selected deck(s).</string>
+              </property>
+              <property name="text">
+               <string>Disable</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="exclude_spacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QListWidget" name="excluded_decks_list">
+            <property name="selectionMode">
+             <enum>QAbstractItemView::ExtendedSelection</enum>
+            </property>
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="about_tab">
+      <attribute name="title">
+       <string>About</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QScrollArea" name="scroll_area">
+         <widget class="QWidget" name="about_scroll">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>449</width>
+            <height>802</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="scroll_layout" stretch="0,0,1">
+           <property name="spacing">
+            <number>6</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="about_label_header">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>## Study Time Stats
+Adds a total and ranged study time statistic to Anki's main window.  
+
+Version: {version}  
+Have any issues or feedback? Feel free to post on the project's issue section on [GitHub](https://github.com/iamjustkoi/StudyTimeStats/issues)!  
+
+[Releases/Changelog](https://github.com/iamjustkoi/StudyTimeStats/releases)  
+[Source Code](https://github.com/iamjustkoi/StudyTimeStats)  
+
+If you like the add-on and want to consider supporting my stuff:</string>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::MarkdownText</enum>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="support_buttons">
+             <property name="leftMargin">
+              <number>6</number>
+             </property>
+             <property name="topMargin">
+              <number>6</number>
+             </property>
+             <property name="rightMargin">
+              <number>6</number>
+             </property>
+             <property name="bottomMargin">
+              <number>6</number>
+             </property>
+             <item>
+              <widget class="QPushButton" name="like_button">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>42</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>200</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="contextMenuPolicy">
+                <enum>Qt::CustomContextMenu</enum>
+               </property>
+               <property name="text">
+                <string>Review on AnkiWeb </string>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>raw/anki_like.png</normaloff>raw/anki_like.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="kofi_button">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>42</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>200</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="contextMenuPolicy">
+                <enum>Qt::CustomContextMenu</enum>
+               </property>
+               <property name="text">
+                <string>  Buy me a coffee </string>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>raw/kofilogo_blue.PNG</normaloff>raw/kofilogo_blue.PNG</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="patreon_button">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>42</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>200</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="contextMenuPolicy">
+                <enum>Qt::CustomContextMenu</enum>
+               </property>
+               <property name="text">
+                <string>  Become a patron </string>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>raw/patreon.png</normaloff>raw/patreon.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QLabel" name="about_label_body">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Every bit helps with maintaining and developing the add-on and is greatly appreciated!
+### Text Macros
+The add-on can also filter text in the custom labels input to show information based on what's set in the config (e.g. &quot;Past %range&quot; to &quot;Past Week&quot;). These can be used multiple times and will update whenever Anki's main window reloads.
+
+### Available Macros:
+
+##### General
++ `%range` - the currently selected range format (Week, 2 Weeks, Month, Year)
++ `%from_date` - range filter's start date using the system's locale (2022-06-30)
++ `%from_day` - range filter's starting day using a compact format (Sun)
++ `%from_full_day` - range filter's full start day (Sunday)
++ `%from_month` - range filter's month name using a compact format (Sep)
++ `%from_full_month` - range filter's full month name (September)
++ `%days` - total days the range filter checks against (17)
+&lt;br&gt;&lt;/br&gt;
+##### Advanced
+These macros will each index the received review logs and output its individual value-unit combination (e.g. &quot;%total_hrs&quot; -&gt; &quot;3.14 hrs&quot;).
++ `%total_hrs` - total study time
++ `%range_hrs` - ranged study time
++ `%last_cal_hrs` - total study time of the last calendar range
++ `%last_day_hrs` - total study time of the previous day
+&lt;br&gt;&lt;/br&gt;
+##### Misc
++ `%%` - returns a single % symbol and doesn't apply the text macro (%, %range, etc)
+
+&lt;br&gt;&lt;/br&gt;
+Thanks for downloading and hope you enjoy!  
+-koi  
+&lt;br&gt;&lt;/br&gt;  
+MIT License    
+©2022 JustKoi (iamjustkoi)  </string>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::MarkdownText</enum>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="confirm_button_box">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>confirm_button_box</sender>
+   <signal>accepted()</signal>
+   <receiver>OptionsDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>confirm_button_box</sender>
+   <signal>rejected()</signal>
+   <receiver>OptionsDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
