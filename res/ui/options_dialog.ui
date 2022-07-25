@@ -137,7 +137,7 @@
               <string>The day a new week should start on.</string>
              </property>
              <property name="currentText">
-              <string>Sunday</string>
+              <string>Monday</string>
              </property>
              <property name="sizeAdjustPolicy">
               <enum>QComboBox::AdjustToContents</enum>
@@ -578,7 +578,7 @@ See: About -&gt; Text Macros</string>
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-427</y>
+            <y>0</y>
             <width>449</width>
             <height>802</height>
            </rect>
@@ -776,7 +776,7 @@ The add-on can also filter text in the custom labels input to show information b
 These macros will each index the received review logs and output its individual value-unit combination (e.g. &quot;%total_hrs&quot; -&gt; &quot;3.14 hrs&quot;).
 + `%total_hrs` - total study time
 + `%range_hrs` - ranged study time
-+ `%prev_cal_hrs` - total study time of the last calendar range
++ `%prev_rangel_hrs` - total study time of the last calendar range
 &lt;br&gt;&lt;/br&gt;
 
 Total time for a specific range (current week, current month, etc):
