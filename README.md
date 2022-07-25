@@ -38,10 +38,10 @@ These macros will each index the received review logs and output its individual 
 + `%range_hrs` - ranged study time
 + `%prev_cal_hrs` - total study time of the last calendar range
 
-Current times for specific ranges:
+Total time for a specific range (current week, current month, etc):
 + `%week_hrs`, `%two_week_hrs`, `%month_hrs`, `%year_hrs`
 
-Previous times for specific ranges:
+Total time for a specific, previous range (previous week, previous month, etc):
 + `%prev_day_hrs`, `%prev_week_hrs`, `%prev_two_week_hrs`, `%prev_month_hrs`, `%prev_year_hrs` 
 
 ##### Misc
