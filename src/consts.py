@@ -19,10 +19,14 @@ CMD_MONTH = '%from_month'
 CMD_FULL_MONTH = '%from_full_month'
 
 CMD_TOTAL_HRS = '%total_hrs'
+
 CMD_RANGE_HRS = '%range_hrs'
+CMD_WEEK_HRS = '%week_hrs'
+CMD_TWO_WEEKS_HRS = '%two_week_hrs'
+CMD_MONTH_HRS = '%month_hrs'
+CMD_YEAR_HRS = '%year_hrs'
 
 CMD_PREV_RANGE_HRS = '%prev_range_hrs'
-
 CMD_PREV_DAY_HRS = '%prev_day_hrs'
 CMD_PREV_WEEK_HRS = '%prev_week_hrs'
 CMD_PREV_TWO_WEEKS_HRS = '%prev_two_week_hrs'

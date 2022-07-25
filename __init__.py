@@ -202,13 +202,20 @@ Uses the addon config and current get_time_stats to retrieve the html to display
     return get_formatted_html_macros(html_string)
 
 
-def get_formatted_prev_range_hrs(revlog:  [[int, int]], range_type: int):
+def get_formatted_prev_range_hrs(revlog: [[int, int]], range_type: int):
     # extra day added to not include the received week-start day
     from_date = datetime.today() - timedelta(days=get_days_ago(range_type) + 1)
     ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, Range.DAYS_IN[range_type] - 1, from_date=from_date))
     cal_val = get_formatted_hrs_or_min(ranged_hrs)
     cal_unit = get_config_manager().config[get_unit_type(ranged_hrs)]
     return f'{cal_val} {cal_unit}'
+
+
+def get_formatted_range_hrs(revlog: [[int, int]], days_ago: int):
+    ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago))
+    range_val = get_formatted_hrs_or_min(ranged_hrs)
+    range_unit = get_config_manager().config[get_unit_type(ranged_hrs)]
+    return f'{range_val} {range_unit}'
 
 
 def get_formatted_html_macros(html_string: str):
@@ -231,10 +238,31 @@ Currently, uses the string identifiers: %range, %from_date, %from_year, %from_fu
         html_string = html_string.replace(CMD_TOTAL_HRS, f'{total_val} {total_unit}')
 
     if re.search(fr'(?<!%){CMD_RANGE_HRS}', html_string):
-        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago))
-        range_val = get_formatted_hrs_or_min(ranged_hrs)
-        range_unit = addon_config[get_unit_type(ranged_hrs)]
-        html_string = html_string.replace(CMD_RANGE_HRS, f'{range_val} {range_unit}')
+        html_string = html_string.replace(CMD_RANGE_HRS, get_formatted_range_hrs(revlog, days_ago))
+
+    #     -------------
+
+    if re.search(fr'(?<!%){CMD_WEEK_HRS}', html_string):
+        html_string = html_string.replace(
+            CMD_WEEK_HRS, get_formatted_range_hrs(revlog, get_days_ago(Range.WEEK))
+        )
+
+    if re.search(fr'(?<!%){CMD_TWO_WEEKS_HRS}', html_string):
+        html_string = html_string.replace(
+            CMD_TWO_WEEKS_HRS, get_formatted_range_hrs(revlog, get_days_ago(Range.TWO_WEEKS))
+        )
+
+    if re.search(fr'(?<!%){CMD_MONTH_HRS}', html_string):
+        html_string = html_string.replace(
+            CMD_MONTH_HRS, get_formatted_range_hrs(revlog, get_days_ago(Range.MONTH))
+        )
+
+    if re.search(fr'(?<!%){CMD_YEAR_HRS}', html_string):
+        html_string = html_string.replace(
+            CMD_YEAR_HRS, get_formatted_range_hrs(revlog, get_days_ago(Range.YEAR))
+        )
+
+    #     -------------
 
     if re.search(fr'(?<!%){CMD_PREV_RANGE_HRS}', html_string):
         html_string = html_string.replace(CMD_PREV_RANGE_HRS, get_formatted_prev_range_hrs(revlog, range_type))
