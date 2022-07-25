@@ -3,7 +3,7 @@ MIT License: Copyright (c) 2022 JustKoi (iamjustkoi) <https://github.com/iamjust
 Full license text available in the "LICENSE" file, packaged with the add-on.
 """
 
-CURRENT_VERSION = '1.2.12-beta'
+CURRENT_VERSION = '1.2.12-beta-1'
 
 ANKI_LEGACY_VER = 35
 ANKI_DEFAULT_ROLLOVER = 4
@@ -23,10 +23,10 @@ CMD_RANGE_HRS = '%range_hrs'
 CMD_LAST_CAL_HRS = '%last_cal_hrs'
 CMD_LAST_DAY_HRS = '%last_day_hrs'
 
-ICON_PATH = 'raw/stats_icon.svg'
-KOFI_FILEPATH = 'raw\\kofilogo_blue.PNG'
-PATREON_FILEPATH = 'raw\\patreon.png'
-ANKI_FILEPATH = 'raw\\anki_like.png'
+ICON_PATH = '../res/img/stats_icon.svg'
+KOFI_FILEPATH = '../res/img/kofilogo_blue.PNG'
+PATREON_FILEPATH = '../res/img/patreon.png'
+ANKI_FILEPATH = '../res/img/anki_like.png'
 PATREON_URL = 'https://www.patreon.com/iamjustkoi'
 KOFI_URL = 'https://ko-fi.com/iamjustkoi'
 ANKI_URL = 'https://ankiweb.net/shared/info/1247171202'
