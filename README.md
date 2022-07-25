@@ -9,7 +9,7 @@ Or inside Anki (Tools -> Add-ons -> Get Add-ons...)
 
 ## Options Menu  
 ### General
-These settings can be used to change the visibility, look, and text of the rendered stats, as well as how the add-on should filter the total review time.  
+These settings can be used to change the visibility, look, and text of the rendered stats, as well as how the add-on should filter the total time.  
 <p align="center"><img src=".github/options_general.png"></p>
 
 ### Advanced
@@ -41,11 +41,15 @@ These macros will each index the received review logs and output its individual 
 ##### Misc
 + `%%` - returns a single % symbol and doesn't apply the text macro (%, %range, etc)
 
+#### How It Works
+The add-on uses Anki's built-in review logs and queries how much time's been spent on each card and tallies the results based on the selected filter.
+
+Using the built-in logs also means that all reviews done before downloading will also be fetched!
+
 #### Bugs/Issues:
 Please post any issues or feedback you might have on [GitHub](https://github.com/iamjustkoi/StudyTimeStats/issues).
 <br></br>  
 
 Wish you the best! -koi
 
-MIT License  
-©2022 JustKoi (iamjustkoi)  
+MIT License ©2022 JustKoi (iamjustkoi)
