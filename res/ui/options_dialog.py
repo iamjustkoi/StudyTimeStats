@@ -237,7 +237,7 @@ class Ui_OptionsDialog(object):
         self.scroll_area = QtWidgets.QScrollArea(self.about_tab)
         self.scroll_area.setObjectName("scroll_area")
         self.about_scroll = QtWidgets.QWidget()
-        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 449, 802))
+        self.about_scroll.setGeometry(QtCore.QRect(0, -427, 449, 802))
         self.about_scroll.setObjectName("about_scroll")
         self.scroll_layout = QtWidgets.QVBoxLayout(self.about_scroll)
         self.scroll_layout.setSpacing(6)
@@ -335,6 +335,7 @@ class Ui_OptionsDialog(object):
         self.use_calendar_checkbox.setText(_translate("OptionsDialog", "Use Calendar Week"))
         self.week_start_label.setText(_translate("OptionsDialog", "Week-Start Day"))
         self.week_start_dropdown.setToolTip(_translate("OptionsDialog", "The day a new week should start on."))
+        self.week_start_dropdown.setCurrentText(_translate("OptionsDialog", "Sunday"))
         self.week_start_dropdown.setItemText(0, _translate("OptionsDialog", "Monday"))
         self.week_start_dropdown.setItemText(1, _translate("OptionsDialog", "Tuesday"))
         self.week_start_dropdown.setItemText(2, _translate("OptionsDialog", "Wednesday"))
@@ -417,8 +418,15 @@ class Ui_OptionsDialog(object):
 "These macros will each index the received review logs and output its individual value-unit combination (e.g. \"%total_hrs\" -> \"3.14 hrs\").\n"
 "+ `%total_hrs` - total study time\n"
 "+ `%range_hrs` - ranged study time\n"
-"+ `%last_cal_hrs` - total study time of the last calendar range\n"
-"+ `%last_day_hrs` - total study time of the previous day\n"
+"+ `%prev_cal_hrs` - total study time of the last calendar range\n"
+"<br></br>\n"
+"\n"
+"Times for a specific range (current week, current month, etc):\n"
+"+ `%week_hrs`, `%two_week_hrs`, `%month_hrs`, `%year_hrs`\n"
+"<br></br>\n"
+"\n"
+"Times for a specific, previous range (previous week, previous month, etc):\n"
+"+ `%prev_day_hrs`, `%prev_week_hrs`, `%prev_two_week_hrs`, `%prev_month_hrs`, `%prev_year_hrs`\n"
 "<br></br>\n"
 "##### Misc\n"
 "+ `%%` - returns a single % symbol and doesn\'t apply the text macro (%, %range, etc)\n"
