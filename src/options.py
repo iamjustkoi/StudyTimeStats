@@ -11,9 +11,9 @@ import aqt
 from aqt.qt import QDialog, QColorDialog, QColor, QLabel, QDialogButtonBox, QRect, QIcon, QMenu
 from aqt.qt import QListWidgetItem, QWidget, QHBoxLayout
 
-from res.ui.options_dialog import Ui_OptionsDialog
 from .config import TimeStatsConfigManager
 from .consts import *
+from ..res.ui.options_dialog import Ui_OptionsDialog
 
 
 def set_label_background(label: QLabel, hex_arg: str, use_circle=True):
@@ -21,10 +21,6 @@ def set_label_background(label: QLabel, hex_arg: str, use_circle=True):
         label.setStyleSheet(f'QWidget {{background-color: {hex_arg}; border-radius: 10px;}}')
     else:
         label.setStyleSheet(f'QWidget {{background-color: {hex_arg}}}')
-
-
-def custom_exec():
-    pass
 
 
 class TimeStatsOptionsDialog(QDialog):
