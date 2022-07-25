@@ -2,6 +2,7 @@
 MIT License: Copyright (c) 2022 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
 Full license text available in "LICENSE" file, located in the add-on's root directory.
 """
+from os import path
 
 from anki import buildinfo
 from aqt import AnkiQt
@@ -22,7 +23,7 @@ Generic config manager for accessing and writing addon config values.
         """
         super().__init__()
         self.mw = mw
-        self._addon = self.mw.addonManager.addonFromModule(__name__)
+        self._addon = self.mw.addonManager.addonFromModule(path.dirname(path.dirname(__file__)))
         self._meta = self.mw.addonManager.addonMeta(self._addon)
 
         self.config = self._meta.get('config', Config.DEFAULT_CONFIG)

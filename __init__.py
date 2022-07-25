@@ -12,9 +12,9 @@ from aqt.deckbrowser import DeckBrowser, DeckBrowserContent
 from aqt.overview import Overview, OverviewContent
 from aqt.qt import QAction
 
-from src.config import TimeStatsConfigManager, ANKI_VERSION
-from src.consts import *
-from src.options import TimeStatsOptionsDialog
+from .src.config import TimeStatsConfigManager, ANKI_VERSION
+from .src.consts import *
+from .src.options import TimeStatsOptionsDialog
 
 table_id, col_id, label_id, data_id = 'sts-table', 'sts-col', 'sts-label', 'sts-data'
 html_shell = '''
@@ -134,33 +134,6 @@ def append_to_overview(overview: Overview, content: OverviewContent):
         content.table += get_stats_html()
 
 
-# def append_to_webview(content: webview.WebContent, context: object or None):
-#     """
-# If the current deck screen isn't excluded, formats the Anki webview to include html with study time data,
-# else does nothing.
-#     :param content: WebContent to be formatted
-#     :param context: object used to check if the current view can/should be formatted
-#     """
-#     if mw.col is None:
-#         # print(f'--Anki Window was NoneType')
-#         return
-#
-#     addon_config = get_config_manager().config
-#     #
-#     # if isinstance(context, DeckBrowser) and addon_config[Config.BROWSER_ENABLED]:
-#     #     content.stats += get_stats_html()
-#     # else:
-#
-#     #  handles legacy congrats
-#     on_congrats = False if ANKI_VERSION > ANKI_LEGACY_VER else content.body.find("Congratulations!") >= 0
-#     show_on_congrats = on_congrats and addon_config[Config.CONGRATS_ENABLED]
-#
-#     show_on_overview = isinstance(context, Overview) and addon_config[Config.OVERVIEW_ENABLED] and not on_congrats
-#
-#     if (show_on_overview or show_on_congrats) and is_enabled_for_current_deck():
-#         content.body += get_stats_html()
-
-
 def append_to_congrats(web: webview.AnkiWebView):
     """
 Extra handler used for the congrats page since it can't be as easily retrieved with the existing hooks.
@@ -229,6 +202,15 @@ Uses the addon config and current get_time_stats to retrieve the html to display
     return get_formatted_html_macros(html_string)
 
 
+def get_formatted_prev_range_hrs(revlog:  [[int, int]], range_type: int):
+    # extra day added to not include the received week-start day
+    from_date = datetime.today() - timedelta(days=get_days_ago(range_type) + 1)
+    ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, Range.DAYS_IN[range_type] - 1, from_date=from_date))
+    cal_val = get_formatted_hrs_or_min(ranged_hrs)
+    cal_unit = get_config_manager().config[get_unit_type(ranged_hrs)]
+    return f'{cal_val} {cal_unit}'
+
+
 def get_formatted_html_macros(html_string: str):
     """
 Replaces the input html string with formatted text based on input codes.
@@ -240,7 +222,7 @@ Currently, uses the string identifiers: %range, %from_date, %from_year, %from_fu
     range_type = addon_config[Config.RANGE_TYPE]
 
     revlog = get_revlog(addon_config)
-    days_ago = get_days_ago(addon_config[Config.RANGE_TYPE], addon_config)
+    days_ago = get_days_ago(addon_config[Config.RANGE_TYPE])
 
     if re.search(fr'(?<!%){CMD_TOTAL_HRS}', html_string):
         total_hrs = get_hrs_in_revlog(revlog)
@@ -254,25 +236,31 @@ Currently, uses the string identifiers: %range, %from_date, %from_year, %from_fu
         range_unit = addon_config[get_unit_type(ranged_hrs)]
         html_string = html_string.replace(CMD_RANGE_HRS, f'{range_val} {range_unit}')
 
-    if re.search(fr'(?<!%){CMD_LAST_CAL_HRS}', html_string):
-        # extra day added to not include the received week-start day
-        from_date = datetime.today() - timedelta(days=get_days_ago(range_type, addon_config) + 1)
-        # = 1 accounts for extra day
-        ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, Range.DAYS_IN[range_type] - 1, from_date=from_date))
-        cal_val = get_formatted_hrs_or_min(ranged_hrs)
-        cal_unit = addon_config[get_unit_type(ranged_hrs)]
-        html_string = html_string.replace(CMD_LAST_CAL_HRS, f'{cal_val} {cal_unit}')
+    if re.search(fr'(?<!%){CMD_PREV_RANGE_HRS}', html_string):
+        html_string = html_string.replace(CMD_PREV_RANGE_HRS, get_formatted_prev_range_hrs(revlog, range_type))
+
+    if re.search(fr'(?<!%){CMD_PREV_WEEK_HRS}', html_string):
+        html_string = html_string.replace(CMD_PREV_WEEK_HRS, get_formatted_prev_range_hrs(revlog, Range.WEEK))
+
+    if re.search(fr'(?<!%){CMD_PREV_TWO_WEEKS_HRS}', html_string):
+        html_string = html_string.replace(CMD_PREV_TWO_WEEKS_HRS, get_formatted_prev_range_hrs(revlog, Range.TWO_WEEKS))
+
+    if re.search(fr'(?<!%){CMD_PREV_MONTH_HRS}', html_string):
+        html_string = html_string.replace(CMD_PREV_MONTH_HRS, get_formatted_prev_range_hrs(revlog, Range.MONTH))
+
+    if re.search(fr'(?<!%){CMD_PREV_YEAR_HRS}', html_string):
+        html_string = html_string.replace(CMD_PREV_YEAR_HRS, get_formatted_prev_range_hrs(revlog, Range.YEAR))
 
     # Use for not returning duplicates in double-passed variables:
     # match = re.search(fr'(?<!%){CMD_LAST_DAY}', html_string)
     # len(match.regs)r
-    if re.search(fr'(?<!%){CMD_LAST_DAY_HRS}', html_string):
+    if re.search(fr'(?<!%){CMD_PREV_DAY_HRS}', html_string):
         ref_date = (datetime.today() - timedelta(days=1)).replace(hour=23, minute=59, second=59)
         # ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago=0, from_date=ref_date))
         ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, 0, ref_date))
         day_val = get_formatted_hrs_or_min(ranged_hrs)
         day_unit = addon_config[get_unit_type(ranged_hrs)]
-        html_string = html_string.replace(CMD_LAST_DAY_HRS, f'{day_val} {day_unit}')
+        html_string = html_string.replace(CMD_PREV_DAY_HRS, f'{day_val} {day_unit}')
 
     if re.search(fr'(?<!%){CMD_RANGE}', html_string):
         if range_type != Range.CUSTOM:
@@ -361,14 +349,15 @@ Retrieves Anki review data using the currently displayed decks and excluded deck
     return mw.col.db.all(revlog_cmd)
 
 
-def get_days_ago(range_type: int, addon_config, from_date=datetime.today()):
+def get_days_ago(range_type: int, from_date=datetime.today()):
     """
 Returns the total number of days since the start of a ranged time length.
     :param range_type: range to use as a reference
-    :param addon_config: add-on config for retrieving user values
     :param from_date: input date to check distance of start from
     :return: total days away the range is from the referenced date-time
     """
+    addon_config = get_config_manager().config
+
     # Calendar Range Math!
     if range_type == Range.CUSTOM:
         return addon_config[Config.CUSTOM_DAYS]
