@@ -34,9 +34,10 @@ CMD_PREV_MONTH_HRS = '%prev_month_hrs'
 CMD_PREV_YEAR_HRS = '%prev_year_hrs'
 
 ICON_PATH = '../res/img/stats_icon.svg'
-KOFI_FILEPATH = '../res/img/kofilogo_blue.PNG'
-PATREON_FILEPATH = '../res/img/patreon.png'
-ANKI_FILEPATH = '../res/img/anki_like.png'
+KOFI_ICON_PATH = '../res/img/kofilogo_blue.PNG'
+PATREON_ICON_PATH = '../res/img/patreon.png'
+ANKI_LIKE_ICON_PATH = '../res/img/anki_like.png'
+
 PATREON_URL = 'https://www.patreon.com/iamjustkoi'
 KOFI_URL = 'https://ko-fi.com/iamjustkoi'
 ANKI_URL = 'https://ankiweb.net/shared/info/1247171202'

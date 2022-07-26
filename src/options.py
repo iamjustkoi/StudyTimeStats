@@ -51,21 +51,21 @@ Addon options QDialog class for accessing and changing the addon's config values
         self.ui.context_menu = QMenu(self)
 
         kofi_button = self.ui.kofi_button
-        kofi_button.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{KOFI_FILEPATH}'))
+        kofi_button.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{KOFI_ICON_PATH}'))
         kofi_button.released.connect(lambda: webbrowser.open(KOFI_URL))
         kofi_button.customContextMenuRequested.connect(
             lambda point: self.on_line_context_menu(point, kofi_button)
         )
 
         patreon_button = self.ui.patreon_button
-        patreon_button.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{PATREON_FILEPATH}'))
+        patreon_button.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{PATREON_ICON_PATH}'))
         patreon_button.released.connect(lambda: webbrowser.open(PATREON_URL))
         patreon_button.customContextMenuRequested.connect(
             lambda point: self.on_line_context_menu(point, patreon_button)
         )
 
         ankiweb_button = self.ui.like_button
-        ankiweb_button.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{ANKI_FILEPATH}'))
+        ankiweb_button.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{ANKI_LIKE_ICON_PATH}'))
         ankiweb_button.released.connect(lambda: webbrowser.open(ANKI_URL))
         ankiweb_button.customContextMenuRequested.connect(
             lambda point: self.on_line_context_menu(point, ankiweb_button)
