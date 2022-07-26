@@ -221,7 +221,6 @@ def get_formatted_range_hrs(revlog: [[int, int]], days_ago: int):
 def get_formatted_html_macros(html_string: str):
     """
 Replaces the input html string with formatted text based on input codes.
-Currently, uses the string identifiers: %range, %from_date, %from_year, %from_full_weekday, %from_weekday, and %days.
     :param html_string: html string to be formatted
     :return: the formatted html string object
     """
