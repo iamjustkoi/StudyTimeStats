@@ -8,8 +8,19 @@ import webbrowser
 from pathlib import Path
 
 import aqt
-from aqt.qt import QDialog, QColorDialog, QColor, QLabel, QDialogButtonBox, QRect, QIcon, QMenu
-from aqt.qt import QListWidgetItem, QWidget, QHBoxLayout
+from aqt.qt import (
+    QColor,
+    QColorDialog,
+    QDialog,
+    QDialogButtonBox,
+    QHBoxLayout,
+    QIcon,
+    QLabel,
+    QListWidgetItem,
+    QMenu,
+    QRect,
+    QWidget,
+)
 
 from .config import TimeStatsConfigManager
 from .consts import *
@@ -184,7 +195,6 @@ Loads deck names to list and sets label to enabled if not in current config's ex
             deck_item.set_included(deck_item.label.text() not in self.excluded_deck_names)
 
             list_item = DeckListItem(decks_list)
-            # list_item.__lt__ = lambda
             list_item.setSizeHint(deck_item.sizeHint())
 
             decks_list.addItem(list_item)
@@ -334,7 +344,7 @@ DeckItem used for DeckListItems to give more options to interaction between the 
         :param text: string value to use for the label of the list item
         :param dialog: reference to the base class to use for context menu actions
         """
-        super().__init__()
+        super().__init__(flags=aqt.mw.flags)
         self.context_menu = QMenu(self)
         self.dialog = dialog
 
@@ -344,7 +354,7 @@ DeckItem used for DeckListItems to give more options to interaction between the 
         self.item_layout = QHBoxLayout()
         self.item_layout.setContentsMargins(4, 0, 0, 0)
 
-        self.item_layout.addWidget(self.label)
+        self.item_layout.addWidget(self.label, alignment=self.label.alignment())
         self.setLayout(self.item_layout)
 
         self.enabled = False
@@ -366,7 +376,7 @@ Uses the DeckItems enabled/disabled values, otherwise label text, to sort the it
             return self.label.text() < other.label.text()
 
     def from_widget(self: QWidget):
-        return self if isinstance(self, DeckItem) else QWidget(self)
+        return self if isinstance(self, DeckItem) else QWidget(self, flags=aqt.mw.flags)
 
     def from_list_widget(self: TimeStatsOptionsDialog, item: QListWidgetItem) -> DeckItem:
         return self.ui.excluded_decks_list.itemWidget(item)
