@@ -237,7 +237,7 @@ class Ui_OptionsDialog(object):
         self.scroll_area = QtWidgets.QScrollArea(self.about_tab)
         self.scroll_area.setObjectName("scroll_area")
         self.about_scroll = QtWidgets.QWidget()
-        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 449, 802))
+        self.about_scroll.setGeometry(QtCore.QRect(0, -427, 449, 802))
         self.about_scroll.setObjectName("about_scroll")
         self.scroll_layout = QtWidgets.QVBoxLayout(self.about_scroll)
         self.scroll_layout.setSpacing(6)
@@ -431,6 +431,10 @@ class Ui_OptionsDialog(object):
 "\n"
 "Total time for a specific, previous range (previous week, previous month, etc):\n"
 "+ `%prev_day_hrs`, `%prev_week_hrs`, `%prev_two_week_hrs`, `%prev_month_hrs`, `%prev_year_hrs`\n"
+"<br></br>\n"
+"\n"
+"Custom date:\n"
+"+ `%from_custom_date:<YYYY-MM-DD>` - total study time from a unique, input date (e.g. \"%from_custom_date:2022-03-14\" -> \"22.5 hrs\" (from 2022, March 14th))\n"
 "<br></br>\n"
 "##### Misc\n"
 "+ `%%` - returns a single % symbol and doesn\'t apply the text macro (%, %range, etc)\n"
