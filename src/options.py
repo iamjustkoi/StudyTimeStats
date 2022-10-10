@@ -344,7 +344,7 @@ DeckItem used for DeckListItems to give more options to interaction between the 
         :param text: string value to use for the label of the list item
         :param dialog: reference to the base class to use for context menu actions
         """
-        super().__init__(flags=aqt.mw.flags)
+        super().__init__(flags=aqt.mw.windowFlags())
         self.context_menu = QMenu(self)
         self.dialog = dialog
 
@@ -376,7 +376,7 @@ Uses the DeckItems enabled/disabled values, otherwise label text, to sort the it
             return self.label.text() < other.label.text()
 
     def from_widget(self: QWidget):
-        return self if isinstance(self, DeckItem) else QWidget(self, flags=aqt.mw.flags)
+        return self if isinstance(self, DeckItem) else QWidget(self, flags=aqt.mw.windowFlags())
 
     def from_list_widget(self: TimeStatsOptionsDialog, item: QListWidgetItem) -> DeckItem:
         return self.ui.excluded_decks_list.itemWidget(item)
