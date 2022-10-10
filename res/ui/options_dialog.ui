@@ -30,7 +30,7 @@
    <item>
     <widget class="QTabWidget" name="tabs_widget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="appearance_tab">
       <property name="enabled">
@@ -578,7 +578,7 @@ See: About -&gt; Text Macros</string>
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-427</y>
+            <y>0</y>
             <width>449</width>
             <height>802</height>
            </rect>
@@ -615,6 +615,12 @@ If you like the add-on and want to consider supporting my stuff:</string>
              </property>
              <property name="wordWrap">
               <bool>true</bool>
+             </property>
+             <property name="openExternalLinks">
+              <bool>true</bool>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
              </property>
             </widget>
            </item>
@@ -804,6 +810,12 @@ MIT License
              </property>
              <property name="wordWrap">
               <bool>true</bool>
+             </property>
+             <property name="openExternalLinks">
+              <bool>true</bool>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
              </property>
             </widget>
            </item>
