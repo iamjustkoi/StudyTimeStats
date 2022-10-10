@@ -17,8 +17,8 @@ These settings can change other options outside of the UI.
 <p align="center"><img src=".github/options_advanced.png"></p>  
 
 The output text can also be changed here to show custom information using any of the available text macros:
+<p align="center"><img src=".github/custom_stat_options.png"></p>
 <p align="center"><img src=".github/custom_stat.png"></p>
-
 
 ## Text Macros
 The add-on can also filter text in the custom labels input to show information based on what's set in the config (e.g. "Past %range" -> "Past Week"). These can be used multiple times and will update whenever Anki's main window reloads.
