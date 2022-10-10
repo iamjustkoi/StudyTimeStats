@@ -33,6 +33,8 @@ CMD_PREV_TWO_WEEKS_HRS = '%prev_two_week_hrs'
 CMD_PREV_MONTH_HRS = '%prev_month_hrs'
 CMD_PREV_YEAR_HRS = '%prev_year_hrs'
 
+CMD_FROM_CUSTOM_DATE = '%from_custom_date:'
+
 ICON_PATH = '../res/img/stats_icon.svg'
 KOFI_ICON_PATH = '../res/img/kofilogo_blue.PNG'
 PATREON_ICON_PATH = '../res/img/patreon.png'

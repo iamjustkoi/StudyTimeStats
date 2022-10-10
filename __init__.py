@@ -5,14 +5,16 @@ Full license text available in the "LICENSE" file, packaged with the add-on.
 Shows total study time and a ranged amount of study time in Anki's main window.
 """
 import re
-from datetime import timedelta, datetime, date
+import traceback
+from datetime import date, datetime, timedelta
 
-from aqt import mw, gui_hooks, webview
+import aqt.utils
+from aqt import gui_hooks, mw, webview
 from aqt.deckbrowser import DeckBrowser, DeckBrowserContent
 from aqt.overview import Overview, OverviewContent
 from aqt.qt import QAction
 
-from .src.config import TimeStatsConfigManager, ANKI_VERSION
+from .src.config import ANKI_VERSION, TimeStatsConfigManager
 from .src.consts import *
 from .src.options import TimeStatsOptionsDialog
 
@@ -211,6 +213,15 @@ def get_formatted_prev_range_hrs(revlog: [[int, int]], range_type: int):
     return f'{cal_val} {cal_unit}'
 
 
+def get_formatted_days_ago_hrs(revlog: [[int, int]], days_ago: int):
+    # extra day added to not include the received week-start day
+    from_date = datetime.today() - timedelta(days_ago)
+    ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago, from_date=from_date))
+    cal_val = get_formatted_hrs_or_min(ranged_hrs)
+    cal_unit = get_config_manager().config[get_unit_type(ranged_hrs)]
+    return f'{cal_val} {cal_unit}'
+
+
 def get_formatted_range_hrs(revlog: [[int, int]], days_ago: int):
     ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago))
     range_val = get_formatted_hrs_or_min(ranged_hrs)
@@ -327,6 +338,18 @@ Replaces the input html string with formatted text based on input codes.
             CMD_DAYS, f'{days_ago}'
         )
         # if re.search(r'(?<!%)%date\(.*,+.*\)', html_string):  # future filter?
+
+    try:
+        if matches := re.search(fr'(?<!%)({CMD_FROM_CUSTOM_DATE})(\d\d\d\d-\d\d-\d\d)', html_string):
+            print(f'matches.groups: {matches.groups()}')
+            print(f'date_str: {matches.group(2)}')
+            input_date = date.fromisoformat(matches.group(2))
+            test = (date.today() - input_date)
+            html_string = html_string.replace(
+                "".join(matches.groups()), get_formatted_days_ago_hrs(revlog, test.days)
+            )
+    except ValueError:
+        aqt.utils.showWarning(f'{traceback.format_exc()}')
 
     if re.search(r'%%', html_string):
         html_string = html_string.replace('%%', '%')
