@@ -578,7 +578,7 @@ See: About -&gt; Text Macros</string>
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
+            <y>-427</y>
             <width>449</width>
             <height>802</height>
            </rect>
@@ -791,6 +791,10 @@ Total time for a specific range (current week, current month, etc):
 
 Total time for a specific, previous range (previous week, previous month, etc):
 + `%prev_day_hrs`, `%prev_week_hrs`, `%prev_two_week_hrs`, `%prev_month_hrs`, `%prev_year_hrs`
+&lt;br&gt;&lt;/br&gt;
+
+Custom date:
++ `%from_custom_date:&lt;YYYY-MM-DD&gt;` - total study time from a unique, input date (e.g. &quot;%from_custom_date:2022-03-14&quot; -&gt; &quot;22.5 hrs&quot; (from 2022, March 14th))
 &lt;br&gt;&lt;/br&gt;
 ##### Misc
 + `%%` - returns a single % symbol and doesn't apply the text macro (%, %range, etc)
