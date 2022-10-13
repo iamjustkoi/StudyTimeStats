@@ -205,11 +205,17 @@ Uses the addon config and current get_time_stats to retrieve the html to display
 
 
 def get_formatted_prev_range_hrs(revlog: [[int, int]], range_type: int):
-    # extra day added to not include the received week-start day
-    from_date = datetime.today() - timedelta(days=get_days_ago(range_type) + 1)
-    ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, Range.DAYS_IN[range_type] - 1, from_date=from_date))
+    """
+    Retrieves the formatted hrs using the given revlog and selected range type.
+    :return: A formatted string with the value and hours in the format "val unit".
+    """
+    config = get_config_manager().config
+    # extra day added to not include the received week-start/current day
+    from_date = _get_adjusted_date(datetime.today()) - timedelta(days=get_days_ago(range_type) + 1)
+    days_ago = Range.DAYS_IN[range_type] - 1 if range_type != Range.CUSTOM else config[Config.CUSTOM_DAYS]
+    ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago, from_date))
     cal_val = get_formatted_hrs_or_min(ranged_hrs)
-    cal_unit = get_config_manager().config[get_unit_type(ranged_hrs)]
+    cal_unit = config[get_unit_type(ranged_hrs)]
     return f'{cal_val} {cal_unit}'
 
 
@@ -281,7 +287,6 @@ Replaces the input html string with formatted text based on input codes.
     # len(match.regs)r
     if re.search(fr'(?<!%){CMD_PREV_DAY_HRS}', html_string):
         ref_date = (datetime.today() - timedelta(days=1)).replace(hour=23, minute=59, second=59)
-        # ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago=0, from_date=ref_date))
         ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, 0, ref_date))
         range_val = get_formatted_hrs_or_min(ranged_hrs)
         range_unit = addon_config[get_unit_type(ranged_hrs)]
@@ -330,19 +335,15 @@ Replaces the input html string with formatted text based on input codes.
         )
         # if re.search(r'(?<!%)%date\(.*,+.*\)', html_string):  # future filter?
 
-    try:
-        if matches := re.search(fr'(?<!%)({CMD_FROM_CUSTOM_DATE})(\d\d\d\d-\d\d-\d\d)', html_string):
+    if matches := re.search(fr'(?<!%)({CMD_FROM_CUSTOM_DATE})(\d\d\d\d-\d\d-\d\d)', html_string):
+        try:
             day_range = (datetime.today() - datetime.fromisoformat(matches.group(2))).days
-            # print(f'day_range: {day_range}')
             ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, day_range))
-            # print(f'ranged_hrs: {ranged_hrs}')
             range_val = get_formatted_hrs_or_min(ranged_hrs)
-            # print(f'range_val: {range_val}')
             range_unit = addon_config[get_unit_type(ranged_hrs)]
-            # print(f'range_unit: {range_unit}')
             html_string = html_string.replace("".join(matches.groups()), f'{range_val} {range_unit}')
-    except ValueError:
-        aqt.utils.showWarning(f'{traceback.format_exc()}')
+        except ValueError:
+            aqt.utils.showWarning(f'{traceback.format_exc()}')
 
     if re.search(r'%%', html_string):
         html_string = html_string.replace('%%', '%')
@@ -401,18 +402,18 @@ Returns the total number of days since the start of a ranged time length.
     if range_type == Range.CUSTOM:
         return addon_config[Config.CUSTOM_DAYS]
 
-    from_base_date = from_date.replace(hour=23, minute=59, second=59)
+    from_adjusted_date = _get_adjusted_date(from_date)
 
     days_ago = Range.DAYS_IN[range_type]
     if addon_config[Config.USE_CALENDAR_RANGE]:
         if range_type == Range.WEEK or range_type == Range.TWO_WEEKS:
             total_weeks = Range.DAYS_IN[range_type] / 7
-            days_ago = get_days_since_week_start(total_weeks, addon_config[Config.WEEK_START], from_base_date)
+            days_ago = get_days_since_week_start(total_weeks, addon_config[Config.WEEK_START], from_adjusted_date)
         else:
             if range_type == Range.MONTH:
-                days_ago = (from_base_date - from_base_date.replace(day=1)).days
+                days_ago = (from_adjusted_date - from_adjusted_date.replace(day=1)).days
             elif range_type == Range.YEAR:
-                days_ago = (from_base_date - from_base_date.replace(month=1, day=1)).days
+                days_ago = (from_adjusted_date - from_adjusted_date.replace(month=1, day=1)).days
     return days_ago
 
 
@@ -437,9 +438,22 @@ Gets days since the last week-start date based on a set number of weeks.
     :param from_date: changes the reference date to this datetime
     :return: days since week start
     """
-    ref_day = from_date.weekday()
+    from_adjusted_date = _get_adjusted_date(from_date)
+    ref_day = from_adjusted_date.weekday()
     # Adds an extra week if the current day is already past the week start
     return (total_weeks * 7) + ((ref_day - week_start_day) - (7 * (ref_day >= week_start_day)))
+
+
+def _get_adjusted_date(from_date: datetime = datetime.today()):
+    if get_config_manager().config[Config.USE_ROLLOVER]:
+        if ANKI_VERSION > ANKI_LEGACY_VER:
+            offset_hour = mw.col.get_preferences().scheduling.rollover
+        else:
+            offset_hour = mw.col.conf.get('rollover', ANKI_DEFAULT_ROLLOVER)
+    else:
+        offset_hour = 0
+
+    return from_date.replace(hour=23, minute=59, second=59) - timedelta(hours=offset_hour)
 
 
 def get_logs_in_range(
@@ -454,15 +468,8 @@ Retrieves a collection of review logs based on the input number of days to retri
     :param from_date: changes the reference date to this datetime
     :return: a new list of review logs based on the input days to filter
     """
-    if get_config_manager().config[Config.USE_ROLLOVER]:
-        if ANKI_VERSION > ANKI_LEGACY_VER:
-            offset_hour = mw.col.get_preferences().scheduling.rollover
-        else:
-            offset_hour = mw.col.conf.get('rollover', ANKI_DEFAULT_ROLLOVER)
-    else:
-        offset_hour = 0
 
-    from_adjusted_date = from_date.replace(hour=23, minute=59, second=59) - timedelta(hours=offset_hour)
+    from_adjusted_date = _get_adjusted_date(from_date)
 
     filtered_logs = []
     for log in revlog[0:]:
