@@ -132,7 +132,10 @@ Addon options QDialog class for accessing and changing the addon's config values
             self.ui.include_deleted_checkbox.stateChanged,
             self.ui.total_hrs_line.textChanged,
             self.ui.range_hrs_line.textChanged,
-            self.ui.excluded_decks_list.itemChanged,
+            self.ui.excluded_decks_list.itemDoubleClicked,
+            self.ui.excluded_decks_list.itemActivated,
+            self.ui.deck_enable_button.clicked,
+            self.ui.deck_disable_button.clicked,
             self.ui.confirm_button_box.clicked,
         }
         self._attach_change_signals(change_signals)
