@@ -213,15 +213,6 @@ def get_formatted_prev_range_hrs(revlog: [[int, int]], range_type: int):
     return f'{cal_val} {cal_unit}'
 
 
-def get_formatted_days_ago_hrs(revlog: [[int, int]], days_ago: int):
-    # extra day added to not include the received week-start day
-    from_date = datetime.today() - timedelta(days_ago)
-    ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago, from_date=from_date))
-    cal_val = get_formatted_hrs_or_min(ranged_hrs)
-    cal_unit = get_config_manager().config[get_unit_type(ranged_hrs)]
-    return f'{cal_val} {cal_unit}'
-
-
 def get_formatted_range_hrs(revlog: [[int, int]], days_ago: int):
     ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago))
     range_val = get_formatted_hrs_or_min(ranged_hrs)
