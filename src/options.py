@@ -103,9 +103,56 @@ Addon options QDialog class for accessing and changing the addon's config values
         updated_about_header = self.ui.about_label_header.text().format(version=CURRENT_VERSION)
         self.ui.about_label_header.setText(updated_about_header)
 
+        self.apply_button = self.ui.confirm_button_box.button(QDialogButtonBox.Apply)
+        self.apply_button.setEnabled(False)
+        self.apply_button.clicked.connect(self.apply)
+
         # Setting current index again to overwrite QTDesigner's auto-setting, just in case
         self.ui.tabs_widget.setCurrentIndex(0)
         self._load()
+
+        # Attached post-load to prevent pre-change broadcasts
+        change_signals = {
+            self.ui.range_select_dropdown.currentIndexChanged,
+            self.ui.use_calendar_checkbox.stateChanged,
+            self.ui.week_start_dropdown.currentIndexChanged,
+            self.ui.custom_range_spinbox.valueChanged,
+            self.ui.show_total_checkbox.stateChanged,
+            self.ui.show_ranged_checkbox.stateChanged,
+            self.ui.total_line.textChanged,
+            self.ui.ranged_line.textChanged,
+            self.ui.hrs_line.textChanged,
+            self.ui.min_line.textChanged,
+            self.ui.primary_color_button.clicked,
+            self.ui.seconday_color_button.clicked,
+            self.ui.browser_checkbox.stateChanged,
+            self.ui.overview_checkbox.stateChanged,
+            self.ui.congrats_checkbox.stateChanged,
+            self.ui.toolbar_checkbox.stateChanged,
+            self.ui.include_deleted_checkbox.stateChanged,
+            self.ui.total_hrs_line.textChanged,
+            self.ui.range_hrs_line.textChanged,
+            self.ui.excluded_decks_list.itemChanged,
+            self.ui.confirm_button_box.clicked,
+        }
+        self._attach_change_signals(change_signals)
+
+    def apply(self):
+        """
+        Write options to add-on config, refresh the Anki window, and disable the apply button.
+        """
+        self._save()
+        self.apply_button.setEnabled(False)
+
+    def _attach_change_signals(self, signals: set[aqt.qt.pyqtBoundSignal]):
+        for signal in signals:
+            def enable_apply(*args):
+                """
+                Intercept function for the created button. Refreshes the button's visibility after running the input
+                write-callback.
+                """
+                self.apply_button.setEnabled(True)
+            signal.connect(enable_apply)
 
     def _load(self):
         """
