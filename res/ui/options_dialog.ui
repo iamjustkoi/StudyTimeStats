@@ -30,7 +30,7 @@
    <item>
     <widget class="QTabWidget" name="tabs_widget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="appearance_tab">
       <property name="enabled">
@@ -578,7 +578,7 @@ See: About -&gt; Text Macros</string>
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-427</y>
+            <y>0</y>
             <width>449</width>
             <height>802</height>
            </rect>
@@ -837,7 +837,7 @@ MIT License
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
      </property>
     </widget>
    </item>
