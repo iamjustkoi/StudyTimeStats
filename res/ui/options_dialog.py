@@ -188,6 +188,10 @@ class Ui_OptionsDialog(object):
         self.include_deleted_checkbox.setChecked(True)
         self.include_deleted_checkbox.setObjectName("include_deleted_checkbox")
         self.verticalLayout.addWidget(self.include_deleted_checkbox)
+        self.useRolloverCheckbox = QtWidgets.QCheckBox(self.decks_tab)
+        self.useRolloverCheckbox.setChecked(True)
+        self.useRolloverCheckbox.setObjectName("useRolloverCheckbox")
+        self.verticalLayout.addWidget(self.useRolloverCheckbox)
         self.formLayout = QtWidgets.QFormLayout()
         self.formLayout.setContentsMargins(-1, -1, -1, 20)
         self.formLayout.setObjectName("formLayout")
@@ -319,7 +323,7 @@ class Ui_OptionsDialog(object):
         self.verticalLayout_4.addWidget(self.confirm_button_box)
 
         self.retranslateUi(OptionsDialog)
-        self.tabs_widget.setCurrentIndex(0)
+        self.tabs_widget.setCurrentIndex(1)
         self.confirm_button_box.accepted.connect(OptionsDialog.accept)
         self.confirm_button_box.rejected.connect(OptionsDialog.reject)
         QtCore.QMetaObject.connectSlotsByName(OptionsDialog)
@@ -377,6 +381,8 @@ class Ui_OptionsDialog(object):
         self.toolbar_checkbox.setText(_translate("OptionsDialog", "Show options shortcut in the Tools Menu"))
         self.include_deleted_checkbox.setToolTip(_translate("OptionsDialog", "Include review times from cards that were deleted."))
         self.include_deleted_checkbox.setText(_translate("OptionsDialog", "Include reviews from deleted cards"))
+        self.useRolloverCheckbox.setToolTip(_translate("OptionsDialog", "Use the rollover (next-day) hour in Anki\'s preferences when considering how much time was spent reviewing for a given day."))
+        self.useRolloverCheckbox.setText(_translate("OptionsDialog", "Use the next-day hour when calculating ranged times"))
         self.total_hrs_line.setToolTip(_translate("OptionsDialog", "Custom output filter to use for the total statistics value.\n"
 "See: About -> Text Macros"))
         self.total_hrs_label.setText(_translate("OptionsDialog", "Total Text Output"))

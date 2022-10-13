@@ -454,10 +454,13 @@ Retrieves a collection of review logs based on the input number of days to retri
     :param from_date: changes the reference date to this datetime
     :return: a new list of review logs based on the input days to filter
     """
-    if ANKI_VERSION > ANKI_LEGACY_VER:
-        offset_hour = mw.col.get_preferences().scheduling.rollover
+    if get_config_manager().config[Config.USE_ROLLOVER]:
+        if ANKI_VERSION > ANKI_LEGACY_VER:
+            offset_hour = mw.col.get_preferences().scheduling.rollover
+        else:
+            offset_hour = mw.col.conf.get('rollover', ANKI_DEFAULT_ROLLOVER)
     else:
-        offset_hour = mw.col.conf.get('rollover', ANKI_DEFAULT_ROLLOVER)
+        offset_hour = 0
 
     from_adjusted_date = from_date.replace(hour=23, minute=59, second=59) - timedelta(hours=offset_hour)
 
