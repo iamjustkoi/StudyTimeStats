@@ -14,9 +14,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_OptionsDialog(object):
     def setupUi(self, OptionsDialog):
         OptionsDialog.setObjectName("OptionsDialog")
-        OptionsDialog.setWindowModality(QtCore.Qt.ApplicationModal)
+        OptionsDialog.setWindowModality(QtCore.Qt.WindowModal)
         OptionsDialog.resize(508, 485)
-        OptionsDialog.setMinimumSize(QtCore.QSize(484, 0))
         OptionsDialog.setModal(True)
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(OptionsDialog)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
