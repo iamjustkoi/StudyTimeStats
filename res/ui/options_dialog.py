@@ -381,7 +381,7 @@ class Ui_OptionsDialog(object):
         self.toolbar_checkbox.setText(_translate("OptionsDialog", "Show options shortcut in the Tools Menu"))
         self.include_deleted_checkbox.setToolTip(_translate("OptionsDialog", "Include review times from cards that were deleted."))
         self.include_deleted_checkbox.setText(_translate("OptionsDialog", "Include reviews from deleted cards"))
-        self.useRolloverCheckbox.setToolTip(_translate("OptionsDialog", "Use the rollover (next-day) hour in Anki\'s preferences when considering how much time was spent reviewing for a given day."))
+        self.useRolloverCheckbox.setToolTip(_translate("OptionsDialog", "Use the rollover (next-day) hour in Anki\'s preferences when considering when the time a day should be cut off at."))
         self.useRolloverCheckbox.setText(_translate("OptionsDialog", "Use the next-day hour when calculating ranged times"))
         self.total_hrs_line.setToolTip(_translate("OptionsDialog", "Custom output filter to use for the total statistics value.\n"
 "See: About -> Text Macros"))

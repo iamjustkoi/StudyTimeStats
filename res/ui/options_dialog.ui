@@ -457,7 +457,7 @@ This window can also be opened in the Add-ons menu using the Config button.</str
        <item>
         <widget class="QCheckBox" name="useRolloverCheckbox">
          <property name="toolTip">
-          <string>Use the rollover (next-day) hour in Anki's preferences when considering how much time was spent reviewing for a given day.</string>
+          <string>Use the rollover (next-day) hour in Anki's preferences when considering when the time a day should be cut off at.</string>
          </property>
          <property name="text">
           <string>Use the next-day hour when calculating ranged times</string>
