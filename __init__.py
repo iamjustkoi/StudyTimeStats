@@ -283,9 +283,9 @@ Replaces the input html string with formatted text based on input codes.
         ref_date = (datetime.today() - timedelta(days=1)).replace(hour=23, minute=59, second=59)
         # ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago=0, from_date=ref_date))
         ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, 0, ref_date))
-        day_val = get_formatted_hrs_or_min(ranged_hrs)
-        day_unit = addon_config[get_unit_type(ranged_hrs)]
-        html_string = html_string.replace(CMD_PREV_DAY_HRS, f'{day_val} {day_unit}')
+        range_val = get_formatted_hrs_or_min(ranged_hrs)
+        range_unit = addon_config[get_unit_type(ranged_hrs)]
+        html_string = html_string.replace(CMD_PREV_DAY_HRS, f'{range_val} {range_unit}')
 
     if re.search(fr'(?<!%){CMD_RANGE}', html_string):
         if range_type != Range.CUSTOM:
@@ -332,13 +332,15 @@ Replaces the input html string with formatted text based on input codes.
 
     try:
         if matches := re.search(fr'(?<!%)({CMD_FROM_CUSTOM_DATE})(\d\d\d\d-\d\d-\d\d)', html_string):
-            print(f'matches.groups: {matches.groups()}')
-            print(f'date_str: {matches.group(2)}')
-            input_date = date.fromisoformat(matches.group(2))
-            test = (date.today() - input_date)
-            html_string = html_string.replace(
-                "".join(matches.groups()), get_formatted_days_ago_hrs(revlog, test.days)
-            )
+            day_range = (datetime.today() - datetime.fromisoformat(matches.group(2))).days
+            # print(f'day_range: {day_range}')
+            ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, day_range))
+            # print(f'ranged_hrs: {ranged_hrs}')
+            range_val = get_formatted_hrs_or_min(ranged_hrs)
+            # print(f'range_val: {range_val}')
+            range_unit = addon_config[get_unit_type(ranged_hrs)]
+            # print(f'range_unit: {range_unit}')
+            html_string = html_string.replace("".join(matches.groups()), f'{range_val} {range_unit}')
     except ValueError:
         aqt.utils.showWarning(f'{traceback.format_exc()}')
 
@@ -424,9 +426,9 @@ Returns the total review time within a sequence of reviews.
 
 
 def get_days_since_week_start(
-        total_weeks: int,
-        week_start_day: int,
-        from_date: datetime
+    total_weeks: int,
+    week_start_day: int,
+    from_date: datetime
 ):
     """
 Gets days since the last week-start date based on a set number of weeks.
@@ -441,9 +443,9 @@ Gets days since the last week-start date based on a set number of weeks.
 
 
 def get_logs_in_range(
-        revlog: [[int, int]],
-        days_ago: int = 0,
-        from_date: datetime = datetime.today()
+    revlog: [[int, int]],
+    days_ago: int = 0,
+    from_date: datetime = datetime.today()
 ) -> [[int, int]]:
     """
 Retrieves a collection of review logs based on the input number of days to retrieve from today.
