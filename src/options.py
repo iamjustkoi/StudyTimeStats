@@ -137,6 +137,7 @@ Addon options QDialog class for accessing and changing the addon's config values
             self.ui.deck_enable_button.clicked,
             self.ui.deck_disable_button.clicked,
             self.ui.confirm_button_box.clicked,
+            self.ui.useRolloverCheckbox.stateChanged,
         }
         self._attach_change_signals(change_signals)
 
@@ -194,6 +195,8 @@ Loads all config values to the options dialog.
 
         self.ui.include_deleted_checkbox.setChecked(self.config[Config.INCLUDE_DELETED])
 
+        self.ui.useRolloverCheckbox.setChecked(self.config[Config.USE_ROLLOVER])
+
         # Excluded Decks
         self._load_excluded_decks()
 
@@ -226,6 +229,8 @@ window to update all the ui.
         self.config[Config.CONGRATS_ENABLED] = self.ui.congrats_checkbox.isChecked()
 
         self.config[Config.INCLUDE_DELETED] = self.ui.include_deleted_checkbox.isChecked()
+
+        self.config[Config.USE_ROLLOVER] = self.ui.useRolloverCheckbox.isChecked()
 
         self.config[Config.EXCLUDED_DIDS] = self._get_excluded_dids()
 

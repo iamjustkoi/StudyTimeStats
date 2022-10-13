@@ -94,6 +94,7 @@ class Config:
     OVERVIEW_ENABLED = 'Overview_Enabled'
     CONGRATS_ENABLED = 'Congrats_Enabled'
     INCLUDE_DELETED = 'Include_Deleted_Reviews'
+    USE_ROLLOVER = 'Use_Rollover_Hour'
     EXCLUDED_DIDS = "Excluded_Deck_IDs"
     DEFAULT_CONFIG = {
         TOOLBAR_ENABLED: True,
@@ -115,5 +116,6 @@ class Config:
         OVERVIEW_ENABLED: True,
         CONGRATS_ENABLED: True,
         INCLUDE_DELETED: True,
+        USE_ROLLOVER: False,
         EXCLUDED_DIDS: [1]
     }

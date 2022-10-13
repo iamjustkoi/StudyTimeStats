@@ -24,7 +24,7 @@
    <item>
     <widget class="QTabWidget" name="tabs_widget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="appearance_tab">
       <property name="enabled">
@@ -448,6 +448,19 @@ This window can also be opened in the Add-ons menu using the Config button.</str
          </property>
          <property name="text">
           <string>Include reviews from deleted cards</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="useRolloverCheckbox">
+         <property name="toolTip">
+          <string>Use the rollover (next-day) hour in Anki's preferences when considering how much time was spent reviewing for a given day.</string>
+         </property>
+         <property name="text">
+          <string>Use the next-day hour when calculating ranged times</string>
          </property>
          <property name="checked">
           <bool>true</bool>
