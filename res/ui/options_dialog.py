@@ -15,7 +15,7 @@ class Ui_OptionsDialog(object):
     def setupUi(self, OptionsDialog):
         OptionsDialog.setObjectName("OptionsDialog")
         OptionsDialog.setWindowModality(QtCore.Qt.WindowModal)
-        OptionsDialog.resize(556, 554)
+        OptionsDialog.resize(513, 495)
         OptionsDialog.setSizeGripEnabled(True)
         OptionsDialog.setModal(True)
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(OptionsDialog)
@@ -458,7 +458,7 @@ class Ui_OptionsDialog(object):
 "<br></br>\n"
 "\n"
 "Custom date:\n"
-"+ `%from_custom_date:<YYYY-MM-DD>` - total study time from a unique, input date (e.g. \"%from_custom_date:2022-03-14\" -> \"22.5 hrs\" (from 2022, March 14th))\n"
+"+ `%from_custom_hrs:<YYYY-MM-DD>` - total study time from a unique, input date (e.g. \"%from_custom_hrs:2022-03-14\" -> \"22.5 hrs\" (from 2022, March 14th))\n"
 "<br></br>\n"
 "\n"
 "##### Misc\n"
