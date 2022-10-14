@@ -21,6 +21,7 @@ CMD_FULL_MONTH = '%from_full_month'
 CMD_TOTAL_HRS = '%total_hrs'
 
 CMD_RANGE_HRS = '%range_hrs'
+CMD_DAY_HRS = '%day_hrs'
 CMD_WEEK_HRS = '%week_hrs'
 CMD_TWO_WEEKS_HRS = '%two_week_hrs'
 CMD_MONTH_HRS = '%month_hrs'
