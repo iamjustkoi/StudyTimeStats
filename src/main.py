@@ -217,7 +217,14 @@ def get_formatted_html_macros(html_string: str):
         html_string = html_string.replace(CMD_TOTAL_HRS, f'{total_val} {total_unit}')
 
     if re.search(fr'(?<!%){CMD_RANGE_HRS}', html_string):
-        html_string = html_string.replace(CMD_RANGE_HRS, get_formatted_range_hrs(revlog, days_ago))
+        html_string = html_string.replace(
+            CMD_RANGE_HRS, get_formatted_range_hrs(revlog, days_ago)
+        )
+
+    if re.search(fr'(?<!%){CMD_DAY_HRS}', html_string):
+        html_string = html_string.replace(
+            CMD_DAY_HRS, get_formatted_range_hrs(revlog, days=0)
+        )
 
     if re.search(fr'(?<!%){CMD_WEEK_HRS}', html_string):
         html_string = html_string.replace(
