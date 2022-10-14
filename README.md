@@ -45,7 +45,7 @@ Total time for a specific, previous range (previous week, previous month, etc):
 + `%prev_day_hrs`, `%prev_week_hrs`, `%prev_two_week_hrs`, `%prev_month_hrs`, `%prev_year_hrs` 
 
 Custom date:
-+ `%from_custom_date:<YYYY-MM-DD>` - total study time from a unique, input date (e.g. "%from_custom_date:2022-03-14" -> "22.5 hrs" (from 2022, March 14th))
++ `%from_custom_hrs:<YYYY-MM-DD>` - total study time from a unique, input date (e.g. "%from_custom_hrs:2022-03-14" -> "22.5 hrs" (from 2022, March 14th))
 
 ##### Misc
 + `%%` - returns a single % symbol and doesn't apply the text macro (%, %range, etc)

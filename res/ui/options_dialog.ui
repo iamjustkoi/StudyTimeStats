@@ -10,8 +10,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>556</width>
-    <height>554</height>
+    <width>513</width>
+    <height>495</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -825,7 +825,7 @@ Total time for a specific, previous range (previous week, previous month, etc):
 &lt;br&gt;&lt;/br&gt;
 
 Custom date:
-+ `%from_custom_date:&lt;YYYY-MM-DD&gt;` - total study time from a unique, input date (e.g. &quot;%from_custom_date:2022-03-14&quot; -&gt; &quot;22.5 hrs&quot; (from 2022, March 14th))
++ `%from_custom_hrs:&lt;YYYY-MM-DD&gt;` - total study time from a unique, input date (e.g. &quot;%from_custom_hrs:2022-03-14&quot; -&gt; &quot;22.5 hrs&quot; (from 2022, March 14th))
 &lt;br&gt;&lt;/br&gt;
 
 ##### Misc
