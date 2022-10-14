@@ -15,7 +15,7 @@ from .consts import (
     CMD_DATE,
     CMD_DAY,
     CMD_DAYS,
-    CMD_FROM_CUSTOM_DATE,
+    CMD_DAY_HRS, CMD_FROM_CUSTOM_DATE,
     CMD_FULL_DAY,
     CMD_FULL_MONTH,
     CMD_MONTH,
@@ -39,14 +39,14 @@ from .consts import (
     String,
     TABLE_ID,
     UNIQUE_DATE,
-)  # COL_ID,; LABEL_ID,; DATA_ID,
+)
 from .options import TimeStatsOptionsDialog
 
 
 def build_actions():
     """
-Add and connect addon actions. Currently, adds an options menu action and sets the addon configuration action,
-found in Anki's addon window, to also open the options menu.
+    Add and connect addon actions. Currently, adds an options menu action and sets the addon configuration action,
+    found in Anki's addon window, to also open the options menu.
     """
     refresh_tools_menu_action()
     mw.addonManager.setConfigAction(__name__, on_options_called)
@@ -54,8 +54,9 @@ found in Anki's addon window, to also open the options menu.
 
 def refresh_tools_menu_action(changes=None, obj=None):
     """
-Updates the toolbar actions menu with the options shortcut. Expects an Operation Change hook call,
-but can also be used as a general update push, too.
+    Updates the toolbar actions menu with the options shortcut. Expects an Operation Change hook call,
+    but can also be used as a general update push, too.
+
     :param changes: unused OpChanges object
     :param obj: unused options object
     """
@@ -73,7 +74,7 @@ but can also be used as a general update push, too.
 
 def on_options_called():
     """
-Initializes and opens the options dialog.
+    Initializes and opens the options dialog.
     """
     dialog = TimeStatsOptionsDialog(get_config_manager())
     dialog.exec()
@@ -81,7 +82,8 @@ Initializes and opens the options dialog.
 
 def get_config_manager() -> TimeStatsConfigManager:
     """
-Retrieves the addon's config manager.
+    Retrieves the addon's config manager.
+
     :return: a deep-copy of the TimeStatsConfigManager Class
     """
     # this is neat, but also maybe a date option for the custom filter might be nice...
@@ -101,7 +103,8 @@ def append_to_overview(overview: Overview, content: OverviewContent):
 
 def append_to_congrats(web: webview.AnkiWebView):
     """
-Extra handler used for the congrats page since it can't be as easily retrieved with the existing hooks.
+    Extra handler used for the congrats page since it can't be as easily retrieved with the existing hooks.
+
     :param web: AnkiWebView to check against and format.
     """
     if mw.col is None:
@@ -116,7 +119,8 @@ Extra handler used for the congrats page since it can't be as easily retrieved w
 
 def is_enabled_for_current_deck() -> bool:
     """
-Determines whether the current screen's selection should display get_time_stats based on user's excluded deck ID's.
+    Determines whether the current screen's selection should display get_time_stats based on user's excluded deck ID's.
+
     :return: true if current selection isn't excluded, otherwise false.
     """
     return mw.col.decks.current().get('id') not in get_config_manager().config[Config.EXCLUDED_DIDS]
@@ -124,7 +128,8 @@ Determines whether the current screen's selection should display get_time_stats 
 
 def get_unit_type(hours: float):
     """
-Returns the given unit type for the given amount of time.
+    Returns the given unit type for the given amount of time.
+
     :param hours: referenced time
     :return: the hours unit if given a value larger than 1, otherwise the minutes unit
     """
@@ -133,7 +138,8 @@ Returns the given unit type for the given amount of time.
 
 def get_formatted_hrs_or_min(hours: float, precision=2):
     """
-Returns a locale-formatted length of time.
+    Returns a locale-formatted length of time.
+
     :param hours: referenced time
     :param precision: total digits to show after a decimal
     :return: hours if given a value larger than 1, otherwise minutes
@@ -144,7 +150,7 @@ Returns a locale-formatted length of time.
 
 def get_stats_html():
     """
-Uses the addon config and current get_time_stats to retrieve the html to display on Anki's main window.
+    Uses the addon config and current get_time_stats to retrieve the html to display on Anki's main window.
     :return: html string containing review configured review information
     """
     addon_config = get_config_manager().config
@@ -158,40 +164,43 @@ Uses the addon config and current get_time_stats to retrieve the html to display
         secondary_color=addon_config[Config.SECONDARY_COLOR],
         total_style='' if addon_config[Config.SHOW_TOTAL] else 'display: none;',
         range_style='' if addon_config[Config.SHOW_RANGED] else 'display: none;',
-        # table_id=TABLE_ID,
-        # col_id=COL_ID,
-        # label_id=LABEL_ID,
-        # data_id=DATA_ID
     )
 
     return get_formatted_html_macros(html_string)
 
 
-def get_formatted_prev_range_hrs(revlog: [[int, int]], range_type: int):
+def get_formatted_range_hrs(revlog: [[int, int]], days: int = 0, range_type: int = None, start_at=0):
     """
-    Retrieves the formatted hrs using the given revlog and selected range type.
-    :return: A formatted string with the value and hours in the format "val unit".
+    Retrieves the given range's hours in reviews.
+
+    :param revlog: referenced log sequence
+    :param days: (optional) days to go back from, overridden by range_type inputs
+    :param range_type: (optional) range_type to use for hour calculations
+    :param start_at: iteration to start the range_type gathering from, goes back n previous iterations, else starts
+    from current
+    :return: a formatted string with the range in hours/minutes with its associated unit pair (e.g. '2 hrs'/'3.1 min')
     """
     config = get_config_manager().config
-    # extra day added to not include the received week-start/current day
-    from_date = _get_adjusted_date(datetime.today()) - timedelta(days=get_days_ago(range_type) + 1)
-    days_ago = Range.DAYS_IN[range_type] - 1 if range_type != Range.CUSTOM else config[Config.CUSTOM_DAYS]
-    ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago, from_date))
-    cal_val = get_formatted_hrs_or_min(ranged_hrs)
-    cal_unit = config[get_unit_type(ranged_hrs)]
-    return f'{cal_val} {cal_unit}'
+    from_date = datetime.today()
 
+    if range_type is not None:
+        days = get_days_ago(range_type)
+        if start_at > 0:
+            # extra day added to not include the current/later range for outputs
+            from_date -= timedelta(days=(get_days_ago(range_type) * start_at) + 1)
+            days -= 1
 
-def get_formatted_range_hrs(revlog: [[int, int]], days_ago: int):
-    ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days_ago))
+    ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days, from_date))
     range_val = get_formatted_hrs_or_min(ranged_hrs)
-    range_unit = get_config_manager().config[get_unit_type(ranged_hrs)]
+    range_unit = config[get_unit_type(ranged_hrs)]
+
     return f'{range_val} {range_unit}'
 
 
 def get_formatted_html_macros(html_string: str):
     """
-Replaces the input html string with formatted text based on input codes.
+    Replaces the input html string with formatted text based on input codes.
+
     :param html_string: html string to be formatted
     :return: the formatted html string object
     """
@@ -231,23 +240,26 @@ Replaces the input html string with formatted text based on input codes.
         )
 
     if re.search(fr'(?<!%){CMD_PREV_RANGE_HRS}', html_string):
-        html_string = html_string.replace(CMD_PREV_RANGE_HRS, get_formatted_prev_range_hrs(revlog, range_type))
+        range_hrs = get_formatted_range_hrs(revlog, range_type=range_type, start_at=1)
+        html_string = html_string.replace(CMD_PREV_RANGE_HRS, range_hrs)
 
     if re.search(fr'(?<!%){CMD_PREV_WEEK_HRS}', html_string):
-        html_string = html_string.replace(CMD_PREV_WEEK_HRS, get_formatted_prev_range_hrs(revlog, Range.WEEK))
+        range_hrs = get_formatted_range_hrs(revlog, range_type=Range.WEEK, start_at=1)
+        html_string = html_string.replace(CMD_PREV_WEEK_HRS, range_hrs)
 
     if re.search(fr'(?<!%){CMD_PREV_TWO_WEEKS_HRS}', html_string):
-        html_string = html_string.replace(CMD_PREV_TWO_WEEKS_HRS, get_formatted_prev_range_hrs(revlog, Range.TWO_WEEKS))
+        range_hrs = get_formatted_range_hrs(revlog, range_type=Range.TWO_WEEKS, start_at=1)
+        html_string = html_string.replace(CMD_PREV_TWO_WEEKS_HRS, range_hrs)
 
     if re.search(fr'(?<!%){CMD_PREV_MONTH_HRS}', html_string):
-        html_string = html_string.replace(CMD_PREV_MONTH_HRS, get_formatted_prev_range_hrs(revlog, Range.MONTH))
+        range_hrs = get_formatted_range_hrs(revlog, range_type=Range.MONTH, start_at=1)
+        html_string = html_string.replace(CMD_PREV_MONTH_HRS, range_hrs)
 
     if re.search(fr'(?<!%){CMD_PREV_YEAR_HRS}', html_string):
-        html_string = html_string.replace(CMD_PREV_YEAR_HRS, get_formatted_prev_range_hrs(revlog, Range.YEAR))
+        range_hrs = get_formatted_range_hrs(revlog, range_type=Range.YEAR, start_at=1)
+        html_string = html_string.replace(CMD_PREV_YEAR_HRS, range_hrs)
 
     # Use for not returning duplicates in double-passed variables:
-    # match = re.search(fr'(?<!%){CMD_LAST_DAY}', html_string)
-    # len(match.regs)r
     if re.search(fr'(?<!%){CMD_PREV_DAY_HRS}', html_string):
         ref_date = (datetime.today() - timedelta(days=1)).replace(hour=23, minute=59, second=59)
         ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, 0, ref_date))
@@ -314,13 +326,21 @@ Replaces the input html string with formatted text based on input codes.
     return html_string
 
 
-def get_args_from_ids(cids: list):
-    return '(' + (str(cids).replace('[', '').replace(']', '')) + ')'
+def get_args_from_ids(ids: list):
+    """
+    Does the same thing as Anki's implementation (ids2str) with less concern over versioning, but also less
+    reliability.
+
+    :param ids: ids to output
+    :return: a string element converted from a square brackets to a parenthesis format
+    """
+    return '(' + (str(ids).replace('[', '').replace(']', '')) + ')'
 
 
 def get_revlog(addon_config):
     """
-Retrieves Anki review data using the currently displayed decks and excluded decks filters.
+    Retrieves Anki review data using the currently displayed decks and excluded decks filters.
+
     :param addon_config: config to use as a reference for excluded deck ids
     :return: a sequence with the format: [[log_id, review_time], ...]
     """
@@ -342,8 +362,6 @@ Retrieves Anki review data using the currently displayed decks and excluded deck
                 dids.remove(excluded_did)
         cids_cmd = f'SELECT id FROM cards WHERE did in {get_args_from_ids(dids)}'
 
-        # print(f'checking decks: {[mw.col.decks.name(i) for i in dids]}')
-
     all_cids = mw.col.db.all(cids_cmd)
     # Remove duplicates via set-builder syntax
     unique_cids = {cid[0] for cid in all_cids}
@@ -352,9 +370,10 @@ Retrieves Anki review data using the currently displayed decks and excluded deck
     return mw.col.db.all(revlog_cmd)
 
 
-def get_days_ago(range_type: int, from_date=datetime.today()):
+def get_days_ago(range_type: int, from_date=datetime.today()) -> int:
     """
-Returns the total number of days since the start of a ranged time length.
+    Returns the total number of days since the start of a ranged time length.
+
     :param range_type: range to use as a reference
     :param from_date: input date to check distance of start from
     :return: total days away the range is from the referenced date-time
@@ -382,7 +401,8 @@ Returns the total number of days since the start of a ranged time length.
 
 def get_hrs_in_revlog(revlog: [[int, int]]):
     """
-Returns the total review time within a sequence of reviews.
+    Returns the total review time within a sequence of reviews.
+
     :param revlog: referenced log sequence
     :return: total hours in the sequence
     """
@@ -395,7 +415,8 @@ def get_days_since_week_start(
     from_date: datetime
 ):
     """
-Gets days since the last week-start date based on a set number of weeks.
+    Gets days since the last week-start date based on a set number of weeks.
+
     :param total_weeks: range of weeks to use as a reference point
     :param week_start_day: start of the week to count total days from
     :param from_date: changes the reference date to this datetime
@@ -408,6 +429,12 @@ Gets days since the last week-start date based on a set number of weeks.
 
 
 def _get_adjusted_date(from_date: datetime = datetime.today()):
+    """
+    Retrieves a date-time adjusted to its day-end hour and Anki/add-on preferences for end of day.
+
+    :param from_date: Date to adjust
+    :return: an adjusted datetime object
+    """
     if get_config_manager().config[Config.USE_ROLLOVER]:
         if ANKI_VERSION > ANKI_LEGACY_VER:
             offset_hour = mw.col.get_preferences().scheduling.rollover
@@ -425,7 +452,8 @@ def get_logs_in_range(
     from_date: datetime = datetime.today()
 ) -> [[int, int]]:
     """
-Retrieves a collection of review logs based on the input number of days to retrieve from today.
+    Retrieves a collection of review logs based on the input number of days to retrieve from today.
+
     :param revlog: list of review logs containing an array with [log time-identifier, log time spent]
     :param days_ago: number of days to filter back through
     :param from_date: changes the reference date to this datetime
@@ -447,7 +475,7 @@ Retrieves a collection of review logs based on the input number of days to retri
 
 def build_hooks():
     """
-Append addon hooks to Anki.
+    Append addon hooks to Anki.
     """
     gui_hooks.deck_browser_will_render_content.append(append_to_browser)
     gui_hooks.overview_will_render_content.append(append_to_overview)
