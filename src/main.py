@@ -3,10 +3,10 @@ import traceback
 from datetime import date, datetime, timedelta
 
 import aqt.utils
-from PyQt5.QtWidgets import QAction
 from aqt import gui_hooks, mw, webview
 from aqt.deckbrowser import DeckBrowser, DeckBrowserContent
 from aqt.overview import Overview, OverviewContent
+from aqt.qt import QAction
 
 from .config import ANKI_VERSION, TimeStatsConfigManager
 from .consts import (
