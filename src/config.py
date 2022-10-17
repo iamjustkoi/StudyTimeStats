@@ -3,7 +3,6 @@ MIT License: Copyright (c) 2022 JustKoi (iamjustkoi) <https://github.com/iamjust
 Full license text available in "LICENSE" file, located in the add-on's root directory.
 """
 import re
-from typing import Any, Dict
 
 from anki import buildinfo
 from aqt import AnkiQt
@@ -13,7 +12,7 @@ from .consts import CMD_FROM_DATE_HRS, Config
 ANKI_VERSION = int(buildinfo.version.replace('2.1.', ''))
 
 
-def _reformat_conf(config: Dict[str: Any]):
+def _reformat_conf(config: dict):
     for field in config:
         data = config[field]
         if isinstance(data, str):
