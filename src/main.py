@@ -214,123 +214,124 @@ def get_formatted_html_macros(html_string: str):
 
     revlog = get_revlog(addon_config)
     days_ago = get_days_ago(addon_config[Config.RANGE_TYPE])
+    pattern = r'(?<!%){}'
+
+    # print(f'pattern.format={pattern.format(CMD_RANGE_HRS)}')
 
     if re.search(fr'(?<!%){CMD_TOTAL_HRS}', html_string):
         total_hrs = get_hrs_in_revlog(revlog)
         total_val = get_formatted_hrs_or_min(total_hrs)
         total_unit = addon_config[get_unit_type(total_hrs)]
-        html_string = html_string.replace(CMD_TOTAL_HRS, f'{total_val} {total_unit}')
+        html_string = re.sub(pattern.format(CMD_TOTAL_HRS), f'{total_val} {total_unit}', html_string)
 
-    if re.search(fr'(?<!%){CMD_RANGE_HRS}', html_string):
-        html_string = html_string.replace(
-            CMD_RANGE_HRS, get_formatted_range_hrs(revlog, days_ago)
+    if re.search(pattern.format(CMD_RANGE_HRS), html_string):
+        html_string = re.sub(pattern.format(CMD_RANGE_HRS), get_formatted_range_hrs(revlog, days_ago), html_string)
+
+    if re.search(pattern.format(CMD_DAY_HRS), html_string):
+        html_string = re.sub(pattern.format(CMD_DAY_HRS), get_formatted_range_hrs(revlog, days=0), html_string)
+
+    # html_string = re.sub(pattern.format(___), ___, html_string)
+
+    if re.search(pattern.format(CMD_WEEK_HRS), html_string):
+        html_string = re.sub(
+            pattern.format(CMD_WEEK_HRS), get_formatted_range_hrs(revlog, get_days_ago(Range.WEEK)), html_string
         )
 
-    if re.search(fr'(?<!%){CMD_DAY_HRS}', html_string):
-        html_string = html_string.replace(
-            CMD_DAY_HRS, get_formatted_range_hrs(revlog, days=0)
+    if re.search(pattern.format(CMD_TWO_WEEKS_HRS), html_string):
+        html_string = re.sub(
+            pattern.format(CMD_TWO_WEEKS_HRS),
+            get_formatted_range_hrs(revlog, get_days_ago(Range.TWO_WEEKS)),
+            html_string
         )
 
-    if re.search(fr'(?<!%){CMD_WEEK_HRS}', html_string):
-        html_string = html_string.replace(
-            CMD_WEEK_HRS, get_formatted_range_hrs(revlog, get_days_ago(Range.WEEK))
+    if re.search(pattern.format(CMD_MONTH_HRS), html_string):
+        html_string = re.sub(
+            pattern.format(CMD_MONTH_HRS), get_formatted_range_hrs(revlog, get_days_ago(Range.MONTH)), html_string
         )
 
-    if re.search(fr'(?<!%){CMD_TWO_WEEKS_HRS}', html_string):
-        html_string = html_string.replace(
-            CMD_TWO_WEEKS_HRS, get_formatted_range_hrs(revlog, get_days_ago(Range.TWO_WEEKS))
+    if re.search(pattern.format(CMD_YEAR_HRS), html_string):
+        html_string = re.sub(
+            pattern.format(CMD_YEAR_HRS), get_formatted_range_hrs(revlog, get_days_ago(Range.YEAR)), html_string
         )
 
-    if re.search(fr'(?<!%){CMD_MONTH_HRS}', html_string):
-        html_string = html_string.replace(
-            CMD_MONTH_HRS, get_formatted_range_hrs(revlog, get_days_ago(Range.MONTH))
-        )
-
-    if re.search(fr'(?<!%){CMD_YEAR_HRS}', html_string):
-        html_string = html_string.replace(
-            CMD_YEAR_HRS, get_formatted_range_hrs(revlog, get_days_ago(Range.YEAR))
-        )
-
-    if re.search(fr'(?<!%){CMD_PREV_RANGE_HRS}', html_string):
+    if re.search(pattern.format(CMD_PREV_RANGE_HRS), html_string):
         range_hrs = get_formatted_range_hrs(revlog, range_type=range_type, start_at=1)
-        html_string = html_string.replace(CMD_PREV_RANGE_HRS, range_hrs)
+        html_string = re.sub(pattern.format(CMD_PREV_RANGE_HRS), range_hrs, html_string)
 
-    if re.search(fr'(?<!%){CMD_PREV_WEEK_HRS}', html_string):
+    if re.search(pattern.format(CMD_PREV_WEEK_HRS), html_string):
         range_hrs = get_formatted_range_hrs(revlog, range_type=Range.WEEK, start_at=1)
-        html_string = html_string.replace(CMD_PREV_WEEK_HRS, range_hrs)
+        html_string = re.sub(pattern.format(CMD_PREV_WEEK_HRS), range_hrs, html_string)
 
-    if re.search(fr'(?<!%){CMD_PREV_TWO_WEEKS_HRS}', html_string):
+    if re.search(pattern.format(CMD_PREV_TWO_WEEKS_HRS), html_string):
         range_hrs = get_formatted_range_hrs(revlog, range_type=Range.TWO_WEEKS, start_at=1)
-        html_string = html_string.replace(CMD_PREV_TWO_WEEKS_HRS, range_hrs)
+        html_string = re.sub(pattern.format(CMD_PREV_TWO_WEEKS_HRS), range_hrs, html_string)
 
-    if re.search(fr'(?<!%){CMD_PREV_MONTH_HRS}', html_string):
+    if re.search(pattern.format(CMD_PREV_MONTH_HRS), html_string):
         range_hrs = get_formatted_range_hrs(revlog, range_type=Range.MONTH, start_at=1)
-        html_string = html_string.replace(CMD_PREV_MONTH_HRS, range_hrs)
+        html_string = re.sub(pattern.format(CMD_PREV_MONTH_HRS), range_hrs, html_string)
 
-    if re.search(fr'(?<!%){CMD_PREV_YEAR_HRS}', html_string):
+    if re.search(pattern.format(CMD_PREV_YEAR_HRS), html_string):
         range_hrs = get_formatted_range_hrs(revlog, range_type=Range.YEAR, start_at=1)
-        html_string = html_string.replace(CMD_PREV_YEAR_HRS, range_hrs)
+        html_string = re.sub(pattern.format(CMD_PREV_YEAR_HRS), range_hrs, html_string)
 
     # Use for not returning duplicates in double-passed variables:
-    if re.search(fr'(?<!%){CMD_PREV_DAY_HRS}', html_string):
+    if re.search(pattern.format(CMD_PREV_DAY_HRS), html_string):
         ref_date = (datetime.today() - timedelta(days=1)).replace(hour=23, minute=59, second=59)
         ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, 0, ref_date))
         range_val = get_formatted_hrs_or_min(ranged_hrs)
         range_unit = addon_config[get_unit_type(ranged_hrs)]
-        html_string = html_string.replace(CMD_PREV_DAY_HRS, f'{range_val} {range_unit}')
+        html_string = re.sub(pattern.format(CMD_PREV_DAY_HRS), f'{range_val} {range_unit}', html_string)
 
-    if re.search(fr'(?<!%){CMD_RANGE}', html_string):
+    if re.search(pattern.format(CMD_RANGE), html_string):
         if range_type != Range.CUSTOM:
             range_text = Range.LABEL[range_type]
         else:
             range_text = f'{addon_config[Config.CUSTOM_DAYS]} {String.DAYS}'
-        html_string = html_string.replace(CMD_RANGE, range_text)
+        html_string = re.sub(pattern.format(CMD_RANGE), range_text, html_string)
 
-    if re.search(fr'(?<!%){CMD_DATE}', html_string):
-        html_string = html_string.replace(
-            CMD_DATE, (date.today() - timedelta(days=days_ago)).strftime('%x')
+    if re.search(pattern.format(CMD_DATE), html_string):
+        html_string = re.sub(
+            pattern.format(CMD_DATE), (date.today() - timedelta(days=days_ago)).strftime('%x'), html_string
         )
 
-    if re.search(fr'(?<!%){CMD_YEAR}', html_string):
-        html_string = html_string.replace(
-            CMD_YEAR, (date.today() - timedelta(days=days_ago)).strftime('%Y')
+    if re.search(pattern.format(CMD_YEAR), html_string):
+        html_string = re.sub(
+            pattern.format(CMD_YEAR), (date.today() - timedelta(days=days_ago)).strftime('%Y'), html_string
         )
 
-    if re.search(fr'(?<!%){CMD_FULL_DAY}', html_string):
-        html_string = html_string.replace(
-            CMD_FULL_DAY, (date.today() - timedelta(days=days_ago)).strftime('%A')
+    if re.search(pattern.format(CMD_FULL_DAY), html_string):
+        html_string = re.sub(
+            pattern.format(CMD_FULL_DAY), (date.today() - timedelta(days=days_ago)).strftime('%A'), html_string
         )
 
-    if re.search(fr'(?<!%){CMD_DAY}', html_string):
-        html_string = html_string.replace(
-            CMD_DAY, (date.today() - timedelta(days=days_ago)).strftime('%a')
+    if re.search(pattern.format(CMD_DAY), html_string):
+        html_string = re.sub(
+            pattern.format(CMD_DAY), (date.today() - timedelta(days=days_ago)).strftime('%a'), html_string
         )
 
-    if re.search(fr'(?<!%){CMD_MONTH}', html_string):
-        html_string = html_string.replace(
-            CMD_MONTH, (date.today() - timedelta(days=days_ago)).strftime('%b')
+    if re.search(pattern.format(CMD_MONTH), html_string):
+        html_string = re.sub(
+            pattern.format(CMD_MONTH), (date.today() - timedelta(days=days_ago)).strftime('%b'), html_string
         )
 
-    if re.search(fr'(?<!%){CMD_FULL_MONTH}', html_string):
-        html_string = html_string.replace(
-            CMD_FULL_MONTH, (date.today() - timedelta(days=days_ago)).strftime('%B')
+    if re.search(pattern.format(CMD_FULL_MONTH), html_string):
+        html_string = re.sub(
+            pattern.format(CMD_FULL_MONTH), (date.today() - timedelta(days=days_ago)).strftime('%B'), html_string
         )
 
-    if re.search(fr'(?<!%){CMD_DAYS}', html_string):
-        html_string = html_string.replace(
-            CMD_DAYS, f'{days_ago}'
-        )
+    if re.search(pattern.format(CMD_DAYS), html_string):
+        html_string = re.sub(pattern.format(CMD_DAYS), f'{days_ago}', html_string)
         # if re.search(r'(?<!%)%date\(.*,+.*\)', html_string):  # future filter?
 
     # Removed assignment expression (:=) for Python 3.7 builds
-    matches = re.search(fr'(?<!%)({CMD_FROM_DATE_HRS})(\d\d\d\d-\d\d-\d\d)', html_string)
+    matches = re.search(pattern.format(fr'{CMD_FROM_DATE_HRS}\d\d\d\d-\d\d-\d\d'), html_string)
     if matches:
         try:
             day_range = (datetime.today() - datetime.fromisoformat(matches.group(2))).days
             ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, day_range))
             range_val = get_formatted_hrs_or_min(ranged_hrs)
             range_unit = addon_config[get_unit_type(ranged_hrs)]
-            html_string = html_string.replace("".join(matches.groups()), f'{range_val} {range_unit}')
+            html_string = re.sub(pattern.format("".join(matches.groups())), f'{range_val} {range_unit}', html_string)
         except ValueError:
             aqt.utils.showWarning(f'{traceback.format_exc()}')
 
