@@ -315,14 +315,14 @@ Copies a link to the clipboard based on the input button.
         :param button: button to use for determining which link to copy
         """
         cb = self.manager.mw.app.clipboard()
-        cb.clear(mode=cb.Clipboard)
+        cb.clear()
 
         if button.objectName() == self.ui.patreon_button.objectName():
-            cb.setText(PATREON_URL, mode=cb.Clipboard)
+            cb.setText(PATREON_URL)
         elif button.objectName() == self.ui.kofi_button.objectName():
-            cb.setText(KOFI_URL, mode=cb.Clipboard)
+            cb.setText(KOFI_URL)
         elif button.objectName() == self.ui.like_button.objectName():
-            cb.setText(ANKI_URL, mode=cb.Clipboard)
+            cb.setText(ANKI_URL)
 
     def open_color_dialog(self, preview: QLabel):
         """
