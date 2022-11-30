@@ -322,7 +322,9 @@ def get_formatted_html_macros(html_string: str):
         )
         # if re.search(r'(?<!%)%date\(.*,+.*\)', html_string):  # future filter?
 
-    if matches := re.search(fr'(?<!%)({CMD_FROM_DATE_HRS})(\d\d\d\d-\d\d-\d\d)', html_string):
+    # Removed assignment expression (:=) for Python 3.7 builds
+    matches = re.search(fr'(?<!%)({CMD_FROM_DATE_HRS})(\d\d\d\d-\d\d-\d\d)', html_string)
+    if matches:
         try:
             day_range = (datetime.today() - datetime.fromisoformat(matches.group(2))).days
             ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, day_range))
