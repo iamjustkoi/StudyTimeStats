@@ -22,7 +22,7 @@ from aqt.qt import (
     QWidget,
 )
 
-from .config import TimeStatsConfigManager
+from .config import ANKI_VERSION, TimeStatsConfigManager
 from .consts import *
 from ..res.ui.options_dialog import Ui_OptionsDialog
 
@@ -245,8 +245,14 @@ Loads deck names to list and sets label to enabled if not in current config's ex
         decks_list = self.ui.excluded_decks_list
         decks_list.clear()
 
-        for deck in self.manager.mw.col.decks.all_names_and_ids():
-            deck_item = DeckItem(deck.name, self)
+        if ANKI_VERSION > ANKI_LEGACY_VER:
+            all_decks = self.manager.mw.col.decks.all_names_and_ids()
+        else:
+            all_decks = self.manager.mw.col.decks.allNames()
+
+        for deck in all_decks:
+            deck_name = deck.name if ANKI_VERSION > ANKI_LEGACY_VER else deck
+            deck_item = DeckItem(deck_name, self)
             deck_item.set_included(deck_item.label.text() not in self.excluded_deck_names)
 
             list_item = DeckListItem(decks_list)
