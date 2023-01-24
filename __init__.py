@@ -12,7 +12,7 @@ def initialize():
     """
 Initializer for the add-on. Called at the start for finer execution order and a bit of readability.
     """
-    main.build_hooks()
+    # main.build_hooks()
     main.build_actions()
 
 
