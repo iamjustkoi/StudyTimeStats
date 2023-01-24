@@ -45,44 +45,83 @@ PATREON_URL = 'https://www.patreon.com/iamjustkoi'
 KOFI_URL = 'https://ko-fi.com/iamjustkoi'
 ANKI_URL = 'https://ankiweb.net/shared/info/1247171202'
 
-TABLE_ID, COL_ID, LABEL_ID, DATA_ID = 'sts-table', 'sts-col', 'sts-label', 'sts-data'
-HTML_SHELL = f'''
-        <style>
-            #{TABLE_ID} {{{{
-                display: table;
-                margin-top: .5em;
-                max-width: fit-content;
-                font-weight: normal;
-            }}}}
-            .{COL_ID} {{{{
-                display: table-cell;
-                word-break: break-all;
-                width: 30vw;
-                max-width: 200px;
-            }}}}
-            .{COL_ID} > * {{{{
-                display: table-row;
-            }}}}
-            .{LABEL_ID} {{{{
-                color: {{primary_color}};
-            }}}}
-            .{DATA_ID} {{{{
-                color: {{secondary_color}};
-                font-weight: bold;
-            }}}}
-        </style>
-        <center>
-            <div id="{TABLE_ID}">
-                <div class="{COL_ID}" style="{{total_style}}">
-                    <div class="{LABEL_ID}">{{total_label}}</div>
-                    <div class="{DATA_ID}">{{total_hrs}}</div>
-                </div>
-                <div class="{COL_ID}" style="{{range_style}}">
-                    <div class="{LABEL_ID}">{{range_label}}</div>
-                    <div class="{DATA_ID}">{{range_hrs}}</div>
-                </div>
-            </div>
-        </center>
+# TABLE_ID, COL_ID, LABEL_ID, DATA_ID = 'sts-table', 'sts-col', 'sts-label', 'sts-data'
+# HTML_SHELL = f'''
+#         <style>
+#             #{TABLE_ID} {{{{
+#                 display: table;
+#                 margin-top: .5em;
+#                 max-width: fit-content;
+#                 font-weight: normal;
+#             }}}}
+#             .{COL_ID} {{{{
+#                 display: table-cell;
+#                 word-break: break-all;
+#                 width: 30vw;
+#                 max-width: 200px;
+#             }}}}
+#             .{COL_ID} > * {{{{
+#                 display: table-row;
+#             }}}}
+#             .{LABEL_ID} {{{{
+#                 color: {{primary_color}};
+#             }}}}
+#             .{DATA_ID} {{{{
+#                 color: {{secondary_color}};
+#                 font-weight: bold;
+#             }}}}
+#         </style>
+#         <center>
+#             <div id="{TABLE_ID}">
+#                 <div class="{COL_ID}" style="{{total_style}}">
+#                     <div class="{LABEL_ID}">{{total_label}}</div>
+#                     <div class="{DATA_ID}">{{total_hrs}}</div>
+#                 </div>
+#                 <div class="{COL_ID}" style="{{range_style}}">
+#                     <div class="{LABEL_ID}">{{range_label}}</div>
+#                     <div class="{DATA_ID}">{{range_hrs}}</div>
+#                 </div>
+#             </div>
+#         </center>
+# '''
+
+TABLE_ID = 'sts-table'
+COL_ID = 'sts-col'
+HTML_SHELL = '''
+         <style>
+             #''' + TABLE_ID + ''' {
+                 display: table;
+                 margin-top: .5em;
+                 max-width: fit-content;
+                 font-weight: normal;
+             }
+             .''' + COL_ID + ''' {
+                 display: table-cell;
+                 word-break: break-all;
+                 width: 30vw;
+                 max-width: 200px;
+             }
+             .''' + COL_ID + ''' > * {
+                 display: table-row;
+             }
+             .flow-horizontal {
+                 display: flex; 
+                 flex-wrap: nowrap; 
+                 justify-content: space-between;
+             }
+         </style>
+         <center>
+             <div id="''' + TABLE_ID + '''">
+                {CELL_DATA}
+             </div>
+         </center>
+'''
+
+CELL_HTML_SHELL = '''
+<div class="{{cell_class}}">
+    <div style="color: {{title_color}}">{{title}}</div>
+    <div style="color: {{output_color}}">{{output}}</div>
+</div>
 '''
 
 
@@ -115,11 +154,16 @@ class Weekday:
     MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY = 0, 1, 2, 3, 4, 5, 6
 
 
+class Direction:
+    VERTICAL = 'vertical'
+    HORIZONTAL = 'horizontal'
+
+
 class Config:
     TOOLBAR_ENABLED = 'Use_Toolbar_Options'
-    WEEK_START = 'Week_Start'
-    USE_CALENDAR_RANGE = 'Use_Calendar_Range'
-    RANGE_TYPE = 'Range_Type'
+    # WEEK_START = 'Week_Start'
+    # USE_CALENDAR_RANGE = 'Use_Calendar_Range'
+    # RANGE_TYPE = 'Range_Type'
     CUSTOM_DAYS = 'Custom_Days'
     CUSTOM_TOTAL_TEXT = 'Custom_Total_Text'
     CUSTOM_RANGE_TEXT = 'Custom_Range_Text'
@@ -127,36 +171,61 @@ class Config:
     CUSTOM_RANGE_HRS = 'Custom_Range_Hrs'
     CUSTOM_HRS_TEXT = 'Custom_Hrs_Text'
     CUSTOM_MIN_TEXT = 'Custom_Min_Text'
-    SHOW_TOTAL = 'Hide_Total_Stat'
-    SHOW_RANGED = 'Hide_Ranged_Stat'
-    PRIMARY_COLOR = 'Primary_Color'
-    SECONDARY_COLOR = 'Secondary_Color'
+    # SHOW_TOTAL = 'Hide_Total_Stat'
+    # SHOW_RANGED = 'Hide_Ranged_Stat'
+    # PRIMARY_COLOR = 'Primary_Color'
+    # SECONDARY_COLOR = 'Secondary_Color'
     BROWSER_ENABLED = 'Browser_Enabled'
     OVERVIEW_ENABLED = 'Overview_Enabled'
     CONGRATS_ENABLED = 'Congrats_Enabled'
     INCLUDE_DELETED = 'Include_Deleted_Reviews'
     USE_ROLLOVER = 'Use_Rollover_Hour'
     EXCLUDED_DIDS = "Excluded_Deck_IDs"
+    CELL_DATA = "Cell_Data"
+
+    DEFAULT_CELL_DATA = {
+        'title': '%range',
+        'output': '%range_hrs',
+        'direction': Direction.VERTICAL,
+        'range': Range.WEEK,
+        'useCalendar': True,
+        'weekStart': '',
+        'days': 7,
+        'hrsUnit': '',
+        'minUnit': '',
+    }
+
     DEFAULT_CONFIG = {
         TOOLBAR_ENABLED: True,
-        WEEK_START: Weekday.SUNDAY,
-        USE_CALENDAR_RANGE: True,
-        RANGE_TYPE: Range.WEEK,
-        CUSTOM_DAYS: 7,
-        CUSTOM_TOTAL_TEXT: String.TOTAL,
-        CUSTOM_RANGE_TEXT: String.PAST_RANGE,
-        CUSTOM_TOTAL_HRS: String.TOTAL_HRS,
-        CUSTOM_RANGE_HRS: String.PAST_HRS,
-        CUSTOM_HRS_TEXT: String.HRS,
-        CUSTOM_MIN_TEXT: String.MIN,
-        SHOW_TOTAL: True,
-        SHOW_RANGED: True,
-        PRIMARY_COLOR: 'white',
-        SECONDARY_COLOR: '#76bfb4',
         BROWSER_ENABLED: True,
         OVERVIEW_ENABLED: True,
         CONGRATS_ENABLED: True,
         INCLUDE_DELETED: True,
         USE_ROLLOVER: False,
-        EXCLUDED_DIDS: [1]
+        EXCLUDED_DIDS: [1],
+        CELL_DATA: []
     }
+
+    # DEFAULT_CONFIG = {
+    #     TOOLBAR_ENABLED: True,
+    #     WEEK_START: Weekday.SUNDAY,
+    #     USE_CALENDAR_RANGE: True,
+    #     RANGE_TYPE: Range.WEEK,
+    #     CUSTOM_DAYS: 7,
+    #     CUSTOM_TOTAL_TEXT: String.TOTAL,
+    #     CUSTOM_RANGE_TEXT: String.PAST_RANGE,
+    #     CUSTOM_TOTAL_HRS: String.TOTAL_HRS,
+    #     CUSTOM_RANGE_HRS: String.PAST_HRS,
+    #     CUSTOM_HRS_TEXT: String.HRS,
+    #     CUSTOM_MIN_TEXT: String.MIN,
+    #     SHOW_TOTAL: True,
+    #     SHOW_RANGED: True,
+    #     PRIMARY_COLOR: 'white',
+    #     SECONDARY_COLOR: '#76bfb4',
+    #     BROWSER_ENABLED: True,
+    #     OVERVIEW_ENABLED: True,
+    #     CONGRATS_ENABLED: True,
+    #     INCLUDE_DELETED: True,
+    #     USE_ROLLOVER: False,
+    #     EXCLUDED_DIDS: [1]
+    # }
