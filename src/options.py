@@ -1,7 +1,6 @@
-"""
-MIT License: Copyright (c) 2022 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
-Full license text available in the "LICENSE" file, packaged with the add-on.
-"""
+#  MIT License: 2022-2023 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
+#  Full license text available in the "LICENSE" file, packaged with the add-on.
+
 from __future__ import annotations
 
 import webbrowser
@@ -13,12 +12,15 @@ from aqt.qt import (
     QDialogButtonBox,
     QFrame,
     QHBoxLayout,
+    QVBoxLayout,
     QIcon,
     QLabel,
     QListWidgetItem,
     QMenu,
     QPushButton,
     QWidget,
+    Qt,
+    QListWidget,
 )
 
 from .config import ANKI_VERSION, TimeStatsConfigManager
@@ -34,8 +36,6 @@ def set_label_background(label: QLabel, hex_arg: str, use_circle=True):
         label.setStyleSheet(f'QWidget {{background-color: {hex_arg}}}')
 
 
-# TODO: handle displaying new settings
-#  + using the new list widget as a 2d array of cell_items (lists of lists containing cell_items)
 class TimeStatsOptionsDialog(QDialog):
 
     def __init__(self, conf_manager: TimeStatsConfigManager):
@@ -51,8 +51,8 @@ Addon options QDialog class for accessing and changing the addon's config values
 
         self.setWindowIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{ICON_PATH}'))
 
-        self._primary_color = self.config[Config.PRIMARY_COLOR]
-        self._secondary_color = self.config[Config.SECONDARY_COLOR]
+        # self._primary_color = self.config[Config.PRIMARY_COLOR]
+        # self._secondary_color = self.config[Config.SECONDARY_COLOR]
 
         # Deck list items
         self.ui.deck_enable_button.released.connect(lambda: self.set_selected_enabled(True))
@@ -87,8 +87,38 @@ Addon options QDialog class for accessing and changing the addon's config values
         # Restore Defaults Button
         self.ui.confirm_button_box.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.on_restore_defaults)
 
-        # TODO
-        # self.ui.rowListWidget.add
+        list_widget = self.ui.rowListWidget
+        list_widget.setStyleSheet('background: transparent; border: none;')
+
+        # TODO: handle add button
+        def add_blank():
+            list_widget.clear()
+
+            # add blank item
+            cell_item = CellItem(list_widget, None)
+            list_item = QListWidgetItem(list_widget)
+
+            list_item.setSizeHint(cell_item.sizeHint())
+            list_item.setFlags(Qt.ItemFlag.NoItemFlags)
+
+            list_widget.addItem(list_item)
+            list_widget.setItemWidget(CellItem.CellListItem(self.ui.rowListWidget), cell_item)
+
+            # redraw list
+            is_qt6 = aqt.qt.QT_VERSION_STR[0] == '6'
+
+            list_widget.item(0).setHidden(is_qt6)
+            item_count = list_widget.count() - is_qt6
+            data_height = list_widget.sizeHintForRow(is_qt6) * item_count
+
+            list_widget.setFixedHeight(data_height if data_height < 256 else 256)
+            list_widget.resize(list_widget.sizeHintForColumn(0), list_widget.height())
+            list_widget.setMaximumWidth(list_widget.parent().maximumWidth())
+
+            # update the entire window for the new stuff
+            self.adjustSize()
+
+        add_blank()
 
         # # Color Select Button
         # self.ui.primary_color_button.clicked.connect(lambda: self.open_color_dialog(self.ui.primary_color_preview))
@@ -227,9 +257,9 @@ window to update all the ui.
         # self.config[Config.CUSTOM_HRS_TEXT] = self.ui.hrs_line.text()
         # self.config[Config.CUSTOM_MIN_TEXT] = self.ui.min_line.text()
 
-        # Store colors with saved hex info
-        self.config[Config.PRIMARY_COLOR] = self._primary_color
-        self.config[Config.SECONDARY_COLOR] = self._secondary_color
+        # # Store colors with saved hex info
+        # self.config[Config.PRIMARY_COLOR] = self._primary_color
+        # self.config[Config.SECONDARY_COLOR] = self._secondary_color
 
         self.config[Config.BROWSER_ENABLED] = self.ui.browser_checkbox.isChecked()
         self.config[Config.OVERVIEW_ENABLED] = self.ui.overview_checkbox.isChecked()
@@ -499,24 +529,29 @@ Uses the base DeckItem to sort its value less than the other DeckItem.
 
 
 class CellItem(QWidget):
+    # data = {k: v for k, v in Config.DEFAULT_CELL_DATA}
 
-    def __init__(self, data=None):
+    class CellListItem(QListWidgetItem):
+        pass
+
+    def __init__(self, list_widget: QListWidget, data: dict = None):
         super().__init__()
         self.data = data
 
-        widget = Ui_CellWidget()
-        widget.setupUi(self)
+        self.widget = Ui_CellWidget()
+        self.widget.setupUi(self)
 
         if self.data is None:
-            self.widget = QWidget(self)
-            self.widget.setFixedSize(widget.frame.width(), widget.frame.height())
-            self.widget.setFrameStyle(QFrame.Box | QFrame.Plain)
-            self.button = QPushButton('Add', self.widget)
-            self.button.move(widget.frame.width()/2 - self.button.width()/2, widget.frame.height()/2 - self.button.height()/2)
+            self.widget.addButton.setVisible(True)
+            self.widget.mainFrame.setVisible(False)
+            self.widget.addButton.clicked.connect(lambda *_: print(f'clicked'))
+            self.setMinimumHeight(self.widget.addButton.height())
         else:
-            self.widget = widget
+            self.widget.addButton.setVisible(False)
+            self.widget.mainFrame.setVisible(True)
             self.data = data
             self.load()
+            self.setMinimumHeight(self.widget.mainFrame.height())
 
     def load(self):
         print(f'Loading data for cell: {self}')
