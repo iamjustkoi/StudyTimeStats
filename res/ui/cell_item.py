@@ -14,26 +14,18 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_CellWidget(object):
     def setupUi(self, CellWidget):
         CellWidget.setObjectName("CellWidget")
-        CellWidget.resize(418, 205)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        CellWidget.resize(382, 273)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(CellWidget.sizePolicy().hasHeightForWidth())
         CellWidget.setSizePolicy(sizePolicy)
-        CellWidget.setStyleSheet("/*#CellWidget {\n"
-"    background: gray;\n"
-"}\n"
-"\n"
-"#CellWidget > * {\n"
-"    background: rgb(20, 74, 111);\n"
-"}\n"
-"*/")
-        self.widgetLayout = QtWidgets.QVBoxLayout(CellWidget)
-        self.widgetLayout.setContentsMargins(6, 0, 6, 2)
-        self.widgetLayout.setSpacing(0)
-        self.widgetLayout.setObjectName("widgetLayout")
+        self.verticalLayout = QtWidgets.QVBoxLayout(CellWidget)
+        self.verticalLayout.setContentsMargins(0, 0, 0, 6)
+        self.verticalLayout.setSpacing(0)
+        self.verticalLayout.setObjectName("verticalLayout")
         self.addButton = QtWidgets.QPushButton(CellWidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.addButton.sizePolicy().hasHeightForWidth())
@@ -42,16 +34,27 @@ class Ui_CellWidget(object):
         self.addButton.setStyleSheet("#addButton {\n"
 "    border: 1px solid rgba(134, 134, 134, 128);\n"
 "    border-radius: 2px;\n"
+"    background: transparent;\n"
 "}")
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("../img/add_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.addButton.setIcon(icon)
         self.addButton.setObjectName("addButton")
-        self.widgetLayout.addWidget(self.addButton)
+        self.verticalLayout.addWidget(self.addButton)
         self.mainFrame = QtWidgets.QFrame(CellWidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.mainFrame.sizePolicy().hasHeightForWidth())
+        self.mainFrame.setSizePolicy(sizePolicy)
+        self.mainFrame.setStyleSheet("#mainFrame {\n"
+"    background: rgba(163, 163, 163, 5%);\n"
+"    border-radius: 6px;\n"
+"}")
+        self.mainFrame.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.mainFrame.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.mainFrame.setObjectName("mainFrame")
         self.gridLayout = QtWidgets.QGridLayout(self.mainFrame)
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
         self.titleColorButton = QtWidgets.QPushButton(self.mainFrame)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
@@ -60,7 +63,7 @@ class Ui_CellWidget(object):
         sizePolicy.setHeightForWidth(self.titleColorButton.sizePolicy().hasHeightForWidth())
         self.titleColorButton.setSizePolicy(sizePolicy)
         self.titleColorButton.setMaximumSize(QtCore.QSize(20, 20))
-        self.titleColorButton.setStyleSheet("QWidget {\n"
+        self.titleColorButton.setStyleSheet("#titleColorButton {\n"
 "    border-radius: 10px;\n"
 "    background-color: #76bfb4;\n"
 "}")
@@ -126,7 +129,7 @@ class Ui_CellWidget(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.cellStyleButton.sizePolicy().hasHeightForWidth())
         self.cellStyleButton.setSizePolicy(sizePolicy)
-        self.cellStyleButton.setMaximumSize(QtCore.QSize(32, 32))
+        self.cellStyleButton.setMaximumSize(QtCore.QSize(20, 20))
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap("../img/code_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.cellStyleButton.setIcon(icon1)
@@ -166,7 +169,6 @@ class Ui_CellWidget(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.customRangeSpinbox.sizePolicy().hasHeightForWidth())
         self.customRangeSpinbox.setSizePolicy(sizePolicy)
-        self.customRangeSpinbox.setStyleSheet("")
         self.customRangeSpinbox.setMaximum(5690)
         self.customRangeSpinbox.setProperty("value", 7)
         self.customRangeSpinbox.setObjectName("customRangeSpinbox")
@@ -189,9 +191,19 @@ class Ui_CellWidget(object):
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.directionVerticalButton = QtWidgets.QPushButton(self.frame_2)
         self.directionVerticalButton.setEnabled(False)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.directionVerticalButton.sizePolicy().hasHeightForWidth())
+        self.directionVerticalButton.setSizePolicy(sizePolicy)
         self.directionVerticalButton.setObjectName("directionVerticalButton")
         self.horizontalLayout_2.addWidget(self.directionVerticalButton)
         self.directionHorizontalButton = QtWidgets.QPushButton(self.frame_2)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.directionHorizontalButton.sizePolicy().hasHeightForWidth())
+        self.directionHorizontalButton.setSizePolicy(sizePolicy)
         self.directionHorizontalButton.setObjectName("directionHorizontalButton")
         self.horizontalLayout_2.addWidget(self.directionHorizontalButton)
         self.gridLayout.addWidget(self.frame_2, 2, 1, 1, 1)
@@ -218,6 +230,12 @@ class Ui_CellWidget(object):
         self.directionLabel.setObjectName("directionLabel")
         self.gridLayout.addWidget(self.directionLabel, 2, 0, 1, 1)
         self.removeButton = QtWidgets.QPushButton(self.mainFrame)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.removeButton.sizePolicy().hasHeightForWidth())
+        self.removeButton.setSizePolicy(sizePolicy)
+        self.removeButton.setMaximumSize(QtCore.QSize(20, 20))
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap("../../../LeechToolkit/res/img/remove_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.removeButton.setIcon(icon2)
@@ -242,19 +260,20 @@ class Ui_CellWidget(object):
         sizePolicy.setHeightForWidth(self.outputColorButton.sizePolicy().hasHeightForWidth())
         self.outputColorButton.setSizePolicy(sizePolicy)
         self.outputColorButton.setMaximumSize(QtCore.QSize(20, 20))
-        self.outputColorButton.setStyleSheet("QWidget {\n"
+        self.outputColorButton.setStyleSheet("#outputColorButton {\n"
 "    border-radius: 10px;\n"
 "    background-color: #FFF;\n"
 "}")
         self.outputColorButton.setObjectName("outputColorButton")
         self.gridLayout.addWidget(self.outputColorButton, 1, 2, 1, 1)
-        self.widgetLayout.addWidget(self.mainFrame)
+        self.verticalLayout.addWidget(self.mainFrame)
 
         self.retranslateUi(CellWidget)
         QtCore.QMetaObject.connectSlotsByName(CellWidget)
 
     def retranslateUi(self, CellWidget):
         _translate = QtCore.QCoreApplication.translate
+        CellWidget.setWindowTitle(_translate("CellWidget", "Form"))
         self.addButton.setText(_translate("CellWidget", "Add"))
         self.rangeLabel.setText(_translate("CellWidget", "Selected Range"))
         self.startDayLabel.setText(_translate("CellWidget", "Week-Start Day"))
@@ -293,7 +312,7 @@ class Ui_CellWidget(object):
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    CellWidget = QtWidgets.QFrame()
+    CellWidget = QtWidgets.QWidget()
     ui = Ui_CellWidget()
     ui.setupUi(CellWidget)
     CellWidget.show()

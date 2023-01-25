@@ -1,51 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>CellWidget</class>
- <widget class="QFrame" name="CellWidget">
+ <widget class="QWidget" name="CellWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>418</width>
-    <height>205</height>
+    <width>382</width>
+    <height>273</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+   <sizepolicy hsizetype="Ignored" vsizetype="Maximum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="styleSheet">
-   <string notr="true">/*#CellWidget {
-	background: gray;
-}
-
-#CellWidget &gt; * {
-	background: rgb(20, 74, 111);
-}
-*/</string>
+  <property name="windowTitle">
+   <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="widgetLayout">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>0</number>
    </property>
    <property name="leftMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
     <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>2</number>
+    <number>6</number>
    </property>
    <item>
     <widget class="QPushButton" name="addButton">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -60,6 +53,7 @@
       <string notr="true">#addButton {
 	border: 1px solid rgba(134, 134, 134, 128);
 	border-radius: 2px;
+	background: transparent;
 }</string>
      </property>
      <property name="text">
@@ -73,19 +67,25 @@
    </item>
    <item>
     <widget class="QFrame" name="mainFrame">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Ignored" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">#mainFrame {
+	background: rgba(163, 163, 163, 5%);
+	border-radius: 6px;
+}</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Sunken</enum>
+     </property>
      <layout class="QGridLayout" name="gridLayout">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
       <item row="0" column="2">
        <widget class="QPushButton" name="titleColorButton">
         <property name="sizePolicy">
@@ -101,7 +101,7 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">QWidget {
+         <string notr="true">#titleColorButton {
 	border-radius: 10px;
 	background-color: #76bfb4;
 }</string>
@@ -217,8 +217,8 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>32</width>
-          <height>32</height>
+          <width>20</width>
+          <height>20</height>
          </size>
         </property>
         <property name="icon">
@@ -324,9 +324,6 @@
         <property name="toolTip">
          <string>Amount of days to filter the custom range.</string>
         </property>
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
         <property name="suffix">
          <string> days</string>
         </property>
@@ -380,6 +377,12 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string>Vertical</string>
            </property>
@@ -387,6 +390,12 @@
          </item>
          <item>
           <widget class="QPushButton" name="directionHorizontalButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string>Horizontal</string>
            </property>
@@ -465,6 +474,18 @@
       </item>
       <item row="0" column="3">
        <widget class="QPushButton" name="removeButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
         <property name="icon">
          <iconset>
           <normaloff>../../../LeechToolkit/res/img/remove_icon.svg</normaloff>../../../LeechToolkit/res/img/remove_icon.svg</iconset>
@@ -505,7 +526,7 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">QWidget {
+         <string notr="true">#outputColorButton {
 	border-radius: 10px;
 	background-color: #FFF;
 }</string>

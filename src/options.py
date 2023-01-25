@@ -21,6 +21,8 @@ from aqt.qt import (
     QWidget,
     Qt,
     QListWidget,
+    QSize,
+    QSizePolicy,
 )
 
 from .config import ANKI_VERSION, TimeStatsConfigManager
@@ -36,6 +38,48 @@ def set_label_background(label: QLabel, hex_arg: str, use_circle=True):
         label.setStyleSheet(f'QWidget {{background-color: {hex_arg}}}')
 
 
+def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem):
+
+    list_item = CellItem.CellListItem(list_widget)
+
+    list_item.setSizeHint(cell_item.sizeHint())
+    list_item.setFlags(Qt.ItemFlag.NoItemFlags)
+
+    list_widget.insertItem(1, list_item)
+
+    list_widget.setItemWidget(list_item, cell_item)
+
+    # redraw list
+    # list_widget.parentWidget().parentWidget()
+
+    data_height = 0
+    for i in range(list_widget.count()):
+        data_height += list_widget.sizeHintForRow(i)
+
+        print(f'list_widget.sizeHintForRow({i})={list_widget.sizeHintForRow(i)}')
+        print(f'list_widget.item({i})={list_widget.item(i)}')
+
+    print(f'{list_widget.parentWidget().parentWidget().height()=}')
+
+    # list_widget.setFixedHeight(data_height)
+    # list_widget.parentWidget().parentWidget().adjustSize()
+    #
+    # if data_height < list_widget.parentWidget().parentWidget().height():
+
+    # TODO make this work + buttons + cell removal
+    # if data_height < 512:
+    #     list_widget.setFixedHeight(data_height)
+    # else:
+    list_widget.setMinimumHeight(512)
+    list_widget.setMaximumHeight(data_height)
+
+    # list_widget.resize(list_widget.sizeHintForColumn(0), data_height)
+
+    # list_widget.setMaximumWidth(list_widget.parentWidget().maximumWidth())
+
+    print(f'{data_height=}')
+
+
 class TimeStatsOptionsDialog(QDialog):
 
     def __init__(self, conf_manager: TimeStatsConfigManager):
@@ -43,7 +87,7 @@ class TimeStatsOptionsDialog(QDialog):
 Addon options QDialog class for accessing and changing the addon's config values.
         :param conf_manager: TimeStatsConfigManager used to reading and writing user input.
         """
-        super().__init__(flags=conf_manager.mw.windowFlags())
+        super().__init__(flags=aqt.mw.windowFlags())
         self.manager = conf_manager
         self.config = conf_manager.config
         self.ui = Ui_OptionsDialog()
@@ -87,38 +131,13 @@ Addon options QDialog class for accessing and changing the addon's config values
         # Restore Defaults Button
         self.ui.confirm_button_box.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.on_restore_defaults)
 
-        list_widget = self.ui.rowListWidget
-        list_widget.setStyleSheet('background: transparent; border: none;')
+        # Setup Row List
+        self.ui.rowListWidget.setStyleSheet('#rowListWidget { background: transparent; border: none; }')
+        self.ui.rowListWidget.clear()
 
-        # TODO: handle add button
-        def add_blank():
-            list_widget.clear()
-
-            # add blank item
-            cell_item = CellItem(list_widget, None)
-            list_item = QListWidgetItem(list_widget)
-
-            list_item.setSizeHint(cell_item.sizeHint())
-            list_item.setFlags(Qt.ItemFlag.NoItemFlags)
-
-            list_widget.addItem(list_item)
-            list_widget.setItemWidget(CellItem.CellListItem(self.ui.rowListWidget), cell_item)
-
-            # redraw list
-            is_qt6 = aqt.qt.QT_VERSION_STR[0] == '6'
-
-            list_widget.item(0).setHidden(is_qt6)
-            item_count = list_widget.count() - is_qt6
-            data_height = list_widget.sizeHintForRow(is_qt6) * item_count
-
-            list_widget.setFixedHeight(data_height if data_height < 256 else 256)
-            list_widget.resize(list_widget.sizeHintForColumn(0), list_widget.height())
-            list_widget.setMaximumWidth(list_widget.parent().maximumWidth())
-
-            # update the entire window for the new stuff
-            self.adjustSize()
-
-        add_blank()
+        # Add blank item
+        cell_item = CellItem(self.ui.rowListWidget, is_empty=True)
+        _add_cell_to_list(self.ui.rowListWidget, cell_item)
 
         # # Color Select Button
         # self.ui.primary_color_button.clicked.connect(lambda: self.open_color_dialog(self.ui.primary_color_preview))
@@ -176,6 +195,8 @@ Addon options QDialog class for accessing and changing the addon's config values
             self.ui.useRolloverCheckbox.stateChanged,
         }
         self._attach_change_signals(change_signals)
+
+        self.adjustSize()
 
     def apply(self):
         """
@@ -529,31 +550,52 @@ Uses the base DeckItem to sort its value less than the other DeckItem.
 
 
 class CellItem(QWidget):
-    # data = {k: v for k, v in Config.DEFAULT_CELL_DATA}
-
     class CellListItem(QListWidgetItem):
         pass
 
-    def __init__(self, list_widget: QListWidget, data: dict = None):
-        super().__init__()
+    def __init__(self, list_widget: QListWidget, is_empty: bool, data: dict = None):
+        super().__init__(flags=aqt.mw.windowFlags())
+
         self.data = data
 
         self.widget = Ui_CellWidget()
-        self.widget.setupUi(self)
+        self.widget.setupUi(CellWidget=self)
 
-        if self.data is None:
+        def add_new_cell(*args):
+            cell_item = CellItem(list_widget, False)
+            _add_cell_to_list(list_widget, cell_item)
+
+        if is_empty:
             self.widget.addButton.setVisible(True)
             self.widget.mainFrame.setVisible(False)
-            self.widget.addButton.clicked.connect(lambda *_: print(f'clicked'))
+            self.adjustSize()
             self.setMinimumHeight(self.widget.addButton.height())
+
+            self.widget.addButton.clicked.connect(add_new_cell)
+
         else:
             self.widget.addButton.setVisible(False)
             self.widget.mainFrame.setVisible(True)
-            self.data = data
+
+            self.data = data if data else {k: v for k, v in Config.DEFAULT_CELL_DATA.items()}
+
             self.load()
+
+            self.adjustSize()
             self.setMinimumHeight(self.widget.mainFrame.height())
 
     def load(self):
         print(f'Loading data for cell: {self}')
+
         # ...load data into cell widget here
+        self.widget.titleColorButton.setStyleSheet("border-radius: 10px;\n	background-color: #76bfb4;")
+        self.widget.titleColorButton.setFixedSize(20, 20)
+        self.widget.titleColorButton.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.widget.outputColorButton.setStyleSheet("border-radius: 10px;\n	background-color: white;")
+        self.widget.outputColorButton.setFixedSize(20, 20)
+
+        pass
+
+    def save(self):
+        self
         pass
