@@ -36,7 +36,7 @@ CMD_PREV_YEAR_HRS = '%prev_year_hrs'
 
 CMD_FROM_DATE_HRS = '%from_custom_hrs:'
 
-ICON_PATH = '../res/img/stats_icon.svg'
+ADDON_ICON_PATH = '../res/img/stats_icon.svg'
 KOFI_ICON_PATH = '../res/img/kofilogo_blue.PNG'
 PATREON_ICON_PATH = '../res/img/patreon.png'
 ANKI_LIKE_ICON_PATH = '../res/img/anki_like.png'
