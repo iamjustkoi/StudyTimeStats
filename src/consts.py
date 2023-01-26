@@ -41,6 +41,10 @@ KOFI_ICON_PATH = '../res/img/kofilogo_blue.PNG'
 PATREON_ICON_PATH = '../res/img/patreon.png'
 ANKI_LIKE_ICON_PATH = '../res/img/anki_like.png'
 
+REMOVE_ICON_PATH = '../res/img/remove_icon.svg'
+ADD_ICON_PATH = '../res/img/add_icon.svg'
+CODE_ICON_PATH = '../res/img/code_icon.svg'
+
 PATREON_URL = 'https://www.patreon.com/iamjustkoi'
 KOFI_URL = 'https://ko-fi.com/iamjustkoi'
 ANKI_URL = 'https://ankiweb.net/shared/info/1247171202'
