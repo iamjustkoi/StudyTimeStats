@@ -1,20 +1,19 @@
-import aqt
-import aqt.qt
 from aqt import Qt
 from aqt.qt import (
-    QPushButton,
-    QPixmap,
+    QToolButton,
     QColor,
+    QShowEvent,
     QIcon,
 )
 
 
-class HoverButton(QPushButton):
+class HoverButton(QToolButton):
     """
     Custom button for handling button icon tinting during hover events with QPushButtons.
     """
 
-    tint_color = "#FFFFFF"
+    tint = "#FFFFFF"
+    hover_tint = "#8a8a8a"
     mask_color = "black"
     raw_icon = None
 
@@ -24,16 +23,18 @@ class HoverButton(QPushButton):
 
         :param is_hovered: whether the mouse is currently hovered over the HoverButton
         """
+
+        pixmap = self.raw_icon.pixmap(self.size(), QIcon.Normal, QIcon.On)
+
         if is_hovered:
-            pixmap = self.raw_icon.pixmap(self.size(), QIcon.Normal, QIcon.On)
             mask = pixmap.createMaskFromColor(QColor(self.mask_color), Qt.MaskOutColor)
-            pixmap.fill(QColor(self.tint_color))
+            pixmap.fill(QColor(self.hover_tint))
             pixmap.setMask(mask)
             self.setIcon(QIcon(pixmap))
+
         else:
-            pixmap = self.raw_icon.pixmap(self.size(), QIcon.Normal, QIcon.On)
-            mask = pixmap.createMaskFromColor(QColor(self.tint_color), Qt.MaskOutColor)
-            pixmap.fill(QColor(self.mask_color))
+            mask = pixmap.createMaskFromColor(QColor(self.mask_color), Qt.MaskOutColor)
+            pixmap.fill(QColor(self.tint))
             pixmap.setMask(mask)
             self.setIcon(QIcon(pixmap))
 
@@ -41,20 +42,28 @@ class HoverButton(QPushButton):
         self.mask_color = color
 
     def setTint(self, tint: str):
+        self.tint = tint
+
+    def setHoverTint(self, tint: str):
         """
         Set the color of the icon when the mouse is hovering over the button.
         :param tint: a string representation of the color
         """
-        self.tint_color = tint
+        self.hover_tint = tint
 
-    def setIcon(self, icon: QIcon) -> None:
-        super().setIcon(icon)
+    def setRawIcon(self, icon: QIcon) -> None:
         self.raw_icon = icon
+
+    def showEvent(self, a0: QShowEvent) -> None:
+        super().showEvent(a0)
+        self._updateIcon(False)
 
     def enterEvent(self, *args, **kwargs):
         super().enterEvent(*args, *kwargs)
+        print(f'Enter')
         self._updateIcon(True)
 
     def leaveEvent(self, *args, **kwargs):
         super().leaveEvent(*args, *kwargs)
+        print(f'Exit')
         self._updateIcon(False)
