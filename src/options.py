@@ -39,45 +39,13 @@ def set_label_background(label: QLabel, hex_arg: str, use_circle=True):
 
 
 def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem):
-
     list_item = CellItem.CellListItem(list_widget)
-
     list_item.setSizeHint(cell_item.sizeHint())
     list_item.setFlags(Qt.ItemFlag.NoItemFlags)
 
-    list_widget.insertItem(1, list_item)
-
+    list_widget.addItem(list_item)
     list_widget.setItemWidget(list_item, cell_item)
-
-    # redraw list
-    # list_widget.parentWidget().parentWidget()
-
-    data_height = 0
-    for i in range(list_widget.count()):
-        data_height += list_widget.sizeHintForRow(i)
-
-        print(f'list_widget.sizeHintForRow({i})={list_widget.sizeHintForRow(i)}')
-        print(f'list_widget.item({i})={list_widget.item(i)}')
-
-    print(f'{list_widget.parentWidget().parentWidget().height()=}')
-
-    # list_widget.setFixedHeight(data_height)
-    # list_widget.parentWidget().parentWidget().adjustSize()
-    #
-    # if data_height < list_widget.parentWidget().parentWidget().height():
-
-    # TODO make this work + buttons + cell removal
-    # if data_height < 512:
-    #     list_widget.setFixedHeight(data_height)
-    # else:
-    list_widget.setMinimumHeight(512)
-    list_widget.setMaximumHeight(data_height)
-
-    # list_widget.resize(list_widget.sizeHintForColumn(0), data_height)
-
-    # list_widget.setMaximumWidth(list_widget.parentWidget().maximumWidth())
-
-    print(f'{data_height=}')
+    list_widget.sortItems()
 
 
 class TimeStatsOptionsDialog(QDialog):
@@ -93,10 +61,7 @@ Addon options QDialog class for accessing and changing the addon's config values
         self.ui = Ui_OptionsDialog()
         self.ui.setupUi(OptionsDialog=self)
 
-        self.setWindowIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{ICON_PATH}'))
-
-        # self._primary_color = self.config[Config.PRIMARY_COLOR]
-        # self._secondary_color = self.config[Config.SECONDARY_COLOR]
+        self.setWindowIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{ADDON_ICON_PATH}'))
 
         # Deck list items
         self.ui.deck_enable_button.released.connect(lambda: self.set_selected_enabled(True))
@@ -132,27 +97,12 @@ Addon options QDialog class for accessing and changing the addon's config values
         self.ui.confirm_button_box.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.on_restore_defaults)
 
         # Setup Row List
-        self.ui.rowListWidget.setStyleSheet('#rowListWidget { background: transparent; border: none; }')
-        self.ui.rowListWidget.clear()
+        self.ui.cellListWidget.setStyleSheet('#cellListWidget { background: transparent; border: none; }')
+        self.ui.cellListWidget.clear()
 
         # Add blank item
-        cell_item = CellItem(self.ui.rowListWidget, is_empty=True)
-        _add_cell_to_list(self.ui.rowListWidget, cell_item)
-
-        # # Color Select Button
-        # self.ui.primary_color_button.clicked.connect(lambda: self.open_color_dialog(self.ui.primary_color_preview))
-        # self.ui.seconday_color_button.clicked.connect(lambda: self.open_color_dialog(self.ui.secondary_color_preview))
-        #
-        # # Range Button
-        # self.ui.range_select_dropdown.activated[int].connect(self.on_range_type_change)
-        # self.ui.use_calendar_checkbox.clicked.connect(self.update_calendar_range_extras)
-        #
-        # # Update the position of the custom spinbox to the same position as the calendar checkbox
-        # self.ui.range_select_layout.layout().replaceWidget(self.ui.use_calendar_checkbox,
-        # self.ui.custom_range_spinbox)
-        #
-        # # Update custom range's max value
-        # self.ui.custom_range_spinbox.setMaximum(self.manager.max_range)
+        cell_item = CellItem(self.ui.cellListWidget, is_empty=True)
+        _add_cell_to_list(self.ui.cellListWidget, cell_item)
 
         # Update about header text with the current version number
         updated_about_header = self.ui.about_label_header.text().format(version=CURRENT_VERSION)
@@ -168,25 +118,11 @@ Addon options QDialog class for accessing and changing the addon's config values
 
         # Attached post-load to prevent pre-change broadcasts
         change_signals = {
-            # self.ui.range_select_dropdown.currentIndexChanged,
-            # self.ui.use_calendar_checkbox.stateChanged,
-            # self.ui.week_start_dropdown.currentIndexChanged,
-            # self.ui.custom_range_spinbox.valueChanged,
-            # self.ui.show_total_checkbox.stateChanged,
-            # self.ui.show_ranged_checkbox.stateChanged,
-            # self.ui.total_line.textChanged,
-            # self.ui.ranged_line.textChanged,
-            # self.ui.hrs_line.textChanged,
-            # self.ui.min_line.textChanged,
-            # self.ui.primary_color_button.clicked,
-            # self.ui.seconday_color_button.clicked,
             self.ui.browser_checkbox.stateChanged,
             self.ui.overview_checkbox.stateChanged,
             self.ui.congrats_checkbox.stateChanged,
             self.ui.toolbar_checkbox.stateChanged,
             self.ui.include_deleted_checkbox.stateChanged,
-            # self.ui.total_hrs_line.textChanged,
-            # self.ui.range_hrs_line.textChanged,
             self.ui.excluded_decks_list.itemDoubleClicked,
             self.ui.excluded_decks_list.itemActivated,
             self.ui.deck_enable_button.clicked,
@@ -207,7 +143,7 @@ Addon options QDialog class for accessing and changing the addon's config values
 
     def _attach_change_signals(self, signals: set[aqt.qt.pyqtBoundSignal]):
         for signal in signals:
-            def enable_apply(*args):
+            def enable_apply(*__args):
                 """
                 Intercept function for the created button. Refreshes the button's visibility after running the input
                 write-callback.
@@ -221,31 +157,6 @@ Addon options QDialog class for accessing and changing the addon's config values
 Loads all config values to the options dialog.
         """
         self.ui.toolbar_checkbox.setChecked(self.config[Config.TOOLBAR_ENABLED])
-
-        # self.ui.week_start_dropdown.setCurrentIndex(self.config[Config.WEEK_START])
-        #
-        # self.ui.range_select_dropdown.setCurrentIndex(self.config[Config.RANGE_TYPE])
-        # self.on_range_type_change(self.ui.range_select_dropdown.currentIndex())
-        #
-        # self.ui.use_calendar_checkbox.setChecked(self.config[Config.USE_CALENDAR_RANGE])
-        # self.update_calendar_range_extras()
-        #
-        # self.ui.show_total_checkbox.setChecked(self.config[Config.SHOW_TOTAL])
-        # self.ui.show_ranged_checkbox.setChecked(self.config[Config.SHOW_RANGED])
-        #
-        # self.ui.custom_range_spinbox.setValue(self.config[Config.CUSTOM_DAYS])
-        # self.ui.total_line.setText(self.config[Config.CUSTOM_TOTAL_TEXT])
-        # self.ui.ranged_line.setText(self.config[Config.CUSTOM_RANGE_TEXT])
-        # self.ui.hrs_line.setText(self.config[Config.CUSTOM_HRS_TEXT])
-        # self.ui.min_line.setText(self.config[Config.CUSTOM_MIN_TEXT])
-        # self.ui.total_hrs_line.setText(self.config[Config.CUSTOM_TOTAL_HRS])
-        # self.ui.range_hrs_line.setText(self.config[Config.CUSTOM_RANGE_HRS])
-        #
-        # # Color Pickers
-        # set_label_background(self.ui.primary_color_preview, self.config[Config.PRIMARY_COLOR])
-        # self._primary_color = self.config[Config.PRIMARY_COLOR]
-        # set_label_background(self.ui.secondary_color_preview, self.config[Config.SECONDARY_COLOR])
-        # self._secondary_color = self.config[Config.SECONDARY_COLOR]
 
         self.ui.browser_checkbox.setChecked(self.config[Config.BROWSER_ENABLED])
         self.ui.overview_checkbox.setChecked(self.config[Config.OVERVIEW_ENABLED])
@@ -265,22 +176,6 @@ window to update all the ui.
         """
         # Store options
         self.config[Config.TOOLBAR_ENABLED] = self.ui.toolbar_checkbox.isChecked()
-        # self.config[Config.WEEK_START] = self.ui.week_start_dropdown.currentIndex()
-        # self.config[Config.RANGE_TYPE] = self.ui.range_select_dropdown.currentIndex()
-        # self.config[Config.USE_CALENDAR_RANGE] = self.ui.use_calendar_checkbox.isChecked()
-        # self.config[Config.SHOW_TOTAL] = self.ui.show_total_checkbox.isChecked()
-        # self.config[Config.SHOW_RANGED] = self.ui.show_ranged_checkbox.isChecked()
-        # self.config[Config.CUSTOM_DAYS] = self.ui.custom_range_spinbox.value()
-        # self.config[Config.CUSTOM_TOTAL_TEXT] = self.ui.total_line.text()
-        # self.config[Config.CUSTOM_RANGE_TEXT] = self.ui.ranged_line.text()
-        # self.config[Config.CUSTOM_TOTAL_HRS] = self.ui.total_hrs_line.text()
-        # self.config[Config.CUSTOM_RANGE_HRS] = self.ui.range_hrs_line.text()
-        # self.config[Config.CUSTOM_HRS_TEXT] = self.ui.hrs_line.text()
-        # self.config[Config.CUSTOM_MIN_TEXT] = self.ui.min_line.text()
-
-        # # Store colors with saved hex info
-        # self.config[Config.PRIMARY_COLOR] = self._primary_color
-        # self.config[Config.SECONDARY_COLOR] = self._secondary_color
 
         self.config[Config.BROWSER_ENABLED] = self.ui.browser_checkbox.isChecked()
         self.config[Config.OVERVIEW_ENABLED] = self.ui.overview_checkbox.isChecked()
@@ -436,27 +331,6 @@ Restores all config value to their default settings.
         self._load()
 
 
-#     def update_calendar_range_extras(self):
-#         """
-# Updates the calendar date checkbox label with the appropriate range-type string based on the currently selected
-# range-type index.
-#         """
-#         self._redraw_calendar_checkbox()
-#         dropdown_index = self.ui.range_select_dropdown.currentIndex()
-#         if dropdown_index != Range.CUSTOM:
-#             type_index = dropdown_index if dropdown_index != Range.TWO_WEEKS else Range.WEEK
-#             self.ui.use_calendar_checkbox.setText(f'{String.USE_CALENDAR} {Range.LABEL[type_index]}')
-#
-#         using_calendar_range = self.ui.use_calendar_checkbox.isChecked()
-#         if (dropdown_index == Range.WEEK or dropdown_index == Range.TWO_WEEKS) and using_calendar_range:
-#             self.ui.week_start_dropdown.show()
-#             self.ui.week_start_label.show()
-#         else:
-#             self.ui.week_start_dropdown.hide()
-#             self.ui.week_start_label.hide()
-#             self.ui.week_start_label.hide()
-
-
 class DeckItem(QWidget):
 
     def __init__(self, text: str, dialog: TimeStatsOptionsDialog):
@@ -549,50 +423,129 @@ Uses the base DeckItem to sort its value less than the other DeckItem.
         return this_item < other_item
 
 
+FLAT_STYLE = \
+    '''
+    background: transparent;
+    border: none;
+    width: 20px;
+    height: 20px;
+    '''
+
+
 class CellItem(QWidget):
+    # TODO
+    # # Color Select Button
+    # self.ui.primary_color_button.clicked.connect(lambda: self.open_color_dialog(self.ui.primary_color_preview))
+    # self.ui.seconday_color_button.clicked.connect(lambda: self.open_color_dialog(self.ui.secondary_color_preview))
+    #
+    # # Range Button
+    # self.ui.range_select_dropdown.activated[int].connect(self.on_range_type_change)
+    # self.ui.use_calendar_checkbox.clicked.connect(self.update_calendar_range_extras)
+    #
+    # # Update the position of the custom spinbox to the same position as the calendar checkbox
+    # self.ui.range_select_layout.layout().replaceWidget(self.ui.use_calendar_checkbox,
+    # self.ui.custom_range_spinbox)
+    #
+    # # Update custom range's max value
+    # self.ui.custom_range_spinbox.setMaximum(self.manager.max_range)
+
+    # TODO
+    # def update_calendar_range_extras(self):
+    #         """
+    # Updates the calendar date checkbox label with the appropriate range-type string based on the currently selected
+    # range-type index.
+    #         """
+    #         self._redraw_calendar_checkbox()
+    #         dropdown_index = self.ui.range_select_dropdown.currentIndex()
+    #         if dropdown_index != Range.CUSTOM:
+    #             type_index = dropdown_index if dropdown_index != Range.TWO_WEEKS else Range.WEEK
+    #             self.ui.use_calendar_checkbox.setText(f'{String.USE_CALENDAR} {Range.LABEL[type_index]}')
+    #
+    #         using_calendar_range = self.ui.use_calendar_checkbox.isChecked()
+    #         if (dropdown_index == Range.WEEK or dropdown_index == Range.TWO_WEEKS) and using_calendar_range:
+    #             self.ui.week_start_dropdown.show()
+    #             self.ui.week_start_label.show()
+    #         else:
+    #             self.ui.week_start_dropdown.hide()
+    #             self.ui.week_start_label.hide()
+    #             self.ui.week_start_label.hide()
+
     class CellListItem(QListWidgetItem):
-        pass
+
+        def __init__(self, *args):
+            super().__init__(*args)
+            QListWidgetItem
+
+        def __lt__(self, other: CellItem.CellListItem):
+            this_cell = self.listWidget().itemWidget(self)
+            other_cell = self.listWidget().itemWidget(other) if other else None
+
+            # Returns whether this cell is less than the other cell's index, unless this cell is empty (always last)
+            if isinstance(this_cell, CellItem) and not this_cell.is_empty:
+                return this_cell.index < other_cell.index if isinstance(other_cell, CellItem) else True
+
+            return False
 
     def __init__(self, list_widget: QListWidget, is_empty: bool, data: dict = None):
-        super().__init__(flags=aqt.mw.windowFlags())
+        super().__init__()
 
-        self.data = data
-
+        self.index = data.get('idx', list_widget.count()) if data else list_widget.count()
+        self.is_empty = is_empty
         self.widget = Ui_CellWidget()
         self.widget.setupUi(CellWidget=self)
 
-        def add_new_cell(*args):
+        def add_cell(*__args):
             cell_item = CellItem(list_widget, False)
             _add_cell_to_list(list_widget, cell_item)
 
+        def remove_cell(*__args):
+            print(f'Removing cell...{self}')
+            pass
+
         if is_empty:
+            self.widget.addButton.clicked.connect(add_cell)
+
+            self.widget.addButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{ADD_ICON_PATH}'))
+            print(f'{aqt.mw.pm=}')
+            print(f'{aqt.mw.pm.night_mode()=}')
+            print(f'{aqt.mw.pm.theme()=}')
+            self.widget.addButton.setTint(Color.BUTTON_ICON[aqt.mw.pm.night_mode()])
+            self.widget.addButton.setHoverTint(Color.HOVER[aqt.mw.pm.night_mode()])
+
             self.widget.addButton.setVisible(True)
             self.widget.mainFrame.setVisible(False)
-            self.adjustSize()
+            # self.adjustSize()
             self.setMinimumHeight(self.widget.addButton.height())
 
-            self.widget.addButton.clicked.connect(add_new_cell)
-
         else:
-            self.widget.addButton.setVisible(False)
-            self.widget.mainFrame.setVisible(True)
-
             self.data = data if data else {k: v for k, v in Config.DEFAULT_CELL_DATA.items()}
+
+            self.widget.removeButton.clicked.connect(remove_cell)
+
+            self.widget.removeButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{REMOVE_ICON_PATH}'))
+            self.widget.removeButton.setTint(Color.BUTTON_ICON[aqt.mw.pm.night_mode()])
+            self.widget.removeButton.setHoverTint(Color.HOVER[aqt.mw.pm.night_mode()])
+            self.widget.removeButton.setStyleSheet(FLAT_STYLE)
+
+            self.widget.codeButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{CODE_ICON_PATH}'))
+            self.widget.codeButton.setTint(Color.BUTTON_ICON[aqt.mw.pm.night_mode()])
+            self.widget.codeButton.setHoverTint(Color.HOVER[aqt.mw.pm.night_mode()])
+            self.widget.codeButton.setStyleSheet(FLAT_STYLE)
 
             self.load()
 
-            self.adjustSize()
+            self.widget.addButton.setVisible(False)
+            self.widget.mainFrame.setVisible(True)
+
+            # self.adjustSize()
             self.setMinimumHeight(self.widget.mainFrame.height())
 
     def load(self):
         print(f'Loading data for cell: {self}')
 
         # ...load data into cell widget here
-        self.widget.titleColorButton.setStyleSheet("border-radius: 10px;\n	background-color: #76bfb4;")
-        self.widget.titleColorButton.setFixedSize(20, 20)
-        self.widget.titleColorButton.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.widget.outputColorButton.setStyleSheet("border-radius: 10px;\n	background-color: white;")
-        self.widget.outputColorButton.setFixedSize(20, 20)
+        self.widget.titleColorButton.setStyleSheet("border-radius: 10px;\n	background-color: #76bfb4; width: 20px; height: 20px;")
+        self.widget.outputColorButton.setStyleSheet("border-radius: 10px;\n	background-color: white; width: 20px; height: 20px;")
 
         pass
 

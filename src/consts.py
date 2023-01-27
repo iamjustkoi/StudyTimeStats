@@ -163,6 +163,12 @@ class Direction:
     HORIZONTAL = 'horizontal'
 
 
+class Color:
+    # [Light, Dark]
+    HOVER = ['#565656', '#b0b0b0']
+    BUTTON_ICON = ['#040404', '#8a8a8a']
+
+
 class Config:
     TOOLBAR_ENABLED = 'Use_Toolbar_Options'
     # WEEK_START = 'Week_Start'

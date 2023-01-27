@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>382</width>
-    <height>273</height>
+    <width>367</width>
+    <height>265</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Ignored" vsizetype="Maximum">
+   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -36,7 +36,7 @@
     <number>6</number>
    </property>
    <item>
-    <widget class="QPushButton" name="addButton">
+    <widget class="HoverButton" name="addButton">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -56,12 +56,15 @@
 	background: transparent;
 }</string>
      </property>
-     <property name="text">
-      <string>Add</string>
-     </property>
      <property name="icon">
       <iconset>
        <normaloff>../img/add_icon.svg</normaloff>../img/add_icon.svg</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
      </property>
     </widget>
    </item>
@@ -85,14 +88,20 @@
      <property name="frameShadow">
       <enum>QFrame::Sunken</enum>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="2">
-       <widget class="QPushButton" name="titleColorButton">
+     <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,0">
+      <item row="0" column="3">
+       <widget class="HoverButton" name="removeButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
         </property>
         <property name="maximumSize">
          <size>
@@ -100,19 +109,52 @@
           <height>20</height>
          </size>
         </property>
-        <property name="styleSheet">
-         <string notr="true">#titleColorButton {
-	border-radius: 10px;
-	background-color: #76bfb4;
-}</string>
+        <property name="icon">
+         <iconset>
+          <normaloff>../img/remove_icon.svg</normaloff>../img/remove_icon.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="titleLineEdit"/>
+      <item row="5" column="3">
+       <widget class="HoverButton" name="codeButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../img/code_icon.svg</normaloff>../img/code_icon.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="rangeLabel">
+      <item row="2" column="0">
+       <widget class="QLabel" name="directionLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
           <horstretch>0</horstretch>
@@ -120,7 +162,90 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Selected Range</string>
+         <string>Direction</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QComboBox" name="startDayDropdown">
+        <property name="toolTip">
+         <string>The day a new week should start on.</string>
+        </property>
+        <property name="currentText">
+         <string>Monday</string>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToContents</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>Monday</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Tuesday</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Wednesday</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Thursday</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Friday</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Saturday</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Sunday</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QSpinBox" name="customRangeSpinbox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Amount of days to filter the custom range.</string>
+        </property>
+        <property name="suffix">
+         <string> days</string>
+        </property>
+        <property name="maximum">
+         <number>5690</number>
+        </property>
+        <property name="value">
+         <number>7</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="titleLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Title</string>
         </property>
        </widget>
       </item>
@@ -137,21 +262,64 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="1">
-       <widget class="QFrame" name="frame_3">
+      <item row="1" column="0">
+       <widget class="QLabel" name="outputLabel">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="text">
+         <string>Output</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="outputLineEdit"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="rangeLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Selected Range</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="titleLineEdit">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="unitLabel">
+        <property name="text">
+         <string>Units</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QFrame" name="frame_2">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -165,69 +333,35 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="hourLabel">
-           <property name="text">
-            <string>Hour</string>
+          <widget class="QPushButton" name="directionVerticalButton">
+           <property name="enabled">
+            <bool>false</bool>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="hourEdit">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <property name="text">
-            <string>hrs</string>
+            <string>Vertical</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="minuteLabel">
-           <property name="text">
-            <string>Minute</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="minEdit">
+          <widget class="QPushButton" name="directionHorizontalButton">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <property name="text">
-            <string>min</string>
+            <string>Horizontal</string>
            </property>
           </widget>
          </item>
         </layout>
-       </widget>
-      </item>
-      <item row="5" column="3">
-       <widget class="QPushButton" name="codeButton">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../img/code_icon.svg</normaloff>../img/code_icon.svg</iconset>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
        </widget>
       </item>
       <item row="3" column="1">
@@ -313,53 +447,21 @@
         </layout>
        </widget>
       </item>
-      <item row="6" column="1">
-       <widget class="QSpinBox" name="customRangeSpinbox">
+      <item row="5" column="1">
+       <widget class="QFrame" name="frame_3">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip">
-         <string>Amount of days to filter the custom range.</string>
-        </property>
-        <property name="suffix">
-         <string> days</string>
-        </property>
-        <property name="maximum">
-         <number>5690</number>
-        </property>
-        <property name="value">
-         <number>7</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="titleLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Title</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QFrame" name="frame_2">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <property name="spacing">
-          <number>0</number>
-         </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -373,107 +475,50 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QPushButton" name="directionVerticalButton">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
+          <widget class="QLabel" name="hourLabel">
            <property name="text">
-            <string>Vertical</string>
+            <string>Hour</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="directionHorizontalButton">
+          <widget class="QLineEdit" name="hourEdit">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Horizontal</string>
+            <string>hrs</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="minuteLabel">
+           <property name="text">
+            <string>Minute</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="minEdit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>min</string>
            </property>
           </widget>
          </item>
         </layout>
        </widget>
       </item>
-      <item row="4" column="1">
-       <widget class="QComboBox" name="startDayDropdown">
-        <property name="toolTip">
-         <string>The day a new week should start on.</string>
-        </property>
-        <property name="currentText">
-         <string>Monday</string>
-        </property>
-        <property name="sizeAdjustPolicy">
-         <enum>QComboBox::AdjustToContents</enum>
-        </property>
-        <item>
-         <property name="text">
-          <string>Monday</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Tuesday</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Wednesday</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Thursday</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Friday</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Saturday</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Sunday</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="unitLabel">
-        <property name="text">
-         <string>Units</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="directionLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Direction</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QPushButton" name="removeButton">
+      <item row="0" column="2">
+       <widget class="QToolButton" name="titleColorButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -486,33 +531,17 @@
           <height>20</height>
          </size>
         </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../../../LeechToolkit/res/img/remove_icon.svg</normaloff>../../../LeechToolkit/res/img/remove_icon.svg</iconset>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="outputLineEdit"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="outputLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Output</string>
+        <property name="styleSheet">
+         <string notr="true">#titleColorButton {
+	border-radius: 10px;
+	background-color: #76bfb4;
+	width: 20px;
+}</string>
         </property>
        </widget>
       </item>
       <item row="1" column="2">
-       <widget class="QPushButton" name="outputColorButton">
+       <widget class="QToolButton" name="outputColorButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -538,6 +567,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>HoverButton</class>
+   <extends>QPushButton</extends>
+   <header>.forms.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
