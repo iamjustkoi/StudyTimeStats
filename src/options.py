@@ -31,23 +31,6 @@ from ..res.ui.cell_item import Ui_CellWidget
 from ..res.ui.options_dialog import Ui_OptionsDialog
 
 
-def set_label_background(label: QLabel, hex_arg: str, use_circle=True):
-    if use_circle:
-        label.setStyleSheet(f'QWidget {{background-color: {hex_arg}; border-radius: 10px;}}')
-    else:
-        label.setStyleSheet(f'QWidget {{background-color: {hex_arg}}}')
-
-
-def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem):
-    list_item = CellItem.CellListItem(list_widget)
-    list_item.setSizeHint(cell_item.sizeHint())
-    list_item.setFlags(Qt.ItemFlag.NoItemFlags)
-
-    list_widget.addItem(list_item)
-    list_widget.setItemWidget(list_item, cell_item)
-    list_widget.sortItems()
-
-
 class TimeStatsOptionsDialog(QDialog):
 
     def __init__(self, conf_manager: TimeStatsConfigManager):
@@ -423,7 +406,24 @@ Uses the base DeckItem to sort its value less than the other DeckItem.
         return this_item < other_item
 
 
-FLAT_STYLE = \
+def set_label_background(label: QLabel, hex_arg: str, use_circle=True):
+    if use_circle:
+        label.setStyleSheet(f'QWidget {{background-color: {hex_arg}; border-radius: 10px;}}')
+    else:
+        label.setStyleSheet(f'QWidget {{background-color: {hex_arg}}}')
+
+
+def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem):
+    list_item = CellItem.CellListItem(list_widget)
+    list_item.setSizeHint(cell_item.sizeHint())
+    list_item.setFlags(Qt.ItemFlag.NoItemFlags)
+
+    list_widget.addItem(list_item)
+    list_widget.setItemWidget(list_item, cell_item)
+    list_widget.sortItems()
+
+
+FLAT_ICON_STYLE = \
     '''
     background: transparent;
     border: none;
@@ -525,12 +525,12 @@ class CellItem(QWidget):
             self.widget.removeButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{REMOVE_ICON_PATH}'))
             self.widget.removeButton.setTint(Color.BUTTON_ICON[aqt.mw.pm.night_mode()])
             self.widget.removeButton.setHoverTint(Color.HOVER[aqt.mw.pm.night_mode()])
-            self.widget.removeButton.setStyleSheet(FLAT_STYLE)
+            self.widget.removeButton.setStyleSheet(FLAT_ICON_STYLE)
 
             self.widget.codeButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{CODE_ICON_PATH}'))
             self.widget.codeButton.setTint(Color.BUTTON_ICON[aqt.mw.pm.night_mode()])
             self.widget.codeButton.setHoverTint(Color.HOVER[aqt.mw.pm.night_mode()])
-            self.widget.codeButton.setStyleSheet(FLAT_STYLE)
+            self.widget.codeButton.setStyleSheet(FLAT_ICON_STYLE)
 
             self.load()
 
