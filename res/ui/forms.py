@@ -19,6 +19,11 @@ class HoverButton(QPushButton):
     raw_icon = None
 
     def _updateIcon(self, is_hovered: bool):
+        """
+        Updates the icon of the HoverButton to a tinted color if the mouse is currently hovering over it.
+
+        :param is_hovered: whether the mouse is currently hovered over the HoverButton
+        """
         if is_hovered:
             pixmap = self.raw_icon.pixmap(self.size(), QIcon.Normal, QIcon.On)
             mask = pixmap.createMaskFromColor(QColor(self.mask_color), Qt.MaskOutColor)
@@ -36,6 +41,10 @@ class HoverButton(QPushButton):
         self.mask_color = color
 
     def setTint(self, tint: str):
+        """
+        Set the color of the icon when the mouse is hovering over the button.
+        :param tint: a string representation of the color
+        """
         self.tint_color = tint
 
     def setIcon(self, icon: QIcon) -> None:
