@@ -2,6 +2,7 @@
 MIT License: Copyright (c) 2022 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
 Full license text available in the "LICENSE" file, packaged with the add-on.
 """
+import aqt
 
 CURRENT_VERSION = '1.3.9'
 
@@ -167,6 +168,8 @@ class Color:
     # [Light, Dark]
     HOVER = ['#565656', '#b0b0b0']
     BUTTON_ICON = ['#040404', '#8a8a8a']
+    TITLE_DEFAULT = ['#000000', '#FFFFFF']
+    OUTPUT_DEFAULT = ['#76bfb4', '#76bfb4']
 
 
 class Config:
@@ -193,16 +196,29 @@ class Config:
     EXCLUDED_DIDS = "Excluded_Deck_IDs"
     CELL_DATA = "Cell_Data"
 
+    TITLE = 'title'
+    OUTPUT = 'output'
+    TITLE_COLOR = 'titleColor'
+    OUTPUT_COLOR = 'outputColor'
+    DIRECTION = 'direction'
+    RANGE = 'range'
+    USE_CALENDAR = 'useCalendar'
+    WEEK_START = 'weekStart'
+    DAYS = 'days'
+    HRS_UNIT = 'hrsUnit'
+    MIN_UNIT = 'minUnit'
     DEFAULT_CELL_DATA = {
-        'title': '%range',
-        'output': '%range_hrs',
-        'direction': Direction.VERTICAL,
-        'range': Range.WEEK,
-        'useCalendar': True,
-        'weekStart': '',
-        'days': 7,
-        'hrsUnit': '',
-        'minUnit': '',
+        TITLE: String.PAST_RANGE,
+        OUTPUT: String.PAST_HRS,
+        TITLE_COLOR: Color.TITLE_DEFAULT[aqt.mw.pm.night_mode()],
+        OUTPUT_COLOR: Color.OUTPUT_DEFAULT[aqt.mw.pm.night_mode()],
+        DIRECTION: Direction.VERTICAL,
+        RANGE: Range.WEEK,
+        USE_CALENDAR: True,
+        WEEK_START: Weekday.SUNDAY,
+        DAYS: 7,
+        HRS_UNIT: String.HRS,
+        MIN_UNIT: String.MIN,
     }
 
     DEFAULT_CONFIG = {
