@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import webbrowser
 from pathlib import Path
+from datetime import date
 
 import aqt
 from aqt.qt import (
@@ -12,7 +13,7 @@ from aqt.qt import (
     QDialogButtonBox,
     QFrame,
     QHBoxLayout,
-    QVBoxLayout,
+    QGridLayout,
     QIcon,
     QLabel,
     QListWidgetItem,
@@ -443,40 +444,6 @@ FLAT_ICON_STYLE = \
 
 
 class CellItem(QWidget):
-    # TODO
-    #
-    # # Range Button
-    # self.ui.range_select_dropdown.activated[int].connect(self.on_range_type_change)
-    # self.ui.use_calendar_checkbox.clicked.connect(self.update_calendar_range_extras)
-    #
-    # # Update the position of the custom spinbox to the same position as the calendar checkbox
-    # self.ui.range_select_layout.layout().replaceWidget(self.ui.use_calendar_checkbox,
-    # self.ui.custom_range_spinbox)
-    #
-    # # Update custom range's max value
-    # self.ui.custom_range_spinbox.setMaximum(self.manager.max_range)
-
-    # TODO
-    # def update_calendar_range_extras(self):
-    #         """
-    # Updates the calendar date checkbox label with the appropriate range-type string based on the currently selected
-    # range-type index.
-    #         """
-    #         self._redraw_calendar_checkbox()
-    #         dropdown_index = self.ui.range_select_dropdown.currentIndex()
-    #         if dropdown_index != Range.CUSTOM:
-    #             type_index = dropdown_index if dropdown_index != Range.TWO_WEEKS else Range.WEEK
-    #             self.ui.use_calendar_checkbox.setText(f'{String.USE_CALENDAR} {Range.LABEL[type_index]}')
-    #
-    #         using_calendar_range = self.ui.use_calendar_checkbox.isChecked()
-    #         if (dropdown_index == Range.WEEK or dropdown_index == Range.TWO_WEEKS) and using_calendar_range:
-    #             self.ui.week_start_dropdown.show()
-    #             self.ui.week_start_label.show()
-    #         else:
-    #             self.ui.week_start_dropdown.hide()
-    #             self.ui.week_start_label.hide()
-    #             self.ui.week_start_label.hide()
-
     class CellListItem(QListWidgetItem):
         cell_item: CellItem
 
@@ -524,15 +491,8 @@ class CellItem(QWidget):
 
             self.build_hover_buttons(list_widget)
             self.build_color_pickers()
-
-            def toggle_direction_buttons(__):
-                self.widget.directionHorizontalButton.setEnabled(not self.widget.directionHorizontalButton.isEnabled())
-                self.widget.directionVerticalButton.setEnabled(not self.widget.directionVerticalButton.isEnabled())
-                self.data[Config.DIRECTION] = Direction.VERTICAL if self.widget.directionVerticalButton.isEnabled() \
-                    else Direction.HORIZONTAL
-
-            self.widget.directionVerticalButton.clicked.connect(toggle_direction_buttons)
-            self.widget.directionHorizontalButton.clicked.connect(toggle_direction_buttons)
+            self.build_direction_buttons()
+            self.build_range_inputs()
 
             self.load()
 
@@ -549,7 +509,6 @@ class CellItem(QWidget):
 
     def save(self):
         self
-        pass
 
     def build_hover_buttons(self, list_widget: QListWidget):
         self.widget.removeButton.clicked.connect(lambda *_: self.open_delete_confirmation(list_widget))
@@ -576,6 +535,56 @@ class CellItem(QWidget):
         self.widget.outputColorButton.clicked.connect(
             lambda _: on_click_color_button(button=self.widget.outputColorButton)
         )
+
+    def build_direction_buttons(self):
+        def toggle_direction_buttons(__):
+            self.widget.directionHorizontalButton.setEnabled(not self.widget.directionHorizontalButton.isEnabled())
+            self.widget.directionVerticalButton.setEnabled(not self.widget.directionVerticalButton.isEnabled())
+            self.data[Config.DIRECTION] = Direction.VERTICAL if self.widget.directionVerticalButton.isEnabled() \
+                else Direction.HORIZONTAL
+
+        self.widget.directionVerticalButton.clicked.connect(toggle_direction_buttons)
+        self.widget.directionHorizontalButton.clicked.connect(toggle_direction_buttons)
+
+    def build_range_inputs(self):
+        def on_range_update(index: int):
+            range_idx = index - 1
+
+            if range_idx < 0:
+                self.widget.customRangeSpinbox.hide()
+
+                self.widget.startDayLabel.hide()
+                self.widget.startDayDropdown.hide()
+                self.widget.calendarCheckbox.hide()
+                self.widget.customRangeSpinbox.hide()
+
+            else:
+                self.widget.rangeExtraFrame.show()
+
+                if range_idx == Range.CUSTOM:
+                    self.widget.startDayLabel.hide()
+                    self.widget.startDayDropdown.hide()
+                    self.widget.customRangeSpinbox.show()
+                    self.widget.calendarCheckbox.hide()
+
+                elif range_idx == Range.WEEK or range_idx == Range.TWO_WEEKS:
+                    self.widget.startDayLabel.show()
+                    self.widget.startDayDropdown.show()
+                    self.widget.customRangeSpinbox.hide()
+                    self.widget.calendarCheckbox.show()
+                    self.widget.calendarCheckbox.setText(f'{String.USE_CALENDAR} {Range.LABEL[Range.WEEK]}')
+
+                elif range_idx == Range.MONTH or range_idx == Range.YEAR:
+                    self.widget.startDayLabel.hide()
+                    self.widget.startDayDropdown.hide()
+                    self.widget.customRangeSpinbox.hide()
+                    self.widget.calendarCheckbox.show()
+                    self.widget.calendarCheckbox.setText(f'{String.USE_CALENDAR} {Range.LABEL[range_idx]}')
+
+        self.widget.rangeDropdown.activated[int].connect(on_range_update)  # Initial updates
+        self.widget.rangeDropdown.currentIndexChanged.connect(on_range_update)
+
+        self.widget.customRangeSpinbox.setMaximum((date.today() - date.fromisoformat(UNIQUE_DATE)).days)
 
     def set_header_color(self, button: QToolButton, color: str):
         button.setStyleSheet(f"border-radius: 10px;\n	background-color: {color}; width: 20px; height: 20px;")
