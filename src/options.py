@@ -526,40 +526,43 @@ class CellItem(QWidget):
         else:
             self.data = data if data else {k: v for k, v in Config.DEFAULT_CELL_DATA.items()}
 
-            # self.widget.removeButton.clicked.connect(lambda *_: _remove_cell_from_list(list_widget, self))
-            self.widget.removeButton.clicked.connect(lambda *_: self.confirmRemove(list_widget))
-
-            self.widget.removeButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{REMOVE_ICON_PATH}'))
-            self.widget.removeButton.setTint(Color.BUTTON_ICON[aqt.mw.pm.night_mode()])
-            self.widget.removeButton.setHoverTint(Color.HOVER[aqt.mw.pm.night_mode()])
-            self.widget.removeButton.setStyleSheet(FLAT_ICON_STYLE)
-
-            self.widget.codeButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{CODE_ICON_PATH}'))
-            self.widget.codeButton.setTint(Color.BUTTON_ICON[aqt.mw.pm.night_mode()])
-            self.widget.codeButton.setHoverTint(Color.HOVER[aqt.mw.pm.night_mode()])
-            self.widget.codeButton.setStyleSheet(FLAT_ICON_STYLE)
-
-            def on_click_color_button(button: QToolButton):
-                color = QColorDialog.getColor(QColor(self.button_colors[button]))
-                if color.isValid():
-                    self.setHeaderColor(button, color.name())
-
-            self.widget.titleColorButton.clicked.connect(
-                lambda _: on_click_color_button(button=self.widget.titleColorButton)
-            )
-            self.widget.outputColorButton.clicked.connect(
-                lambda _: on_click_color_button(button=self.widget.outputColorButton)
-            )
+            self.buildHoverButtons(list_widget)
+            self.buildColorPickers()
 
             self.load()
 
             self.widget.addButton.setVisible(False)
             self.widget.mainFrame.setVisible(True)
-
             self.setMinimumHeight(self.widget.mainFrame.height())
 
         self.list_item.setSizeHint(self.sizeHint())
         self.list_item.setFlags(Qt.ItemFlag.NoItemFlags)
+
+    def buildHoverButtons(self, list_widget: QListWidget):
+        self.widget.removeButton.clicked.connect(lambda *_: self.confirmRemove(list_widget))
+
+        self.widget.removeButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{REMOVE_ICON_PATH}'))
+        self.widget.removeButton.setTint(Color.BUTTON_ICON[aqt.mw.pm.night_mode()])
+        self.widget.removeButton.setHoverTint(Color.HOVER[aqt.mw.pm.night_mode()])
+        self.widget.removeButton.setStyleSheet(FLAT_ICON_STYLE)
+
+        self.widget.codeButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{CODE_ICON_PATH}'))
+        self.widget.codeButton.setTint(Color.BUTTON_ICON[aqt.mw.pm.night_mode()])
+        self.widget.codeButton.setHoverTint(Color.HOVER[aqt.mw.pm.night_mode()])
+        self.widget.codeButton.setStyleSheet(FLAT_ICON_STYLE)
+
+    def buildColorPickers(self):
+        def on_click_color_button(button: QToolButton):
+            color = QColorDialog.getColor(QColor(self.button_colors[button]))
+            if color.isValid():
+                self.setHeaderColor(button, color.name())
+
+        self.widget.titleColorButton.clicked.connect(
+            lambda _: on_click_color_button(button=self.widget.titleColorButton)
+        )
+        self.widget.outputColorButton.clicked.connect(
+            lambda _: on_click_color_button(button=self.widget.outputColorButton)
+        )
 
     def confirmRemove(self, list_widget: QListWidget):
         confirm_button = QToolButton(self)
