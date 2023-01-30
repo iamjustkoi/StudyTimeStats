@@ -17,12 +17,12 @@ from aqt.qt import (
     QLabel,
     QListWidgetItem,
     QMenu,
-    QPushButton,
+    QColor,
     QWidget,
     Qt,
     QListWidget,
     QPoint,
-    QSizePolicy,
+    QColorDialog,
     QToolButton,
 )
 
@@ -444,9 +444,6 @@ FLAT_ICON_STYLE = \
 
 class CellItem(QWidget):
     # TODO
-    # # Color Select Button
-    # self.ui.primary_color_button.clicked.connect(lambda: self.open_color_dialog(self.ui.primary_color_preview))
-    # self.ui.seconday_color_button.clicked.connect(lambda: self.open_color_dialog(self.ui.secondary_color_preview))
     #
     # # Range Button
     # self.ui.range_select_dropdown.activated[int].connect(self.on_range_type_change)
@@ -458,6 +455,12 @@ class CellItem(QWidget):
     #
     # # Update custom range's max value
     # self.ui.custom_range_spinbox.setMaximum(self.manager.max_range)
+
+    button_colors: dict = {}
+
+    def setHeaderColor(self, button: QToolButton, color: str):
+        button.setStyleSheet(f"border-radius: 10px;\n	background-color: {color}; width: 20px; height: 20px;")
+        self.button_colors[button] = color
 
     # TODO
     # def update_calendar_range_extras(self):
@@ -520,7 +523,6 @@ class CellItem(QWidget):
             self.widget.addButton.setVisible(True)
             self.widget.mainFrame.setVisible(False)
             self.setMinimumHeight(self.widget.addButton.height())
-
         else:
             self.data = data if data else {k: v for k, v in Config.DEFAULT_CELL_DATA.items()}
 
@@ -536,6 +538,18 @@ class CellItem(QWidget):
             self.widget.codeButton.setTint(Color.BUTTON_ICON[aqt.mw.pm.night_mode()])
             self.widget.codeButton.setHoverTint(Color.HOVER[aqt.mw.pm.night_mode()])
             self.widget.codeButton.setStyleSheet(FLAT_ICON_STYLE)
+
+            def on_click_color_button(button: QToolButton):
+                color = QColorDialog.getColor(QColor(self.button_colors[button]))
+                if color.isValid():
+                    self.setHeaderColor(button, color.name())
+
+            self.widget.titleColorButton.clicked.connect(
+                lambda _: on_click_color_button(button=self.widget.titleColorButton)
+            )
+            self.widget.outputColorButton.clicked.connect(
+                lambda _: on_click_color_button(button=self.widget.outputColorButton)
+            )
 
             self.load()
 
@@ -562,17 +576,8 @@ class CellItem(QWidget):
         confirm_button.show()
 
     def load(self):
-        print(f'Loading data for cell: {self}')
-
-        # ...load data into cell widget here
-        self.widget.titleColorButton.setStyleSheet(
-            "border-radius: 10px;\n	background-color: #76bfb4; width: 20px; height: 20px;"
-        )
-        self.widget.outputColorButton.setStyleSheet(
-            "border-radius: 10px;\n	background-color: white; width: 20px; height: 20px;"
-        )
-
-        pass
+        self.setHeaderColor(self.widget.titleColorButton, self.data[Config.TITLE_COLOR])
+        self.setHeaderColor(self.widget.outputColorButton, self.data[Config.OUTPUT_COLOR])
 
     def save(self):
         self
