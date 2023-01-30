@@ -60,10 +60,8 @@ class HoverButton(QToolButton):
 
     def enterEvent(self, *args, **kwargs):
         super().enterEvent(*args, *kwargs)
-        print(f'Enter')
         self._updateIcon(True)
 
     def leaveEvent(self, *args, **kwargs):
         super().leaveEvent(*args, *kwargs)
-        print(f'Exit')
         self._updateIcon(False)
