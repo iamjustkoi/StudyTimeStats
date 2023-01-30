@@ -21,8 +21,9 @@ from aqt.qt import (
     QWidget,
     Qt,
     QListWidget,
-    QSize,
+    QPoint,
     QSizePolicy,
+    QToolButton,
 )
 
 from .config import ANKI_VERSION, TimeStatsConfigManager
@@ -84,8 +85,7 @@ Addon options QDialog class for accessing and changing the addon's config values
         self.ui.cellListWidget.clear()
 
         # Add blank item
-        cell_item = CellItem(self.ui.cellListWidget, is_empty=True)
-        _add_cell_to_list(self.ui.cellListWidget, cell_item)
+        _add_cell_to_list(self.ui.cellListWidget, CellItem(self.ui.cellListWidget, is_empty=True))
 
         # Update about header text with the current version number
         updated_about_header = self.ui.about_label_header.text().format(version=CURRENT_VERSION)
@@ -413,18 +413,23 @@ def set_label_background(label: QLabel, hex_arg: str, use_circle=True):
         label.setStyleSheet(f'QWidget {{background-color: {hex_arg}}}')
 
 
-def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem):
-    list_item = CellItem.CellListItem(list_widget)
-    list_item.setSizeHint(cell_item.sizeHint())
-    list_item.setFlags(Qt.ItemFlag.NoItemFlags)
+def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem = None):
+    if cell_item is None:
+        cell_item = CellItem(list_widget, False)
 
-    list_widget.addItem(list_item)
-    list_widget.setItemWidget(list_item, cell_item)
+    list_widget.addItem(cell_item.list_item)
+    list_widget.setItemWidget(cell_item.list_item, cell_item)
     list_widget.sortItems()
 
 
 def _remove_cell_from_list(list_widget: QListWidget, cell_item: CellItem):
-    pass
+    for i in range(list_widget.count()):
+        item: CellItem.CellListItem = list_widget.item(i)
+        if item and item.cell_item == cell_item:
+            list_widget.takeItem(i)
+            break
+
+    list_widget.sortItems()
 
 
 FLAT_ICON_STYLE = \
@@ -482,7 +487,7 @@ class CellItem(QWidget):
             self.cell_item = cell_item
 
         def __lt__(self, other: CellItem.CellListItem):
-            other_cell = other.cell_item if other else None
+            other_cell = other.cell_item if (other and isinstance(other, CellItem.CellListItem)) else None
 
             # Returns whether this cell is less than the other cell's index, unless this cell is empty (always last)
             if not self.cell_item.is_empty:
@@ -498,33 +503,28 @@ class CellItem(QWidget):
         self.widget = Ui_CellWidget()
         self.widget.setupUi(CellWidget=self)
 
-        def add_cell(*__args):
-            cell_item = CellItem(list_widget, False)
-            _add_cell_to_list(list_widget, cell_item)
+        self.list_item = CellItem.CellListItem(list_widget, cell_item=self)
 
-        def remove_cell(*__args):
-            print(f'Removing cell...{self}')
-            pass
+        # print(f'{aqt.mw.pm=}')
+        # print(f'{aqt.mw.pm.night_mode()=}')
+        # print(f'{aqt.mw.pm.theme()=}')
 
         if is_empty:
-            self.widget.addButton.clicked.connect(add_cell)
+            self.widget.addButton.clicked.connect(lambda *_: _add_cell_to_list(list_widget, None))
 
             self.widget.addButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{ADD_ICON_PATH}'))
-            print(f'{aqt.mw.pm=}')
-            print(f'{aqt.mw.pm.night_mode()=}')
-            print(f'{aqt.mw.pm.theme()=}')
             self.widget.addButton.setTint(Color.BUTTON_ICON[aqt.mw.pm.night_mode()])
             self.widget.addButton.setHoverTint(Color.HOVER[aqt.mw.pm.night_mode()])
 
             self.widget.addButton.setVisible(True)
             self.widget.mainFrame.setVisible(False)
-            # self.adjustSize()
             self.setMinimumHeight(self.widget.addButton.height())
 
         else:
             self.data = data if data else {k: v for k, v in Config.DEFAULT_CELL_DATA.items()}
 
-            self.widget.removeButton.clicked.connect(remove_cell)
+            # self.widget.removeButton.clicked.connect(lambda *_: _remove_cell_from_list(list_widget, self))
+            self.widget.removeButton.clicked.connect(lambda *_: self.confirmRemove(list_widget))
 
             self.widget.removeButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{REMOVE_ICON_PATH}'))
             self.widget.removeButton.setTint(Color.BUTTON_ICON[aqt.mw.pm.night_mode()])
@@ -541,15 +541,35 @@ class CellItem(QWidget):
             self.widget.addButton.setVisible(False)
             self.widget.mainFrame.setVisible(True)
 
-            # self.adjustSize()
             self.setMinimumHeight(self.widget.mainFrame.height())
+
+        self.list_item.setSizeHint(self.sizeHint())
+        self.list_item.setFlags(Qt.ItemFlag.NoItemFlags)
+
+    def confirmRemove(self, list_widget: QListWidget):
+        confirm_button = QToolButton(self)
+        confirm_button.setText('Delete?')
+        # noinspection PyUnresolvedReferences
+        confirm_button.clicked.connect(lambda _: _remove_cell_from_list(list_widget, self))
+        confirm_button.leaveEvent = lambda _: confirm_button.deleteLater()
+        confirm_button.move(
+            QPoint(
+                self.widget.removeButton.x() - confirm_button.width() + self.widget.removeButton.width(),
+                self.widget.removeButton.y()
+            )
+        )
+        confirm_button.show()
 
     def load(self):
         print(f'Loading data for cell: {self}')
 
         # ...load data into cell widget here
-        self.widget.titleColorButton.setStyleSheet("border-radius: 10px;\n	background-color: #76bfb4; width: 20px; height: 20px;")
-        self.widget.outputColorButton.setStyleSheet("border-radius: 10px;\n	background-color: white; width: 20px; height: 20px;")
+        self.widget.titleColorButton.setStyleSheet(
+            "border-radius: 10px;\n	background-color: #76bfb4; width: 20px; height: 20px;"
+        )
+        self.widget.outputColorButton.setStyleSheet(
+            "border-radius: 10px;\n	background-color: white; width: 20px; height: 20px;"
+        )
 
         pass
 
