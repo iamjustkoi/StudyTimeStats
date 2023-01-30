@@ -82,6 +82,7 @@ Addon options QDialog class for accessing and changing the addon's config values
 
         # Setup Row List
         self.ui.cellListWidget.setStyleSheet('#cellListWidget { background: transparent; border: none; }')
+        self.ui.cellListWidget.verticalScrollBar().setSingleStep(12)
         self.ui.cellListWidget.clear()
 
         # Add blank item
