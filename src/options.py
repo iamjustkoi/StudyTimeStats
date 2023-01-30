@@ -423,6 +423,10 @@ def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem):
     list_widget.sortItems()
 
 
+def _remove_cell_from_list(list_widget: QListWidget, cell_item: CellItem):
+    pass
+
+
 FLAT_ICON_STYLE = \
     '''
     background: transparent;
@@ -471,18 +475,18 @@ class CellItem(QWidget):
     #             self.ui.week_start_label.hide()
 
     class CellListItem(QListWidgetItem):
+        cell_item: CellItem
 
-        def __init__(self, *args):
+        def __init__(self, *args, cell_item: CellItem):
             super().__init__(*args)
-            QListWidgetItem
+            self.cell_item = cell_item
 
         def __lt__(self, other: CellItem.CellListItem):
-            this_cell = self.listWidget().itemWidget(self)
-            other_cell = self.listWidget().itemWidget(other) if other else None
+            other_cell = other.cell_item if other else None
 
             # Returns whether this cell is less than the other cell's index, unless this cell is empty (always last)
-            if isinstance(this_cell, CellItem) and not this_cell.is_empty:
-                return this_cell.index < other_cell.index if isinstance(other_cell, CellItem) else True
+            if not self.cell_item.is_empty:
+                return self.cell_item.index < other.cell_item.index if other_cell else True
 
             return False
 
