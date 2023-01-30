@@ -525,7 +525,14 @@ class CellItem(QWidget):
             self.build_hover_buttons(list_widget)
             self.build_color_pickers()
 
-            self.widget.directionVerticalButton.clicked.connect()
+            def toggle_direction_buttons(__):
+                self.widget.directionHorizontalButton.setEnabled(not self.widget.directionHorizontalButton.isEnabled())
+                self.widget.directionVerticalButton.setEnabled(not self.widget.directionVerticalButton.isEnabled())
+                self.data[Config.DIRECTION] = Direction.VERTICAL if self.widget.directionVerticalButton.isEnabled() \
+                    else Direction.HORIZONTAL
+
+            self.widget.directionVerticalButton.clicked.connect(toggle_direction_buttons)
+            self.widget.directionHorizontalButton.clicked.connect(toggle_direction_buttons)
 
             self.load()
 
