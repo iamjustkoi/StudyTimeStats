@@ -547,44 +547,45 @@ class CellItem(QWidget):
         self.widget.directionHorizontalButton.clicked.connect(toggle_direction_buttons)
 
     def build_range_inputs(self):
-        def on_range_update(index: int):
-            range_idx = index - 1
-
-            if range_idx < 0:
-                self.widget.customRangeSpinbox.hide()
-
-                self.widget.startDayLabel.hide()
-                self.widget.startDayDropdown.hide()
-                self.widget.calendarCheckbox.hide()
-                self.widget.customRangeSpinbox.hide()
-
-            else:
-                self.widget.rangeExtraFrame.show()
-
-                if range_idx == Range.CUSTOM:
-                    self.widget.startDayLabel.hide()
-                    self.widget.startDayDropdown.hide()
-                    self.widget.customRangeSpinbox.show()
-                    self.widget.calendarCheckbox.hide()
-
-                elif range_idx == Range.WEEK or range_idx == Range.TWO_WEEKS:
-                    self.widget.startDayLabel.show()
-                    self.widget.startDayDropdown.show()
-                    self.widget.customRangeSpinbox.hide()
-                    self.widget.calendarCheckbox.show()
-                    self.widget.calendarCheckbox.setText(f'{String.USE_CALENDAR} {Range.LABEL[Range.WEEK]}')
-
-                elif range_idx == Range.MONTH or range_idx == Range.YEAR:
-                    self.widget.startDayLabel.hide()
-                    self.widget.startDayDropdown.hide()
-                    self.widget.customRangeSpinbox.hide()
-                    self.widget.calendarCheckbox.show()
-                    self.widget.calendarCheckbox.setText(f'{String.USE_CALENDAR} {Range.LABEL[range_idx]}')
-
-        self.widget.rangeDropdown.activated[int].connect(on_range_update)  # Initial updates
-        self.widget.rangeDropdown.currentIndexChanged.connect(on_range_update)
+        self.widget.rangeDropdown.activated[int].connect(self.on_range_update)  # Initial updates
+        self.widget.rangeDropdown.currentIndexChanged.connect(self.on_range_update)
 
         self.widget.customRangeSpinbox.setMaximum((date.today() - date.fromisoformat(UNIQUE_DATE)).days)
+
+    def on_range_update(self, index: int):
+        # TODO update size hint so scales accurately from layout changes, too
+        range_idx = index - 1
+
+        if range_idx < 0:
+            self.widget.customRangeSpinbox.hide()
+
+            self.widget.startDayLabel.hide()
+            self.widget.startDayDropdown.hide()
+            self.widget.calendarCheckbox.hide()
+            self.widget.customRangeSpinbox.hide()
+
+        else:
+            self.widget.rangeExtraFrame.show()
+
+            if range_idx == Range.CUSTOM:
+                self.widget.startDayLabel.hide()
+                self.widget.startDayDropdown.hide()
+                self.widget.customRangeSpinbox.show()
+                self.widget.calendarCheckbox.hide()
+
+            elif range_idx == Range.WEEK or range_idx == Range.TWO_WEEKS:
+                self.widget.startDayLabel.show()
+                self.widget.startDayDropdown.show()
+                self.widget.customRangeSpinbox.hide()
+                self.widget.calendarCheckbox.show()
+                self.widget.calendarCheckbox.setText(f'{String.USE_CALENDAR} {Range.LABEL[Range.WEEK]}')
+
+            elif range_idx == Range.MONTH or range_idx == Range.YEAR:
+                self.widget.startDayLabel.hide()
+                self.widget.startDayDropdown.hide()
+                self.widget.customRangeSpinbox.hide()
+                self.widget.calendarCheckbox.show()
+                self.widget.calendarCheckbox.setText(f'{String.USE_CALENDAR} {Range.LABEL[range_idx]}')
 
     def set_header_color(self, button: QToolButton, color: str):
         button.setStyleSheet(f"border-radius: 10px;\n	background-color: {color}; width: 20px; height: 20px;")
