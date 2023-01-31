@@ -559,8 +559,6 @@ class CellItem(QWidget):
         self.widget.codeButton.clicked.connect(lambda _: self.toggle_code_editor())
         self.toggle_code_editor(True)
 
-    offset = None
-
     # noinspection PyUnresolvedReferences
     def toggle_code_editor(self, hide: bool = None):
         if hide is None:
