@@ -10,10 +10,11 @@ from datetime import date
 import aqt
 from aqt.qt import (
     QDialog,
+    QCursor,
     QDialogButtonBox,
-    QFrame,
     QHBoxLayout,
-    QGridLayout,
+    QVBoxLayout,
+    QPlainTextEdit,
     QIcon,
     QLabel,
     QListWidgetItem,
@@ -24,7 +25,10 @@ from aqt.qt import (
     QListWidget,
     QPoint,
     QColorDialog,
+    QFontMetrics,
     QToolButton,
+    QMouseEvent,
+    QFrame,
 )
 
 from .config import ANKI_VERSION, TimeStatsConfigManager
@@ -486,6 +490,7 @@ class CellItem(QWidget):
             self.build_color_pickers()
             self.build_direction_buttons()
             self.build_range_inputs()
+            self.build_code_button()
 
             self.load()
 
@@ -497,8 +502,8 @@ class CellItem(QWidget):
         self.list_item.setFlags(Qt.ItemFlag.NoItemFlags)
 
     def load(self):
-        self.set_header_color(self.widget.titleColorButton, self.data[Config.TITLE_COLOR])
-        self.set_header_color(self.widget.outputColorButton, self.data[Config.OUTPUT_COLOR])
+        self.set_button_color(self.widget.titleColorButton, self.data[Config.TITLE_COLOR])
+        self.set_button_color(self.widget.outputColorButton, self.data[Config.OUTPUT_COLOR])
 
     def save(self):
         self
@@ -508,7 +513,7 @@ class CellItem(QWidget):
         self.list_item.setSizeHint(self.sizeHint())
 
     def build_hover_buttons(self, list_widget: QListWidget):
-        self.widget.removeButton.clicked.connect(lambda *_: self.open_delete_confirmation(list_widget))
+        self.widget.removeButton.clicked.connect(lambda *_: self.open_delete_confirm_button(list_widget))
 
         self.widget.removeButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{REMOVE_ICON_PATH}'))
         self.widget.removeButton.setTint(Color.BUTTON_ICON[aqt.mw.pm.night_mode()])
@@ -524,7 +529,7 @@ class CellItem(QWidget):
         def on_click_color_button(button: QToolButton):
             color = QColorDialog.getColor(QColor(self.button_colors[button]))
             if color.isValid():
-                self.set_header_color(button, color.name())
+                self.set_button_color(button, color.name())
 
         self.widget.titleColorButton.clicked.connect(
             lambda _: on_click_color_button(button=self.widget.titleColorButton)
@@ -549,6 +554,22 @@ class CellItem(QWidget):
         self.on_range_update(0)  # Initial update
 
         self.widget.customRangeSpinbox.setMaximum((date.today() - date.fromisoformat(UNIQUE_DATE)).days)
+
+    def build_code_button(self):
+        self.widget.codeButton.clicked.connect(lambda _: self.toggle_code_editor())
+        self.toggle_code_editor(True)
+
+    offset = None
+
+    # noinspection PyUnresolvedReferences
+    def toggle_code_editor(self, hide: bool = None):
+        if hide is None:
+            is_hidden = self.widget.codeTextEdit.isHidden()
+            self.widget.codeTextEdit.show() if is_hidden else self.widget.codeTextEdit.hide()
+        else:
+            self.widget.codeTextEdit.show() if not hide else self.widget.codeTextEdit.hide()
+
+        self._redraw()
 
     def on_use_calendar_update(self, *__):
         if self.widget.rangeDropdown.currentIndex() in (Range.WEEK, Range.TWO_WEEKS) \
@@ -591,11 +612,11 @@ class CellItem(QWidget):
 
         self._redraw()
 
-    def set_header_color(self, button: QToolButton, color: str):
+    def set_button_color(self, button: QToolButton, color: str):
         button.setStyleSheet(f"border-radius: 10px;\n	background-color: {color}; width: 20px; height: 20px;")
         self.button_colors[button] = color
 
-    def open_delete_confirmation(self, list_widget: QListWidget):
+    def open_delete_confirm_button(self, list_widget: QListWidget):
         confirm_button = QToolButton(self)
         confirm_button.setText('Delete?')
         # noinspection PyUnresolvedReferences
