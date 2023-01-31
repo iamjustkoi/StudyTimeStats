@@ -408,13 +408,6 @@ Uses the base DeckItem to sort its value less than the other DeckItem.
         return this_item < other_item
 
 
-def set_label_background(label: QLabel, hex_arg: str, use_circle=True):
-    if use_circle:
-        label.setStyleSheet(f'QWidget {{background-color: {hex_arg}; border-radius: 10px;}}')
-    else:
-        label.setStyleSheet(f'QWidget {{background-color: {hex_arg}}}')
-
-
 def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem = None):
     if cell_item is None:
         cell_item = CellItem(list_widget, False)
