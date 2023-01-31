@@ -71,7 +71,7 @@
    <item>
     <widget class="QFrame" name="mainFrame">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Ignored" vsizetype="Maximum">
+      <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
