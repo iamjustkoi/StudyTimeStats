@@ -33,6 +33,34 @@ from ..res.ui.cell_item import Ui_CellWidget
 from ..res.ui.options_dialog import Ui_OptionsDialog
 
 
+def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem = None):
+    if cell_item is None:
+        cell_item = CellItem(list_widget, False)
+
+    list_widget.addItem(cell_item.list_item)
+    list_widget.setItemWidget(cell_item.list_item, cell_item)
+    list_widget.sortItems()
+
+
+def _remove_cell_from_list(list_widget: QListWidget, cell_item: CellItem):
+    for i in range(list_widget.count()):
+        item: CellItem.CellListItem = list_widget.item(i)
+        if item and item.cell_item == cell_item:
+            list_widget.takeItem(i)
+            break
+
+    list_widget.sortItems()
+
+
+FLAT_ICON_STYLE = \
+    '''
+    background: transparent;
+    border: none;
+    width: 20px;
+    height: 20px;
+    '''
+
+
 class TimeStatsOptionsDialog(QDialog):
 
     def __init__(self, conf_manager: TimeStatsConfigManager):
@@ -406,34 +434,6 @@ Uses the base DeckItem to sort its value less than the other DeckItem.
         this_item = DeckItem.from_widget(self.listWidget().itemWidget(self))
         other_item = DeckItem.from_widget(other.listWidget().itemWidget(other))
         return this_item < other_item
-
-
-def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem = None):
-    if cell_item is None:
-        cell_item = CellItem(list_widget, False)
-
-    list_widget.addItem(cell_item.list_item)
-    list_widget.setItemWidget(cell_item.list_item, cell_item)
-    list_widget.sortItems()
-
-
-def _remove_cell_from_list(list_widget: QListWidget, cell_item: CellItem):
-    for i in range(list_widget.count()):
-        item: CellItem.CellListItem = list_widget.item(i)
-        if item and item.cell_item == cell_item:
-            list_widget.takeItem(i)
-            break
-
-    list_widget.sortItems()
-
-
-FLAT_ICON_STYLE = \
-    '''
-    background: transparent;
-    border: none;
-    width: 20px;
-    height: 20px;
-    '''
 
 
 class CellItem(QWidget):
