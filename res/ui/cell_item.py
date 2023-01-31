@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_CellWidget(object):
     def setupUi(self, CellWidget):
         CellWidget.setObjectName("CellWidget")
-        CellWidget.resize(338, 343)
+        CellWidget.resize(348, 318)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -182,7 +182,7 @@ class Ui_CellWidget(object):
         self.directionLabel.setSizePolicy(sizePolicy)
         self.directionLabel.setObjectName("directionLabel")
         self.gridLayout.addWidget(self.directionLabel, 2, 0, 1, 1)
-        spacerItem = QtWidgets.QSpacerItem(16, 0, QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem = QtWidgets.QSpacerItem(20, 0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem, 0, 3, 1, 1)
         self.unitLabel = QtWidgets.QLabel(self.mainFrame)
         self.unitLabel.setObjectName("unitLabel")
@@ -307,7 +307,7 @@ class Ui_CellWidget(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.codeTextEdit.sizePolicy().hasHeightForWidth())
         self.codeTextEdit.setSizePolicy(sizePolicy)
-        self.codeTextEdit.setMinimumSize(QtCore.QSize(0, 96))
+        self.codeTextEdit.setMaximumSize(QtCore.QSize(16777215, 128))
         self.codeTextEdit.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustIgnored)
         self.codeTextEdit.setTabChangesFocus(False)
         self.codeTextEdit.setObjectName("codeTextEdit")
