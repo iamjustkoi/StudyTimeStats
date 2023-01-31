@@ -72,7 +72,7 @@ class Ui_OptionsDialog(object):
         self.cellListWidget.setMinimumSize(QtCore.QSize(0, 64))
         self.cellListWidget.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.cellListWidget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.cellListWidget.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContentsOnFirstShow)
+        self.cellListWidget.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustIgnored)
         self.cellListWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.cellListWidget.setProperty("showDropIndicator", False)
         self.cellListWidget.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)

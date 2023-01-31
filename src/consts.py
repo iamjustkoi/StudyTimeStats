@@ -150,7 +150,7 @@ class String:
 
 
 class Range:
-    WEEK, TWO_WEEKS, MONTH, YEAR, CUSTOM = 0, 1, 2, 3, 4
+    TOTAL, WEEK, TWO_WEEKS, MONTH, YEAR, CUSTOM = -1, 0, 1, 2, 3, 4
     DAYS_IN = {WEEK: 7, TWO_WEEKS: 14, MONTH: 30, YEAR: 365, CUSTOM: 1}
     LABEL = {WEEK: String.WEEK, TWO_WEEKS: String.TWO_WEEKS, MONTH: String.MONTH, YEAR: String.YEAR}
 
@@ -208,12 +208,12 @@ class Config:
     HRS_UNIT = 'hrsUnit'
     MIN_UNIT = 'minUnit'
     DEFAULT_CELL_DATA = {
-        TITLE: String.PAST_RANGE,
-        OUTPUT: String.PAST_HRS,
+        TITLE: String.TOTAL,
+        OUTPUT: String.TOTAL_HRS,
         TITLE_COLOR: Color.TITLE_DEFAULT[aqt.mw.pm.night_mode()],
         OUTPUT_COLOR: Color.OUTPUT_DEFAULT[aqt.mw.pm.night_mode()],
         DIRECTION: Direction.VERTICAL,
-        RANGE: Range.WEEK,
+        RANGE: Range.TOTAL,
         USE_CALENDAR: True,
         WEEK_START: Weekday.SUNDAY,
         DAYS: 7,

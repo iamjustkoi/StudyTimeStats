@@ -130,7 +130,7 @@
                 <enum>Qt::ScrollBarAlwaysOff</enum>
                </property>
                <property name="sizeAdjustPolicy">
-                <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
+                <enum>QAbstractScrollArea::AdjustIgnored</enum>
                </property>
                <property name="editTriggers">
                 <set>QAbstractItemView::NoEditTriggers</set>
@@ -143,9 +143,6 @@
                </property>
                <property name="verticalScrollMode">
                 <enum>QAbstractItemView::ScrollPerPixel</enum>
-               </property>
-               <property name="spacing">
-                <number>6</number>
                </property>
                <property name="sortingEnabled">
                 <bool>true</bool>
