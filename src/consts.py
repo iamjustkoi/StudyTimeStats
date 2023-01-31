@@ -207,6 +207,7 @@ class Config:
     DAYS = 'days'
     HRS_UNIT = 'hrsUnit'
     MIN_UNIT = 'minUnit'
+    HTML = 'html'
     DEFAULT_CELL_DATA = {
         TITLE: String.TOTAL,
         OUTPUT: String.TOTAL_HRS,
@@ -219,6 +220,7 @@ class Config:
         DAYS: 7,
         HRS_UNIT: String.HRS,
         MIN_UNIT: String.MIN,
+        HTML: CELL_HTML_SHELL,
     }
 
     DEFAULT_CONFIG = {
