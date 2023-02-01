@@ -620,7 +620,7 @@ class CellItem(QWidget):
             self.widget.directionVerticalButton.setEnabled(not direction == Direction.VERTICAL)
 
         self.widget.directionFrame.setFocus()  # so focus doesn't switch in a weird direction
-        self.data[Config.DIRECTION] = Direction.VERTICAL if not self.widget.directionVerticalButton.isEnabled() \
+        self.direction = Direction.VERTICAL if not self.widget.directionVerticalButton.isEnabled() \
             else Direction.HORIZONTAL
 
     def on_click_color_button(self, button: QToolButton):
