@@ -210,7 +210,7 @@ class Config:
     HTML = 'html'
     DEFAULT_CELL_DATA = {
         TITLE: String.TOTAL,
-        OUTPUT: String.TOTAL_HRS,
+        OUTPUT: String.PAST_HRS,
         TITLE_COLOR: Color.TITLE_DEFAULT[aqt.mw.pm.night_mode()],
         OUTPUT_COLOR: Color.OUTPUT_DEFAULT[aqt.mw.pm.night_mode()],
         DIRECTION: Direction.VERTICAL,
