@@ -127,7 +127,7 @@ Addon options QDialog class for accessing and changing the addon's config values
         self.ui.tabs_widget.setCurrentIndex(0)
         self._load()
 
-        # Attached post-load to prevent pre-change broadcasts
+        # Attached post-set_data to prevent pre-change broadcasts
         change_signals = {
             self.ui.browser_checkbox.stateChanged,
             self.ui.overview_checkbox.stateChanged,
@@ -197,6 +197,13 @@ window to update all the ui.
         self.config[Config.USE_ROLLOVER] = self.ui.useRolloverCheckbox.isChecked()
 
         self.config[Config.EXCLUDED_DIDS] = self._get_excluded_dids()
+
+        cell_data = []
+        for i in range(self.ui.cellListWidget.count()):
+            item = self.ui.cellListWidget.item(i)
+            if isinstance(item, CellItem.CellListItem) and not item.cell_item.is_empty:
+                cell_data.append(item.cell_item.get_data())
+        self.config[Config.CELL_DATA] = cell_data
 
         self.manager.write_config()
         self.manager.mw.reset()
@@ -337,7 +344,7 @@ Copies a link to the clipboard based on the input button.
 Restores all config value to their default settings.
         """
         for field in Config.DEFAULT_CONFIG:
-            # load temp defaults
+            # set_data temp defaults
             self.config[field] = Config.DEFAULT_CONFIG[field]
         self._load()
 
@@ -452,6 +459,8 @@ class CellItem(QWidget):
             return False
 
     button_colors: dict = {}
+    data: dict = {k: v for k, v in Config.DEFAULT_CELL_DATA.items()}
+    direction = 'vertical'
 
     def __init__(self, list_widget: QListWidget, is_empty: bool, data: dict = None):
         super().__init__()
@@ -478,7 +487,8 @@ class CellItem(QWidget):
             self.widget.mainFrame.setVisible(False)
             self.setMinimumHeight(self.widget.addButton.height())
         else:
-            self.data = data if data else {k: v for k, v in Config.DEFAULT_CELL_DATA.items()}
+            if data:
+                self.data = data
 
             self.build_hover_buttons(list_widget)
             self.build_color_pickers()
@@ -486,7 +496,7 @@ class CellItem(QWidget):
             self.build_range_inputs()
             self.build_code_button()
 
-            self.load()
+            self.set_data(self.data)
 
             self.widget.addButton.setVisible(False)
             self.widget.mainFrame.setVisible(True)
@@ -495,22 +505,36 @@ class CellItem(QWidget):
         self.list_item.setSizeHint(self.sizeHint())
         self.list_item.setFlags(Qt.ItemFlag.NoItemFlags)
 
-    def load(self):
-        self.widget.titleLineEdit.setText(self.data[Config.TITLE])
-        self.widget.outputLineEdit.setText(self.data[Config.OUTPUT])
-        self.widget.rangeDropdown.setCurrentIndex(self.data[Config.RANGE] + 1)
-        self.widget.calendarCheckbox.setChecked(self.data[Config.USE_CALENDAR])
-        self.widget.startDayDropdown.setCurrentIndex(self.data[Config.WEEK_START])
-        self.widget.hourEdit.setText(self.data[Config.HRS_UNIT])
-        self.widget.minEdit.setText(self.data[Config.MIN_UNIT])
-        self.widget.codeTextEdit.setPlainText(self.data[Config.HTML])
+    def set_data(self, data):
+        self.widget.titleLineEdit.setText(data[Config.TITLE])
+        self.widget.outputLineEdit.setText(data[Config.OUTPUT])
+        self.widget.rangeDropdown.setCurrentIndex(data[Config.RANGE] + 1)
+        self.widget.calendarCheckbox.setChecked(data[Config.USE_CALENDAR])
+        self.widget.startDayDropdown.setCurrentIndex(data[Config.WEEK_START])
+        self.widget.hourEdit.setText(data[Config.HRS_UNIT])
+        self.widget.minEdit.setText(data[Config.MIN_UNIT])
+        self.widget.codeTextEdit.setPlainText(data[Config.HTML])
 
-        self.set_button_color(self.widget.titleColorButton, self.data[Config.TITLE_COLOR])
-        self.set_button_color(self.widget.outputColorButton, self.data[Config.OUTPUT_COLOR])
-        self.toggle_direction_buttons(self.data[Config.DIRECTION])
+        self.set_button_color(self.widget.titleColorButton, data[Config.TITLE_COLOR])
+        self.set_button_color(self.widget.outputColorButton, data[Config.OUTPUT_COLOR])
+        self.toggle_direction_buttons(data[Config.DIRECTION])
 
-    def save(self):
-        self
+    def get_data(self):
+        self.data[Config.TITLE] = self.widget.titleLineEdit.text()
+        self.data[Config.OUTPUT] = self.widget.outputLineEdit.text()
+        self.data[Config.RANGE] = self.widget.rangeDropdown.currentIndex() - 1
+        self.data[Config.USE_CALENDAR] = self.widget.calendarCheckbox.isChecked()
+        self.data[Config.WEEK_START] = self.widget.startDayDropdown.currentIndex()
+        self.data[Config.HRS_UNIT] = self.widget.hourEdit.text()
+        self.data[Config.MIN_UNIT] = self.widget.minEdit.text()
+        self.data[Config.HTML] = self.widget.codeTextEdit.toPlainText()
+
+        self.data[Config.TITLE_COLOR] = self.button_colors[self.widget.titleColorButton.objectName()]
+        self.data[Config.OUTPUT_COLOR] = self.button_colors[self.widget.outputColorButton.objectName()]
+
+        self.data[Config.TITLE_COLOR] = self.direction
+
+        return self.data
 
     def _redraw(self):
         self.widget.mainFrame.adjustSize()
@@ -530,16 +554,11 @@ class CellItem(QWidget):
         self.widget.codeButton.setStyleSheet(FLAT_ICON_STYLE)
 
     def build_color_pickers(self):
-        def on_click_color_button(button: QToolButton):
-            color = QColorDialog.getColor(QColor(self.button_colors[button]))
-            if color.isValid():
-                self.set_button_color(button, color.name())
-
         self.widget.titleColorButton.clicked.connect(
-            lambda _: on_click_color_button(button=self.widget.titleColorButton)
+            lambda _: self.on_click_color_button(button=self.widget.titleColorButton)
         )
         self.widget.outputColorButton.clicked.connect(
-            lambda _: on_click_color_button(button=self.widget.outputColorButton)
+            lambda _: self.on_click_color_button(button=self.widget.outputColorButton)
         )
 
     def build_direction_buttons(self):
@@ -601,6 +620,11 @@ class CellItem(QWidget):
         self.data[Config.DIRECTION] = Direction.VERTICAL if not self.widget.directionVerticalButton.isEnabled() \
             else Direction.HORIZONTAL
 
+    def on_click_color_button(self, button: QToolButton):
+        color = QColorDialog.getColor(QColor(self.button_colors[button.objectName()]))
+        if color.isValid():
+            self.set_button_color(button, color.name())
+
     def on_use_calendar_update(self, *__):
         if self.widget.rangeDropdown.currentIndex() in (Range.WEEK, Range.TWO_WEEKS) \
                 and self.widget.calendarCheckbox.isChecked():
@@ -644,7 +668,7 @@ class CellItem(QWidget):
 
     def set_button_color(self, button: QToolButton, color: str):
         button.setStyleSheet(f"border-radius: 10px;\n	background-color: {color}; width: 20px; height: 20px;")
-        self.button_colors[button] = color
+        self.button_colors[button.objectName()] = color
 
     def open_delete_confirm_button(self, list_widget: QListWidget):
         confirm_button = QToolButton(self)
