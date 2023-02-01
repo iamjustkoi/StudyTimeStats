@@ -127,7 +127,7 @@ Addon options QDialog class for accessing and changing the addon's config values
         self.ui.tabs_widget.setCurrentIndex(0)
         self._load()
 
-        # Attached post-set_data to prevent pre-change broadcasts
+        # Attached post-load_data to prevent pre-change broadcasts
         change_signals = {
             self.ui.browser_checkbox.stateChanged,
             self.ui.overview_checkbox.stateChanged,
@@ -202,6 +202,7 @@ window to update all the ui.
         for i in range(self.ui.cellListWidget.count()):
             item = self.ui.cellListWidget.item(i)
             if isinstance(item, CellItem.CellListItem) and not item.cell_item.is_empty:
+                print(f'{item.cell_item.get_data()=}')
                 cell_data.append(item.cell_item.get_data())
         self.config[Config.CELL_DATA] = cell_data
 
@@ -220,6 +221,10 @@ Loads deck names to list and sets label to enabled if not in current config's ex
             all_decks = self.manager.mw.col.decks.all_names_and_ids()
         else:
             all_decks = self.manager.mw.col.decks.allNames()
+
+        for data in self.config[Config.CELL_DATA]:
+            _add_cell_to_list(self.ui.cellListWidget, CellItem(self.ui.cellListWidget, data=data))
+            print(f'{data=}')
 
         for deck in all_decks:
             deck_name = deck.name if ANKI_VERSION > ANKI_LEGACY_VER else deck
@@ -344,7 +349,7 @@ Copies a link to the clipboard based on the input button.
 Restores all config value to their default settings.
         """
         for field in Config.DEFAULT_CONFIG:
-            # set_data temp defaults
+            # load_data temp defaults
             self.config[field] = Config.DEFAULT_CONFIG[field]
         self._load()
 
@@ -462,7 +467,7 @@ class CellItem(QWidget):
     data: dict = {k: v for k, v in Config.DEFAULT_CELL_DATA.items()}
     direction = 'vertical'
 
-    def __init__(self, list_widget: QListWidget, is_empty: bool, data: dict = None):
+    def __init__(self, list_widget: QListWidget, is_empty: bool = False, data: dict = None):
         super().__init__()
 
         self.index = data.get('idx', list_widget.count()) if data else list_widget.count()
@@ -487,16 +492,14 @@ class CellItem(QWidget):
             self.widget.mainFrame.setVisible(False)
             self.setMinimumHeight(self.widget.addButton.height())
         else:
-            if data:
-                self.data = data
-
             self.build_hover_buttons(list_widget)
             self.build_color_pickers()
             self.build_direction_buttons()
             self.build_range_inputs()
             self.build_code_button()
 
-            self.set_data(self.data)
+            self.data = data if data else self.data
+            self.load_data(self.data)
 
             self.widget.addButton.setVisible(False)
             self.widget.mainFrame.setVisible(True)
@@ -505,7 +508,7 @@ class CellItem(QWidget):
         self.list_item.setSizeHint(self.sizeHint())
         self.list_item.setFlags(Qt.ItemFlag.NoItemFlags)
 
-    def set_data(self, data):
+    def load_data(self, data):
         self.widget.titleLineEdit.setText(data[Config.TITLE])
         self.widget.outputLineEdit.setText(data[Config.OUTPUT])
         self.widget.rangeDropdown.setCurrentIndex(data[Config.RANGE] + 1)
@@ -529,10 +532,10 @@ class CellItem(QWidget):
         self.data[Config.MIN_UNIT] = self.widget.minEdit.text()
         self.data[Config.HTML] = self.widget.codeTextEdit.toPlainText()
 
-        self.data[Config.TITLE_COLOR] = self.button_colors[self.widget.titleColorButton.objectName()]
-        self.data[Config.OUTPUT_COLOR] = self.button_colors[self.widget.outputColorButton.objectName()]
+        self.data[Config.TITLE_COLOR] = self.button_colors[str(self.widget.titleColorButton)]
+        self.data[Config.OUTPUT_COLOR] = self.button_colors[str(self.widget.outputColorButton)]
 
-        self.data[Config.TITLE_COLOR] = self.direction
+        self.data[Config.DIRECTION] = self.direction
 
         return self.data
 
@@ -621,7 +624,7 @@ class CellItem(QWidget):
             else Direction.HORIZONTAL
 
     def on_click_color_button(self, button: QToolButton):
-        color = QColorDialog.getColor(QColor(self.button_colors[button.objectName()]))
+        color = QColorDialog.getColor(QColor(self.button_colors[str(button)]))
         if color.isValid():
             self.set_button_color(button, color.name())
 
@@ -668,7 +671,7 @@ class CellItem(QWidget):
 
     def set_button_color(self, button: QToolButton, color: str):
         button.setStyleSheet(f"border-radius: 10px;\n	background-color: {color}; width: 20px; height: 20px;")
-        self.button_colors[button.objectName()] = color
+        self.button_colors[str(button)] = color
 
     def open_delete_confirm_button(self, list_widget: QListWidget):
         confirm_button = QToolButton(self)
