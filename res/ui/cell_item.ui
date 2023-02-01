@@ -241,6 +241,12 @@
       </item>
       <item row="2" column="1">
        <widget class="QFrame" name="directionFrame">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
@@ -274,8 +280,15 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="text">
-            <string>Vertical</string>
+           <property name="maximumSize">
+            <size>
+             <width>42</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>../img/vert_lines.svg</normaloff>../img/vert_lines.svg</iconset>
            </property>
           </widget>
          </item>
@@ -287,8 +300,15 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="text">
-            <string>Horizontal</string>
+           <property name="maximumSize">
+            <size>
+             <width>42</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>../img/horiz_lines.svg</normaloff>../img/horiz_lines.svg</iconset>
            </property>
           </widget>
          </item>

@@ -45,6 +45,8 @@ ANKI_LIKE_ICON_PATH = '../res/img/anki_like.png'
 REMOVE_ICON_PATH = '../res/img/remove_icon.svg'
 ADD_ICON_PATH = '../res/img/add_icon.svg'
 CODE_ICON_PATH = '../res/img/code_icon.svg'
+VERT_LINES_PATH = '../res/img/vert_lines.svg'
+HORIZ_LINES_PATH = '../res/img/horiz_lines.svg'
 
 PATREON_URL = 'https://www.patreon.com/iamjustkoi'
 KOFI_URL = 'https://ko-fi.com/iamjustkoi'
@@ -122,8 +124,7 @@ HTML_SHELL = '''
          </center>
 '''
 
-CELL_HTML_SHELL = '''
-<div class="{{cell_class}}">
+CELL_HTML_SHELL = '''<div class="{{cell_class}}">
     <div style="color: {{title_color}}">{{title}}</div>
     <div style="color: {{output_color}}">{{output}}</div>
 </div>
@@ -170,6 +171,7 @@ class Color:
     BUTTON_ICON = ['#040404', '#8a8a8a']
     TITLE_DEFAULT = ['#000000', '#FFFFFF']
     OUTPUT_DEFAULT = ['#76bfb4', '#76bfb4']
+    BUTTON_ACTIVE = ['rgba(0, 0, 0, 5%)', 'rgba(255, 255, 255, 10%)']
 
 
 class Config:

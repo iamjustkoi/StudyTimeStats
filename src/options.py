@@ -4,32 +4,26 @@
 from __future__ import annotations
 
 import webbrowser
-from pathlib import Path
 from datetime import date
+from pathlib import Path
 
-import aqt
 from aqt.qt import (
+    QColor,
+    QColorDialog,
     QDialog,
-    QCursor,
     QDialogButtonBox,
     QHBoxLayout,
-    QVBoxLayout,
-    QPlainTextEdit,
     QIcon,
     QLabel,
+    QListWidget,
     QListWidgetItem,
     QMenu,
-    QColor,
+    QPoint,
+    QToolButton,
     QWidget,
     Qt,
-    QListWidget,
-    QPoint,
-    QColorDialog,
-    QFontMetrics,
-    QToolButton,
-    QMouseEvent,
-    QFrame,
 )
+from aqt.theme import theme_manager
 
 from .config import ANKI_VERSION, TimeStatsConfigManager
 from .consts import *
@@ -477,8 +471,8 @@ class CellItem(QWidget):
             self.widget.addButton.clicked.connect(lambda *_: _add_cell_to_list(list_widget, None))
 
             self.widget.addButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{ADD_ICON_PATH}'))
-            self.widget.addButton.setTint(Color.BUTTON_ICON[aqt.mw.pm.night_mode()])
-            self.widget.addButton.setHoverTint(Color.HOVER[aqt.mw.pm.night_mode()])
+            self.widget.addButton.setTint(Color.BUTTON_ICON[theme_manager.get_night_mode()])
+            self.widget.addButton.setHoverTint(Color.HOVER[theme_manager.get_night_mode()])
 
             self.widget.addButton.setVisible(True)
             self.widget.mainFrame.setVisible(False)
@@ -526,13 +520,13 @@ class CellItem(QWidget):
         self.widget.removeButton.clicked.connect(lambda *_: self.open_delete_confirm_button(list_widget))
 
         self.widget.removeButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{REMOVE_ICON_PATH}'))
-        self.widget.removeButton.setTint(Color.BUTTON_ICON[aqt.mw.pm.night_mode()])
-        self.widget.removeButton.setHoverTint(Color.HOVER[aqt.mw.pm.night_mode()])
+        self.widget.removeButton.setTint(Color.BUTTON_ICON[theme_manager.get_night_mode()])
+        self.widget.removeButton.setHoverTint(Color.HOVER[theme_manager.get_night_mode()])
         self.widget.removeButton.setStyleSheet(FLAT_ICON_STYLE)
 
         self.widget.codeButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{CODE_ICON_PATH}'))
-        self.widget.codeButton.setTint(Color.BUTTON_ICON[aqt.mw.pm.night_mode()])
-        self.widget.codeButton.setHoverTint(Color.HOVER[aqt.mw.pm.night_mode()])
+        self.widget.codeButton.setTint(Color.BUTTON_ICON[theme_manager.get_night_mode()])
+        self.widget.codeButton.setHoverTint(Color.HOVER[theme_manager.get_night_mode()])
         self.widget.codeButton.setStyleSheet(FLAT_ICON_STYLE)
 
     def build_color_pickers(self):
@@ -549,6 +543,28 @@ class CellItem(QWidget):
         )
 
     def build_direction_buttons(self):
+        mask_color = "#000000"
+
+        vert_lines = QIcon(f'{Path(__file__).parent.resolve()}\\{VERT_LINES_PATH}')
+        vert_pixmap = vert_lines.pixmap(self.widget.directionVerticalButton.size(), QIcon.Normal, QIcon.On)
+        mask = vert_pixmap.createMaskFromColor(QColor(mask_color), Qt.MaskOutColor)
+        vert_pixmap.fill(QColor(Color.BUTTON_ICON[theme_manager.get_night_mode()]))
+        vert_pixmap.setMask(mask)
+        self.widget.directionVerticalButton.setIcon(QIcon(vert_pixmap))
+        self.widget.directionVerticalButton.setStyleSheet(
+            f'QPushButton:disabled {{background: {Color.BUTTON_ACTIVE[theme_manager.get_night_mode()]};}}'
+        )
+
+        horiz_lines = QIcon(f'{Path(__file__).parent.resolve()}\\{HORIZ_LINES_PATH}')
+        horiz_pixmap = horiz_lines.pixmap(self.widget.directionHorizontalButton.size(), QIcon.Normal, QIcon.On)
+        mask = horiz_pixmap.createMaskFromColor(QColor(mask_color), Qt.MaskOutColor)
+        horiz_pixmap.fill(QColor(Color.BUTTON_ICON[theme_manager.get_night_mode()]))
+        horiz_pixmap.setMask(mask)
+        self.widget.directionHorizontalButton.setIcon(QIcon(horiz_pixmap))
+        self.widget.directionHorizontalButton.setStyleSheet(
+            f'QPushButton:disabled {{background: {Color.BUTTON_ACTIVE[theme_manager.get_night_mode()]};}}'
+        )
+
         self.widget.directionVerticalButton.clicked.connect(lambda _: self.toggle_direction_buttons())
         self.widget.directionHorizontalButton.clicked.connect(lambda _: self.toggle_direction_buttons())
 
