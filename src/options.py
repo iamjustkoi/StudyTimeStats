@@ -502,8 +502,18 @@ class CellItem(QWidget):
         self.list_item.setFlags(Qt.ItemFlag.NoItemFlags)
 
     def load(self):
+        self.widget.titleLineEdit.setText(self.data[Config.TITLE])
+        self.widget.outputLineEdit.setText(self.data[Config.OUTPUT])
+        self.widget.rangeDropdown.setCurrentIndex(self.data[Config.RANGE] + 1)
+        self.widget.calendarCheckbox.setChecked(self.data[Config.USE_CALENDAR])
+        self.widget.startDayDropdown.setCurrentIndex(self.data[Config.WEEK_START])
+        self.widget.hourEdit.setText(self.data[Config.HRS_UNIT])
+        self.widget.minEdit.setText(self.data[Config.MIN_UNIT])
+        self.widget.codeTextEdit.setPlainText(self.data[Config.HTML])
+
         self.set_button_color(self.widget.titleColorButton, self.data[Config.TITLE_COLOR])
         self.set_button_color(self.widget.outputColorButton, self.data[Config.OUTPUT_COLOR])
+        self.toggle_direction_buttons(self.data[Config.DIRECTION])
 
     def save(self):
         self
@@ -539,14 +549,8 @@ class CellItem(QWidget):
         )
 
     def build_direction_buttons(self):
-        def toggle_direction_buttons(__):
-            self.widget.directionHorizontalButton.setEnabled(not self.widget.directionHorizontalButton.isEnabled())
-            self.widget.directionVerticalButton.setEnabled(not self.widget.directionVerticalButton.isEnabled())
-            self.data[Config.DIRECTION] = Direction.VERTICAL if self.widget.directionVerticalButton.isEnabled() \
-                else Direction.HORIZONTAL
-
-        self.widget.directionVerticalButton.clicked.connect(toggle_direction_buttons)
-        self.widget.directionHorizontalButton.clicked.connect(toggle_direction_buttons)
+        self.widget.directionVerticalButton.clicked.connect(lambda _: self.toggle_direction_buttons())
+        self.widget.directionHorizontalButton.clicked.connect(lambda _: self.toggle_direction_buttons())
 
     def build_range_inputs(self):
         self.widget.rangeDropdown.currentIndexChanged.connect(self.on_range_update)
@@ -568,6 +572,18 @@ class CellItem(QWidget):
             self.widget.codeTextEdit.show() if not hide else self.widget.codeTextEdit.hide()
 
         self._redraw()
+
+    def toggle_direction_buttons(self, direction: str = None):
+        if direction is None:
+            self.widget.directionHorizontalButton.setEnabled(not self.widget.directionHorizontalButton.isEnabled())
+            self.widget.directionVerticalButton.setEnabled(not self.widget.directionVerticalButton.isEnabled())
+        else:
+            self.widget.directionHorizontalButton.setEnabled(not direction == Direction.HORIZONTAL)
+            self.widget.directionVerticalButton.setEnabled(not direction == Direction.VERTICAL)
+
+        self.widget.directionFrame.setFocus()  # so focus doesn't switch in a weird direction
+        self.data[Config.DIRECTION] = Direction.VERTICAL if not self.widget.directionVerticalButton.isEnabled() \
+            else Direction.HORIZONTAL
 
     def on_use_calendar_update(self, *__):
         if self.widget.rangeDropdown.currentIndex() in (Range.WEEK, Range.TWO_WEEKS) \
