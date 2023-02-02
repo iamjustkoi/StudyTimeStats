@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import typing
 import webbrowser
 from datetime import date
 from pathlib import Path
@@ -22,6 +23,8 @@ from aqt.qt import (
     QToolButton,
     QWidget,
     Qt,
+    pyqtSignal,
+    pyqtSlot,
 )
 from aqt.theme import theme_manager
 
@@ -38,6 +41,7 @@ def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem = None):
     list_widget.addItem(cell_item.list_item)
     list_widget.setItemWidget(cell_item.list_item, cell_item)
     list_widget.sortItems()
+    list_widget.currentRowChanged.emit(list_widget.currentRow())
 
 
 def _remove_cell_from_list(list_widget: QListWidget, cell_item: CellItem):
@@ -48,6 +52,7 @@ def _remove_cell_from_list(list_widget: QListWidget, cell_item: CellItem):
             break
 
     list_widget.sortItems()
+    list_widget.currentRowChanged.emit(list_widget.currentRow())
 
 
 FLAT_ICON_STYLE = \
@@ -140,6 +145,7 @@ Addon options QDialog class for accessing and changing the addon's config values
             self.ui.deck_disable_button.clicked,
             self.ui.confirm_button_box.clicked,
             self.ui.useRolloverCheckbox.stateChanged,
+            self.ui.cellListWidget.currentRowChanged,
         }
         self._attach_change_signals(change_signals)
 
@@ -447,6 +453,12 @@ Uses the base DeckItem to sort its value less than the other DeckItem.
 
 
 class CellItem(QWidget):
+    color_changed = pyqtSignal()
+
+    button_colors: dict = {}
+    data: dict = {k: v for k, v in Config.DEFAULT_CELL_DATA.items()}
+    direction = 'vertical'
+
     class CellListItem(QListWidgetItem):
         cell_item: CellItem
 
@@ -463,9 +475,8 @@ class CellItem(QWidget):
 
             return False
 
-    button_colors: dict = {}
-    data: dict = {k: v for k, v in Config.DEFAULT_CELL_DATA.items()}
-    direction = 'vertical'
+        # def setData(self, role: int, value: typing.Any):
+        #     super().setData(role, value)
 
     def __init__(self, list_widget: QListWidget, is_empty: bool = False, data: dict = None):
         super().__init__()
@@ -504,6 +515,8 @@ class CellItem(QWidget):
             self.widget.addButton.setVisible(False)
             self.widget.mainFrame.setVisible(True)
             self.setMinimumHeight(self.widget.mainFrame.height())
+
+            self.build_signals(list_widget)
 
         self.list_item.setSizeHint(self.sizeHint())
         self.list_item.setFlags(Qt.ItemFlag.NoItemFlags)
@@ -557,12 +570,24 @@ class CellItem(QWidget):
         self.widget.codeButton.setStyleSheet(FLAT_ICON_STYLE)
 
     def build_color_pickers(self):
+        def _append_color_change_signal(button: QToolButton):
+            default_set_stylesheet = button.setStyleSheet
+
+            def set_stylesheet(style_sheet: str):
+                default_set_stylesheet(style_sheet)
+                self.color_changed.emit()
+
+            button.setStyleSheet = set_stylesheet
+
         self.widget.titleColorButton.clicked.connect(
             lambda _: self.on_click_color_button(button=self.widget.titleColorButton)
         )
         self.widget.outputColorButton.clicked.connect(
             lambda _: self.on_click_color_button(button=self.widget.outputColorButton)
         )
+
+        _append_color_change_signal(self.widget.titleColorButton)
+        _append_color_change_signal(self.widget.outputColorButton)
 
     def build_direction_buttons(self):
         mask_color = "#000000"
@@ -600,6 +625,29 @@ class CellItem(QWidget):
     def build_code_button(self):
         self.widget.codeButton.clicked.connect(lambda _: self.toggle_code_editor())
         self.toggle_code_editor(True)
+
+    def build_signals(self, list_widget: QListWidget):
+        def broadcast_change_signal(data=None, *__):
+            print(f'change broadcast')
+            print(f' {data=}')
+            list_widget.currentRowChanged.emit(list_widget.currentRow())
+
+        self.widget.titleLineEdit.textChanged.connect(broadcast_change_signal)
+        self.widget.outputLineEdit.textChanged.connect(broadcast_change_signal)
+        self.widget.hourEdit.textChanged.connect(broadcast_change_signal)
+        self.widget.minEdit.textChanged.connect(broadcast_change_signal)
+        self.widget.codeTextEdit.textChanged.connect(broadcast_change_signal)
+
+        self.widget.rangeDropdown.currentIndexChanged.connect(broadcast_change_signal)
+        self.widget.startDayDropdown.currentIndexChanged.connect(broadcast_change_signal)
+
+        self.widget.calendarCheckbox.stateChanged.connect(broadcast_change_signal)
+        self.widget.customRangeSpinbox.valueChanged.connect(broadcast_change_signal)
+
+        self.widget.directionVerticalButton.clicked.connect(broadcast_change_signal)
+        self.widget.directionHorizontalButton.clicked.connect(broadcast_change_signal)
+
+        self.color_changed.connect(broadcast_change_signal)
 
     # noinspection PyUnresolvedReferences
     def toggle_code_editor(self, hide: bool = None):
