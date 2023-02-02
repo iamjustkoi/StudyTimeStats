@@ -176,9 +176,6 @@ class Color:
 
 class Config:
     TOOLBAR_ENABLED = 'Use_Toolbar_Options'
-    # WEEK_START = 'Week_Start'
-    # USE_CALENDAR_RANGE = 'Use_Calendar_Range'
-    # RANGE_TYPE = 'Range_Type'
     CUSTOM_DAYS = 'Custom_Days'
     CUSTOM_TOTAL_TEXT = 'Custom_Total_Text'
     CUSTOM_RANGE_TEXT = 'Custom_Range_Text'
@@ -186,10 +183,6 @@ class Config:
     CUSTOM_RANGE_HRS = 'Custom_Range_Hrs'
     CUSTOM_HRS_TEXT = 'Custom_Hrs_Text'
     CUSTOM_MIN_TEXT = 'Custom_Min_Text'
-    # SHOW_TOTAL = 'Hide_Total_Stat'
-    # SHOW_RANGED = 'Hide_Ranged_Stat'
-    # PRIMARY_COLOR = 'Primary_Color'
-    # SECONDARY_COLOR = 'Secondary_Color'
     BROWSER_ENABLED = 'Browser_Enabled'
     OVERVIEW_ENABLED = 'Overview_Enabled'
     CONGRATS_ENABLED = 'Congrats_Enabled'
@@ -235,27 +228,3 @@ class Config:
         EXCLUDED_DIDS: [1],
         CELL_DATA: []
     }
-
-    # DEFAULT_CONFIG = {
-    #     TOOLBAR_ENABLED: True,
-    #     WEEK_START: Weekday.SUNDAY,
-    #     USE_CALENDAR_RANGE: True,
-    #     RANGE_TYPE: Range.WEEK,
-    #     CUSTOM_DAYS: 7,
-    #     CUSTOM_TOTAL_TEXT: String.TOTAL,
-    #     CUSTOM_RANGE_TEXT: String.PAST_RANGE,
-    #     CUSTOM_TOTAL_HRS: String.TOTAL_HRS,
-    #     CUSTOM_RANGE_HRS: String.PAST_HRS,
-    #     CUSTOM_HRS_TEXT: String.HRS,
-    #     CUSTOM_MIN_TEXT: String.MIN,
-    #     SHOW_TOTAL: True,
-    #     SHOW_RANGED: True,
-    #     PRIMARY_COLOR: 'white',
-    #     SECONDARY_COLOR: '#76bfb4',
-    #     BROWSER_ENABLED: True,
-    #     OVERVIEW_ENABLED: True,
-    #     CONGRATS_ENABLED: True,
-    #     INCLUDE_DELETED: True,
-    #     USE_ROLLOVER: False,
-    #     EXCLUDED_DIDS: [1]
-    # }
