@@ -28,7 +28,7 @@ def refresh_tools_menu_action(changes=None, obj=None):
     :param changes: unused OpChanges object
     :param obj: unused options object
     """
-    if get_config_manager().config[Config.TOOLBAR_ENABLED]:
+    if TimeStatsConfigManager(mw).config[Config.TOOLBAR_ENABLED]:
         options_action = QAction(String.OPTIONS_ACTION, mw)
         options_action.triggered.connect(on_options_called)
         # Handles edge cases where toolbar action already exists in the tools menu
@@ -44,15 +44,5 @@ def on_options_called():
     """
     Initializes and opens the options dialog.
     """
-    dialog = TimeStatsOptionsDialog(get_config_manager())
+    dialog = TimeStatsOptionsDialog(TimeStatsConfigManager(mw))
     dialog.exec()
-
-
-def get_config_manager() -> TimeStatsConfigManager:
-    """
-    Retrieves the addon's config manager.
-
-    :return: a deep-copy of the TimeStatsConfigManager Class
-    """
-    # this is neat, but also maybe a date option for the custom filter might be nice...
-    return TimeStatsConfigManager(mw, (date.today() - date.fromisoformat(UNIQUE_DATE)).days)
