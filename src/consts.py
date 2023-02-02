@@ -92,8 +92,8 @@ ANKI_URL = 'https://ankiweb.net/shared/info/1247171202'
 # '''
 
 TABLE_ID = 'sts-table'
-COL_ID = 'sts-col'
-HORIZ_CLASS = '.flow-horizontal'
+COL_CLASS = 'sts-col'
+HORIZ_CLASS = 'flow-horizontal'
 HTML_SHELL = '''
          <style>
              #''' + TABLE_ID + ''' {
@@ -102,17 +102,17 @@ HTML_SHELL = '''
                  max-width: fit-content;
                  font-weight: normal;
              }
-             .''' + COL_ID + ''' {
+             .''' + COL_CLASS + ''' {
                  display: table-cell;
                  word-break: break-all;
                  width: 30vw;
                  max-width: 200px;
              }
-             .''' + COL_ID + ''' > * {
+             .''' + COL_CLASS + ''' > * {
                  display: table-row;
              }
-             ''' + HORIZ_CLASS + ''' {
-                 display: flex; 
+             .''' + HORIZ_CLASS + ''' {
+                 display: flex !important; 
                  flex-wrap: nowrap; 
                  justify-content: space-between;
              }
