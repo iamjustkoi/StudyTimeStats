@@ -115,10 +115,6 @@ Addon options QDialog class for accessing and changing the addon's config values
         # Setup Row List
         self.ui.cellListWidget.setStyleSheet('#cellListWidget { background: transparent; border: none; }')
         self.ui.cellListWidget.verticalScrollBar().setSingleStep(12)
-        self.ui.cellListWidget.clear()
-
-        # Add blank item
-        _add_cell_to_list(self.ui.cellListWidget, CellItem(self.ui.cellListWidget, is_empty=True))
 
         # Update about header text with the current version number
         updated_about_header = self.ui.about_label_header.text().format(version=CURRENT_VERSION)
@@ -183,6 +179,15 @@ Loads all config values to the options dialog.
 
         self.ui.useRolloverCheckbox.setChecked(self.config[Config.USE_ROLLOVER])
 
+        # Load Cell Data
+        self.ui.cellListWidget.clear()
+        # Add blank
+        _add_cell_to_list(self.ui.cellListWidget, CellItem(self.ui.cellListWidget, is_empty=True))
+        # Loop through data
+        for data in self.config[Config.CELL_DATA]:
+            _add_cell_to_list(self.ui.cellListWidget, CellItem(self.ui.cellListWidget, data=data))
+            print(f'{data=}')
+
         # Excluded Decks
         self._load_excluded_decks()
 
@@ -227,10 +232,6 @@ Loads deck names to list and sets label to enabled if not in current config's ex
             all_decks = self.manager.mw.col.decks.all_names_and_ids()
         else:
             all_decks = self.manager.mw.col.decks.allNames()
-
-        for data in self.config[Config.CELL_DATA]:
-            _add_cell_to_list(self.ui.cellListWidget, CellItem(self.ui.cellListWidget, data=data))
-            print(f'{data=}')
 
         for deck in all_decks:
             deck_name = deck.name if ANKI_VERSION > ANKI_LEGACY_VER else deck
