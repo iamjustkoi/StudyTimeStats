@@ -24,7 +24,7 @@ def _reformat_conf(config: dict):
 
 class TimeStatsConfigManager:
 
-    def __init__(self, mw: AnkiQt, max_filter_range: int):
+    def __init__(self, mw: AnkiQt):
         """
 Generic config manager for accessing and writing addon config values.
 
@@ -39,7 +39,7 @@ Generic config manager for accessing and writing addon config values.
         self.config = self._meta.get('config', Config.DEFAULT_CONFIG)
         self.config = _reformat_conf(self.config)
         self.decks = self.mw.col.decks if self.mw.col is not None else None
-        self.max_range = max_filter_range
+        # self.max_range = max_filter_range
 
         for field in Config.DEFAULT_CONFIG:
             if field not in self.config:
