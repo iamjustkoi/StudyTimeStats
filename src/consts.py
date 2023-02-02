@@ -118,14 +118,14 @@ HTML_SHELL = '''
          </style>
          <center>
              <div id="''' + TABLE_ID + '''">
-                {CELL_DATA}
+                {cell_data}
              </div>
          </center>
 '''
 
-CELL_HTML_SHELL = '''<div class="{{cell_class}}">
-    <div style="color: {{title_color}}">{{title}}</div>
-    <div style="color: {{output_color}}">{{output}}</div>
+CELL_HTML_SHELL = '''<div class="{{CellClass}}">
+    <div style="color: {{TitleColor}}">{{Title}}</div>
+    <div style="color: {{OutputColor}}">{{Output}}</div>
 </div>
 '''
 
