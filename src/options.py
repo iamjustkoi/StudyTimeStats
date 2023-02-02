@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import typing
 import webbrowser
 from datetime import date
 from pathlib import Path
@@ -24,7 +23,6 @@ from aqt.qt import (
     QWidget,
     Qt,
     pyqtSignal,
-    pyqtSlot,
 )
 from aqt.theme import theme_manager
 
