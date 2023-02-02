@@ -9,12 +9,22 @@ from .config import TimeStatsConfigManager
 from .consts import *
 
 
-def append_to_browser(deck_browser: DeckBrowser, content: DeckBrowserContent):
+def append_to_browser(__browser: DeckBrowser, content: DeckBrowserContent):
+    """
+    Appends stats to the deck browser.
+    :param __browser: unused browser object
+    :param content: browser content to append stats to
+    """
     if TimeStatsConfigManager(mw).config[Config.BROWSER_ENABLED]:
         content.stats += stats_html()
 
 
-def append_to_overview(overview: Overview, content: OverviewContent):
+def append_to_overview(__overview: Overview, content: OverviewContent):
+    """
+    Appends stats to the overview.
+    :param __overview: unused overview object
+    :param content: overview content to append stats to
+    """
     conf_manager = TimeStatsConfigManager(mw)
 
     def is_enabled_for_deck():
