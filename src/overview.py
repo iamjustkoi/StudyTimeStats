@@ -27,7 +27,7 @@ def append_to_overview(overview: Overview, content: OverviewContent):
 def cell_data_html():
     addon_config: dict = TimeStatsConfigManager(mw).config
 
-    for cell_data in addon_config[Config.CELL_DATA]:
+    for cell_data in addon_config[Config.CELLS_DATA]:
         cell_html: str = cell_data[Config.HTML].replace('{{', '{').replace('}}', '}')
         cell_html.format(
             CellClass=HORIZ_CLASS if cell_data[Config.DIRECTION] == Direction.HORIZONTAL else '',

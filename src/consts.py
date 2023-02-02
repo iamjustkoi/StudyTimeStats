@@ -189,7 +189,7 @@ class Config:
     INCLUDE_DELETED = 'Include_Deleted_Reviews'
     USE_ROLLOVER = 'Use_Rollover_Hour'
     EXCLUDED_DIDS = "Excluded_Deck_IDs"
-    CELL_DATA = "Cell_Data"
+    CELLS_DATA = "cellsData"
 
     TITLE = 'title'
     OUTPUT = 'output'
@@ -226,5 +226,5 @@ class Config:
         INCLUDE_DELETED: True,
         USE_ROLLOVER: False,
         EXCLUDED_DIDS: [1],
-        CELL_DATA: []
+        CELLS_DATA: []
     }

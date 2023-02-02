@@ -182,7 +182,7 @@ Loads all config values to the options dialog.
         # Add blank
         _add_cell_to_list(self.ui.cellListWidget, CellItem(self.ui.cellListWidget, is_empty=True))
         # Loop through data
-        for data in self.config[Config.CELL_DATA]:
+        for data in self.config[Config.CELLS_DATA]:
             _add_cell_to_list(self.ui.cellListWidget, CellItem(self.ui.cellListWidget, data=data))
             print(f'{data=}')
 
@@ -213,7 +213,7 @@ window to update all the ui.
             if isinstance(item, CellItem.CellListItem) and not item.cell_item.is_empty:
                 print(f'{item.cell_item.get_data()=}')
                 cell_data.append(item.cell_item.get_data())
-        self.config[Config.CELL_DATA] = cell_data
+        self.config[Config.CELLS_DATA] = cell_data
 
         self.manager.write_config()
         self.manager.mw.reset()
