@@ -93,6 +93,7 @@ ANKI_URL = 'https://ankiweb.net/shared/info/1247171202'
 
 TABLE_ID = 'sts-table'
 COL_ID = 'sts-col'
+HORIZ_CLASS = '.flow-horizontal'
 HTML_SHELL = '''
          <style>
              #''' + TABLE_ID + ''' {
@@ -110,7 +111,7 @@ HTML_SHELL = '''
              .''' + COL_ID + ''' > * {
                  display: table-row;
              }
-             .flow-horizontal {
+             ''' + HORIZ_CLASS + ''' {
                  display: flex; 
                  flex-wrap: nowrap; 
                  justify-content: space-between;
