@@ -51,46 +51,6 @@ PATREON_URL = 'https://www.patreon.com/iamjustkoi'
 KOFI_URL = 'https://ko-fi.com/iamjustkoi'
 ANKI_URL = 'https://ankiweb.net/shared/info/1247171202'
 
-# TABLE_ID, COL_ID, LABEL_ID, DATA_ID = 'sts-table', 'sts-col', 'sts-label', 'sts-data'
-# HTML_SHELL = f'''
-#         <style>
-#             #{TABLE_ID} {{{{
-#                 display: table;
-#                 margin-top: .5em;
-#                 max-width: fit-content;
-#                 font-weight: normal;
-#             }}}}
-#             .{COL_ID} {{{{
-#                 display: table-cell;
-#                 word-break: break-all;
-#                 width: 30vw;
-#                 max-width: 200px;
-#             }}}}
-#             .{COL_ID} > * {{{{
-#                 display: table-row;
-#             }}}}
-#             .{LABEL_ID} {{{{
-#                 color: {{primary_color}};
-#             }}}}
-#             .{DATA_ID} {{{{
-#                 color: {{secondary_color}};
-#                 font-weight: bold;
-#             }}}}
-#         </style>
-#         <center>
-#             <div id="{TABLE_ID}">
-#                 <div class="{COL_ID}" style="{{total_style}}">
-#                     <div class="{LABEL_ID}">{{total_label}}</div>
-#                     <div class="{DATA_ID}">{{total_hrs}}</div>
-#                 </div>
-#                 <div class="{COL_ID}" style="{{range_style}}">
-#                     <div class="{LABEL_ID}">{{range_label}}</div>
-#                     <div class="{DATA_ID}">{{range_hrs}}</div>
-#                 </div>
-#             </div>
-#         </center>
-# '''
-
 TABLE_ID = 'sts-table'
 COL_CLASS = 'sts-col'
 HORIZ_CLASS = 'flow-horizontal'
@@ -104,7 +64,6 @@ HTML_SHELL = '''
              }
              .''' + COL_CLASS + ''' {
                  display: table-cell;
-                 word-break: break-all;
                  width: 30vw;
                  max-width: 200px;
              }
@@ -113,8 +72,11 @@ HTML_SHELL = '''
              }
              .''' + HORIZ_CLASS + ''' {
                  display: flex !important; 
-                 flex-wrap: nowrap; 
-                 justify-content: space-between;
+                 width: max-content;
+                 justify-content: space-evenly;
+             }
+             .''' + HORIZ_CLASS + ''' > * {
+                 padding: 0 2px 0 2px;
              }
          </style>
          <center>
@@ -125,8 +87,8 @@ HTML_SHELL = '''
 '''
 
 CELL_HTML_SHELL = '''<div class="{{CellClass}}">
-    <div style="color: {{TitleColor}}">{{Title}}</div>
-    <div style="color: {{OutputColor}}">{{Output}}</div>
+    <div style="color: {{TitleColor}};">{{Title}}</div>
+    <div style="color: {{OutputColor}}; font-weight: bold;">{{Output}}</div>
 </div>
 '''
 
