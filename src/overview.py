@@ -34,27 +34,27 @@ def append_to_overview(__overview: Overview, content: OverviewContent):
         content.table += stats_html()
 
 
+# use the same, gotten from append functions -> stats_html(), addon config in arg?
 def cell_data_html():
     addon_config: dict = TimeStatsConfigManager(mw).config
 
+    cells_html = ''
     for cell_data in addon_config[Config.CELLS_DATA]:
         cell_html: str = cell_data[Config.HTML].replace('{{', '{').replace('}}', '}')
-        cell_html.format(
-            CellClass=HORIZ_CLASS if cell_data[Config.DIRECTION] == Direction.HORIZONTAL else '',
+        cell_html = f'<div class="{COL_CLASS}">\n{cell_html}\n</div>'
+        cells_html += cell_html.format(
+            CellClass=f'{HORIZ_CLASS}' if cell_data[Config.DIRECTION] == Direction.HORIZONTAL else '',
             TitleColor=cell_data[Config.TITLE_COLOR],
+            Title=cell_data[Config.TITLE],
+            OutputColor=cell_data[Config.OUTPUT_COLOR],
+            Output=cell_data[Config.OUTPUT],
         )
 
-    return ''
+    return cells_html
 
 
 def stats_html():
-    """
-    Uses the addon config and current get_time_stats to retrieve the html to display on Anki's main window.
-    :return: html string containing review configured review information
-    """
-    # addon_config = TimeStatsConfigManager(mw).config
-
-    return HTML_SHELL.format(cell_data=cell_data_html())
+    return HTML_SHELL.replace("{cell_data}", cell_data_html())
 
 
 def build_hooks():
