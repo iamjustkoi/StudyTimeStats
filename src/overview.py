@@ -36,6 +36,9 @@ def append_to_overview(__overview: Overview, content: OverviewContent):
 
 # use the same, gotten from append functions -> stats_html(), addon config in arg?
 def cell_data_html():
+    """
+    :return: an html representation of a statistics-cell block
+    """
     addon_config: dict = TimeStatsConfigManager(mw).config
 
     cells_html = ''
