@@ -281,11 +281,8 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
     cids = filtered_cids(addon_config[Config.EXCLUDED_DIDS], addon_config[Config.INCLUDE_DELETED])
     # pattern = r'(?<!%){}'
 
-    print(f'filtered_html() < {html}')
-
     def sub_html(macro: str, revlog: list):
         nonlocal html
-        print(f'sub_html()')
         total_hrs = _total_hrs_in_revlog(revlog)
         unit_key = _unit_key_for_time(total_hrs)
         html = re.sub(
@@ -299,7 +296,6 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
         # total_hrs = _total_hrs_in_revlog(revlog)
         # unit_key = _unit_key_for_time(total_hrs)
         # sub_html(filtered_revlog(cids), CMD_TOTAL_HRS, f'{_formatted_time(total_hrs)} {addon_config[unit_key]}')
-        print(f're.search(CMD_TOTAL_HRS)')
         sub_html(CMD_TOTAL_HRS, filtered_revlog(cids))
 
     # if re.search(fr'(?<!%){CMD_RANGE_HRS}', html):
