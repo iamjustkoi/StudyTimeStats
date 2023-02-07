@@ -336,7 +336,6 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
         sub_html(CMD_TOTAL_HRS, filtered_revlog(cids))
 
     if re.search(fr'(?<!%){CMD_RANGE_HRS}', updated_html):
-        print(f'CMD_RANGE_HRS')
         sub_html(CMD_RANGE_HRS, filtered_revlog(cids, _range_from_data(cell_data)))
 
     return updated_html
