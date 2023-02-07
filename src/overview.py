@@ -274,34 +274,6 @@ def stats_html():
 #     return html
 
 
-def filtered_html(html: str, addon_config: dict, cell_data: dict):
-    cids = filtered_cids(addon_config[Config.EXCLUDED_DIDS], addon_config[Config.INCLUDE_DELETED])
-    # pattern = r'(?<!%){}'
-    updated_html = html
-
-    def sub_html(macro: str, revlog: list):
-        nonlocal updated_html
-        total_hrs = _total_hrs_in_revlog(revlog)
-        unit_key = _unit_key_for_time(total_hrs)
-        print(f'{macro=}')
-        print(f'{len(revlog)=}')
-        print(f'{total_hrs=}')
-        updated_html = re.sub(
-            fr'(?<!%){macro}',
-            f'{_formatted_time(total_hrs)} {cell_data[unit_key]}',
-            updated_html,
-        )
-
-    if re.search(fr'(?<!%){CMD_TOTAL_HRS}', updated_html):
-        sub_html(CMD_TOTAL_HRS, filtered_revlog(cids))
-
-    if re.search(fr'(?<!%){CMD_RANGE_HRS}', updated_html):
-        print(f'CMD_RANGE_HRS')
-        sub_html(CMD_RANGE_HRS, filtered_revlog(cids, _range_from_data(cell_data)))
-
-    return updated_html
-
-
 def _range_from_data(cell_data: dict) -> tuple[int, int]:
     # range type ->
     #   total: return 0 ~ date.now
@@ -340,6 +312,34 @@ def _range_from_data(cell_data: dict) -> tuple[int, int]:
         elif not cell_data[Config.USE_CALENDAR]:
             from_ms = int((to_date - timedelta(days=Range.DAYS_IN[cell_data[Config.RANGE]])).timestamp() * 1000)
             return from_ms, to_ms
+
+
+def filtered_html(html: str, addon_config: dict, cell_data: dict):
+    cids = filtered_cids(addon_config[Config.EXCLUDED_DIDS], addon_config[Config.INCLUDE_DELETED])
+    # pattern = r'(?<!%){}'
+    updated_html = html
+
+    def sub_html(macro: str, revlog: list):
+        nonlocal updated_html
+        total_hrs = _total_hrs_in_revlog(revlog)
+        unit_key = _unit_key_for_time(total_hrs)
+        print(f'{macro=}')
+        print(f'{len(revlog)=}')
+        print(f'{total_hrs=}')
+        updated_html = re.sub(
+            fr'(?<!%){macro}',
+            f'{_formatted_time(total_hrs)} {cell_data[unit_key]}',
+            updated_html,
+        )
+
+    if re.search(fr'(?<!%){CMD_TOTAL_HRS}', updated_html):
+        sub_html(CMD_TOTAL_HRS, filtered_revlog(cids))
+
+    if re.search(fr'(?<!%){CMD_RANGE_HRS}', updated_html):
+        print(f'CMD_RANGE_HRS')
+        sub_html(CMD_RANGE_HRS, filtered_revlog(cids, _range_from_data(cell_data)))
+
+    return updated_html
 
 
 def filtered_cids(excluded_dids: list = None, include_deleted: bool = False) -> list[Sequence]:
