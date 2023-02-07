@@ -1,6 +1,7 @@
 # MIT License: Copyright (c) 2022-2023 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
 # Full license text available in the "LICENSE" file, packaged with the add-on.
 import re
+import time
 import traceback
 from datetime import datetime, timedelta
 from datetime import date as datetimedate
@@ -130,7 +131,6 @@ def cell_data_html():
     for cell_data in addon_config[Config.CELLS_DATA]:
         cell_html: str = cell_data[Config.HTML].replace('{{', '{').replace('}}', '}')
         cell_html = f'<div class="{COL_CLASS}">\n{cell_html}\n</div>'
-
         cell_html = cell_html.format(
             CellClass=f'{HORIZ_CLASS}' if cell_data[Config.DIRECTION] == Direction.HORIZONTAL else '',
             TitleColor=cell_data[Config.TITLE_COLOR],
@@ -280,35 +280,69 @@ def stats_html():
 def filtered_html(html: str, addon_config: dict, cell_data: dict):
     cids = filtered_cids(addon_config[Config.EXCLUDED_DIDS], addon_config[Config.INCLUDE_DELETED])
     # pattern = r'(?<!%){}'
+    updated_html = html
 
     def sub_html(macro: str, revlog: list):
-        nonlocal html
+        nonlocal updated_html
         total_hrs = _total_hrs_in_revlog(revlog)
         unit_key = _unit_key_for_time(total_hrs)
-        html = re.sub(
+        print(f'{macro=}')
+        print(f'{len(revlog)=}')
+        print(f'{total_hrs=}')
+        updated_html = re.sub(
             fr'(?<!%){macro}',
-            f'{_formatted_time(total_hrs)} {addon_config[unit_key]}',
-            html,
+            f'{_formatted_time(total_hrs)} {cell_data[unit_key]}',
+            updated_html,
         )
 
-    if re.search(fr'(?<!%){CMD_TOTAL_HRS}', html):
-        # revlog = filtered_revlog(cids)
-        # total_hrs = _total_hrs_in_revlog(revlog)
-        # unit_key = _unit_key_for_time(total_hrs)
-        # sub_html(filtered_revlog(cids), CMD_TOTAL_HRS, f'{_formatted_time(total_hrs)} {addon_config[unit_key]}')
+    if re.search(fr'(?<!%){CMD_TOTAL_HRS}', updated_html):
         sub_html(CMD_TOTAL_HRS, filtered_revlog(cids))
 
-    # if re.search(fr'(?<!%){CMD_RANGE_HRS}', html):
-    #     cell_data[Config]
-    #     sub_html(CMD_TOTAL_HRS, filtered_revlog(cids))
+    if re.search(fr'(?<!%){CMD_RANGE_HRS}', updated_html):
+        print(f'CMD_RANGE_HRS')
+        sub_html(CMD_RANGE_HRS, filtered_revlog(cids, _range_from_data(cell_data)))
 
-    # for repl in replacements:
-    #     repl: [str, str]
-    #     html = re.sub(r'(?<!%){}'.format(repl[0]), repl[1], html)
+    return updated_html
 
-    # Get command type -> get logs -> replace
 
-    return html
+def _range_from_data(cell_data: dict) -> tuple[int, int]:
+    # range type ->
+    #   total: return 0 ~ date.now
+    #   use_cal ->
+    #       week/2weeks: return days_since_week_start(num_weeks) ~ date.now
+    #       month: return month_start_date ~ date.now
+    #       year: return year_start_date ~ date.now
+    #   not use_cal ->
+    #       return (date.now - Range[range type]) ~ date.now
+    to_date = date_with_rollover(datetime.utcnow())
+    to_ms = int(to_date.timestamp() * 1000)
+
+    if cell_data[Config.RANGE] == Range.TOTAL:
+        return 0, to_ms
+
+    elif cell_data[Config.RANGE] == Range.CUSTOM:
+        from_ms = int((to_date - timedelta(days=cell_data[Config.DAYS])).timestamp() * 1000)
+        return from_ms, to_ms
+
+    else:
+        if cell_data[Config.USE_CALENDAR]:
+            if cell_data[Config.RANGE] in (Range.WEEK, Range.TWO_WEEKS):
+                weeks = 1 + (cell_data[Config.RANGE] == Range.TWO_WEEKS)
+                delta_days = (days_since_week_start(weeks, cell_data[Config.WEEK_START], to_date))
+                from_ms = int((to_date - timedelta(days=(delta_days + 1))).timestamp() * 1000)
+                return from_ms, to_ms
+
+            elif cell_data[Config.RANGE] == Range.MONTH:
+                from_ms = int((to_date.replace(day=1) - timedelta(days=1)).timestamp() * 1000)
+                return from_ms, to_ms
+
+            elif cell_data[Config.RANGE] == Range.YEAR:
+                from_ms = int((to_date.replace(month=1, day=1) - timedelta(days=1)).timestamp() * 1000)
+                return from_ms, to_ms
+
+        elif not cell_data[Config.USE_CALENDAR]:
+            from_ms = int((to_date - timedelta(days=Range.DAYS_IN[cell_data[Config.RANGE]])).timestamp() * 1000)
+            return from_ms, to_ms
 
 
 def filtered_cids(excluded_dids: list = None, include_deleted: bool = False) -> list[Sequence]:
@@ -321,14 +355,21 @@ def filtered_cids(excluded_dids: list = None, include_deleted: bool = False) -> 
         filter_cmd = f'WHERE cid not in {_args_from_ids(excluded_cids)}'
     else:
         # Grab all parent and child dids for the current deck, or all dids if viewing all decks, currently
-        dids = [
-            str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))
-            if str(i) not in excluded_dids
-        ] if mw.state == 'overview' else [
-            str(name_id.id) for name_id in mw.col.decks.all_names_and_ids()
-            if str(name_id) not in excluded_dids
-        ]
-        filter_cmd = f'WHERE did in {_args_from_ids(dids)}'
+        if mw.state == 'overview':
+            included_dids = [
+                i for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))
+                if str(i) not in excluded_dids
+            ]
+        else:
+            included_dids = [
+                name_id.id for name_id in mw.col.decks.all_names_and_ids()
+                if str(name_id) not in excluded_dids
+            ]
+        filter_cmd = f'''
+            LEFT JOIN Cards 
+            ON Revlog.cid = Cards.id 
+            WHERE Cards.did IN {_args_from_ids(included_dids)};
+        '''
 
     return mw.col.db.all(f'SELECT DISTINCT cid FROM revlog {filter_cmd}')
 
@@ -340,46 +381,46 @@ def filtered_revlog(cids: list, time_range_ms: tuple[int, int] = None) \
     return mw.col.db.all(revlog_cmd)
 
 
-def full_revlog(addon_config) -> list:
-    """
-    Retrieves Anki review data using the currently displayed decks and excluded decks filters.
-
-    :param addon_config: config to use as a reference for excluded deck ids
-    :return: a sequence with the format: [[log_id, review_time], ...]
-    """
-    excluded_dids = _args_from_ids(addon_config[Config.EXCLUDED_DIDS])
-
-    # Get deleted cards on overview, otherwise use standard known-cards per-deck
-    if addon_config[Config.INCLUDE_DELETED] and mw.state != 'overview':
-        excluded_cids_cmd = f'SELECT id FROM cards WHERE did in {excluded_dids}'
-        excluded_cids = mw.col.db.all(excluded_cids_cmd)
-        cids_cmd = f'SELECT cid FROM revlog WHERE cid not in {_args_from_ids(excluded_cids)}'
-    else:
-        if mw.state == 'overview':
-            # grab all parent and child dids for the current deck
-            dids = [str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))]
-        else:
-            # grab all dids
-            dids = [str(name_id.id) for name_id in mw.col.decks.all_names_and_ids()]
-
-        for excluded_did in excluded_dids:
-            if excluded_did in dids:
-                dids.remove(excluded_did)
-
-        cids_cmd = f'SELECT id FROM cards WHERE did in {_args_from_ids(dids)}'
-
-    all_cids = mw.col.db.all(cids_cmd)
-    # Remove duplicates via set-builder syntax
-    unique_cids = {cid[0] for cid in all_cids}
-
-    revlog_cmd = f'SELECT id, time FROM revlog WHERE cid in {_args_from_ids(list(unique_cids))}'
-
-    return mw.col.db.all(revlog_cmd)
+# def full_revlog(addon_config) -> list:
+#     """
+#     Retrieves Anki review data using the currently displayed decks and excluded decks filters.
+#
+#     :param addon_config: config to use as a reference for excluded deck ids
+#     :return: a sequence with the format: [[log_id, review_time], ...]
+#     """
+#     excluded_dids = _args_from_ids(addon_config[Config.EXCLUDED_DIDS])
+#
+#     # Get deleted cards on overview, otherwise use standard known-cards per-deck
+#     if addon_config[Config.INCLUDE_DELETED] and mw.state != 'overview':
+#         excluded_cids_cmd = f'SELECT id FROM cards WHERE did in {excluded_dids}'
+#         excluded_cids = mw.col.db.all(excluded_cids_cmd)
+#         cids_cmd = f'SELECT cid FROM revlog WHERE cid not in {_args_from_ids(excluded_cids)}'
+#     else:
+#         if mw.state == 'overview':
+#             # grab all parent and child dids for the current deck
+#             dids = [str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))]
+#         else:
+#             # grab all dids
+#             dids = [str(name_id.id) for name_id in mw.col.decks.all_names_and_ids()]
+#
+#         for excluded_did in excluded_dids:
+#             if excluded_did in dids:
+#                 dids.remove(excluded_did)
+#
+#         cids_cmd = f'SELECT id FROM cards WHERE did in {_args_from_ids(dids)}'
+#
+#     all_cids = mw.col.db.all(cids_cmd)
+#     # Remove duplicates via set-builder syntax
+#     unique_cids = {cid[0] for cid in all_cids}
+#
+#     revlog_cmd = f'SELECT id, time FROM revlog WHERE cid in {_args_from_ids(list(unique_cids))}'
+#
+#     return mw.col.db.all(revlog_cmd)
 
 
 def logs_in_range(
     revlog: [[int, int]],
-    days_ago: int = 0,
+    days: int = 0,
     from_date: datetime = datetime.today()
 ) -> [[int, int]]:
     """
@@ -399,7 +440,7 @@ def logs_in_range(
         log_date = datetime.fromtimestamp(log_epoch_seconds)
 
         log_delta = from_adjusted_date - log_date
-        if 0 <= log_delta.days <= days_ago:
+        if 0 <= log_delta.days <= days:
             filtered_logs.append(log)
     return filtered_logs
 
@@ -469,12 +510,13 @@ def val_unit_range(revlog: [[int, int]], unit: str, days: int = 0, range_type: i
     return f'{range_val} {unit}'
 
 
-def date_with_rollover(date: datetime = datetime.today()):
+def date_with_rollover(date: datetime = datetime.today(), is_day_end=True):
     """
     Retrieves a date-time adjusted to its day-end hour and Anki/add-on preferences for end of day.
 
+    :param is_day_end:
     :param date: date to adjust
     :return: an adjusted datetime object
     """
-
-    return date.replace(hour=23, minute=59, second=59) - timedelta(hours=_offset_hour())
+    return date.replace(hour=23, minute=59, second=59) - timedelta(hours=_offset_hour()) if is_day_end \
+        else date - timedelta(hours=_offset_hour())
