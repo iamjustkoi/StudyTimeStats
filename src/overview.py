@@ -1,11 +1,8 @@
 # MIT License: Copyright (c) 2022-2023 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
 # Full license text available in the "LICENSE" file, packaged with the add-on.
 import re
-import time
-import traceback
 from datetime import datetime, timedelta
-from datetime import date as datetimedate
-from typing import Match, Sequence
+from typing import Sequence
 
 from aqt import gui_hooks, mw
 from aqt.deckbrowser import DeckBrowser, DeckBrowserContent
@@ -418,52 +415,6 @@ def filtered_revlog(cids: list, time_range_ms: tuple[int, int] = None) \
 #     return mw.col.db.all(revlog_cmd)
 
 
-def logs_in_range(
-    revlog: [[int, int]],
-    days: int = 0,
-    from_date: datetime = datetime.today()
-) -> [[int, int]]:
-    """
-    Retrieves a collection of review logs based on the input number of days to retrieve from today.
-
-    :param revlog: list of review logs containing an array with [log time-identifier, log time spent]
-    :param days_ago: number of days to filter back through
-    :param from_date: changes the reference date to this datetime
-    :return: a new list of review logs based on the input days to filter
-    """
-
-    from_adjusted_date = date_with_rollover(from_date)
-
-    filtered_logs = []
-    for log in revlog[0:]:
-        log_epoch_seconds = log[0] / 1000
-        log_date = datetime.fromtimestamp(log_epoch_seconds)
-
-        log_delta = from_adjusted_date - log_date
-        if 0 <= log_delta.days <= days:
-            filtered_logs.append(log)
-    return filtered_logs
-
-
-def days_ago(range_type: int, use_cal=False, week_start=0, from_date=datetime.today()) -> int:
-    # Calendar Range Math!
-    total_days = Range.DAYS_IN[range_type]
-
-    if use_cal:
-        from_adjusted_date = date_with_rollover(from_date)
-
-        if range_type == Range.WEEK or range_type == Range.TWO_WEEKS:
-            total_weeks = Range.DAYS_IN[range_type] / 7
-            total_days = days_since_week_start(total_weeks, week_start, from_adjusted_date)
-        else:
-            if range_type == Range.MONTH:
-                total_days = (from_adjusted_date - from_adjusted_date.replace(day=1)).days
-            elif range_type == Range.YEAR:
-                total_days = (from_adjusted_date - from_adjusted_date.replace(month=1, day=1)).days
-
-    return total_days
-
-
 def days_since_week_start(
     total_weeks: int,
     week_start_day: int,
@@ -481,33 +432,6 @@ def days_since_week_start(
     ref_day = from_adjusted_date.weekday()
     # Adds an extra week if the current day is already past the week start
     return (total_weeks * 7) + ((ref_day - week_start_day) - (7 * (ref_day >= week_start_day)))
-
-
-def val_unit_range(revlog: [[int, int]], unit: str, days: int = 0, range_type: int = None, start_at=0):
-    """
-    Retrieves the given range's hours in reviews.
-
-    :param revlog: referenced log sequence
-    :param unit: unit to append to output text
-    :param days: (optional) days to go back from, overridden by range_type inputs
-    :param range_type: (optional) range_type to use for hour calculations
-    :param start_at: iteration to start the range_type gathering from, goes back n previous iterations, else starts
-    from current
-    :return: a formatted string with the range in hours/minutes with its associated unit pair (e.g. '2 hrs'/'3.1 min')
-    """
-    from_date = datetime.today()
-
-    if range_type is not None:
-        days = days_ago(range_type)
-        if start_at > 0:
-            # extra day added to not include the current/later range for outputs
-            from_date -= timedelta(days=(days_ago(range_type) * start_at) + 1)
-            days -= 1
-
-    ranged_hrs = _total_hrs_in_revlog(logs_in_range(revlog, days, from_date))
-    range_val = _formatted_time(ranged_hrs)
-
-    return f'{range_val} {unit}'
 
 
 def date_with_rollover(date: datetime = datetime.today(), is_day_end=True):
