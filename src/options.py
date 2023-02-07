@@ -620,6 +620,7 @@ class CellItem(QWidget):
         self.on_range_update(0)  # Initial update
 
         self.widget.customRangeSpinbox.setMaximum((date.today() - date.fromisoformat(UNIQUE_DATE)).days)
+        self.widget.customRangeSpinbox.setMinimum(1)
 
     def build_code_button(self):
         self.widget.codeButton.clicked.connect(lambda _: self.toggle_code_editor())
