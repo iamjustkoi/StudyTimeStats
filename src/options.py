@@ -526,6 +526,7 @@ class CellItem(QWidget):
         self.widget.startDayDropdown.setCurrentIndex(data[Config.WEEK_START])
         self.widget.hourEdit.setText(data[Config.HRS_UNIT])
         self.widget.minEdit.setText(data[Config.MIN_UNIT])
+        self.widget.customRangeSpinbox.setValue(data[Config.DAYS])
         self.widget.codeTextEdit.setPlainText(data[Config.HTML])
 
         self.set_button_color(self.widget.titleColorButton, data[Config.TITLE_COLOR])
@@ -540,6 +541,7 @@ class CellItem(QWidget):
         self.data[Config.WEEK_START] = self.widget.startDayDropdown.currentIndex()
         self.data[Config.HRS_UNIT] = self.widget.hourEdit.text()
         self.data[Config.MIN_UNIT] = self.widget.minEdit.text()
+        self.data[Config.DAYS] = self.widget.customRangeSpinbox.value()
         self.data[Config.HTML] = self.widget.codeTextEdit.toPlainText()
 
         self.data[Config.TITLE_COLOR] = self.button_colors[str(self.widget.titleColorButton)]
