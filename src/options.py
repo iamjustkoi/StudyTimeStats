@@ -184,7 +184,6 @@ Loads all config values to the options dialog.
         # Loop through data
         for data in self.config[Config.CELLS_DATA]:
             _add_cell_to_list(self.ui.cellListWidget, CellItem(self.ui.cellListWidget, data=data))
-            print(f'{data=}')
 
         # Excluded Decks
         self._load_excluded_decks()
@@ -211,7 +210,6 @@ window to update all the ui.
         for i in range(self.ui.cellListWidget.count()):
             item = self.ui.cellListWidget.item(i)
             if isinstance(item, CellItem.CellListItem) and not item.cell_item.is_empty:
-                print(f'{item.cell_item.get_data()=}')
                 cell_data.append(item.cell_item.get_data())
         self.config[Config.CELLS_DATA] = cell_data
 
@@ -627,8 +625,6 @@ class CellItem(QWidget):
 
     def build_signals(self, list_widget: QListWidget):
         def broadcast_change_signal(data=None, *__):
-            print(f'change broadcast')
-            print(f' {data=}')
             list_widget.currentRowChanged.emit(list_widget.currentRow())
 
         self.widget.titleLineEdit.textChanged.connect(broadcast_change_signal)
