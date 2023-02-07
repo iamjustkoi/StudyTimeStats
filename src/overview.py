@@ -37,7 +37,7 @@ def _unit_key_for_time(hours: float):
     :param hours: referenced time
     :return: the hours unit if given a value larger than 1, otherwise the minutes unit
     """
-    return Config.CUSTOM_HRS_TEXT if hours > 1 else Config.CUSTOM_MIN_TEXT
+    return Config.HRS_UNIT if hours > 1 else Config.MIN_UNIT
 
 
 def _formatted_time(hours: float, precision=2):
