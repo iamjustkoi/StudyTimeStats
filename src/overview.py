@@ -264,7 +264,7 @@ def stats_html():
 #     return html
 
 
-def _range_from_data(cell_data: dict) -> tuple[int, int]:
+def _range_from_data(cell_data: dict, to_date=datetime.utcnow()) -> tuple[int, int]:
     # range type ->
     #   total: return 0 ~ date.now
     #   use_cal ->
@@ -273,7 +273,7 @@ def _range_from_data(cell_data: dict) -> tuple[int, int]:
     #       year: return year_start_date ~ date.now
     #   not use_cal ->
     #       return (date.now - Range[range type]) ~ date.now
-    to_date = date_with_rollover(datetime.utcnow())
+    to_date = date_with_rollover(to_date)
     to_ms = int(to_date.timestamp() * 1000)
 
     if cell_data[Config.RANGE] == Range.TOTAL:
