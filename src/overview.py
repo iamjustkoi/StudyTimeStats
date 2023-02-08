@@ -345,9 +345,10 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
 def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] = None, include_deleted=False) \
         -> list[Sequence]:
     if include_deleted and mw.state != 'overview':
+        # If not currently viewing a deck, including deleted decks, grab all non-excluded deck ids
         filtered_did_cmd = f'WHERE cards.did NOT IN {_args_from_ids(excluded_dids) if excluded_dids else ""}'
-
     else:
+        # Grab the current parent/children deck ids (inclusive) if viewing a deck, else grab all deck ids (inclusive)
         if mw.state == 'overview':
             included_dids = [
                 i for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))
@@ -358,9 +359,13 @@ def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] =
                 name_id.id for name_id in mw.col.decks.all_names_and_ids()
                 if str(name_id) not in excluded_dids
             ]
-
         filtered_did_cmd = f'WHERE cards.did IN {_args_from_ids(included_dids)}'
 
+    # SQL
+    # Select id (unix time), time (elapsed review time) from review logs
+    # Join revlog cid with cards id, and use when comparing the cid vs the did of the review
+    #   (revlog doesn't contain a deck id column)
+    # Select id (unix time) between the (optional) unix time range, else end query (;)
     revlog_cmd = f'''
         SELECT revlog.id, revlog.time
         FROM revlog
