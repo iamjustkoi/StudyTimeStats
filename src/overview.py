@@ -150,17 +150,6 @@ def stats_html():
 #
 #     pattern = r'(?<!%){}'
 #
-#     # print(f'pattern.format={pattern.format(CMD_RANGE_HRS)}')
-#
-#     # if re.search(fr'(?<!%){CMD_TOTAL_HRS}', html):
-#     #     total_hrs = _total_hrs_in_revlog(revlog)
-#     #     total_val = _formatted_time(total_hrs)
-#     #     total_unit = addon_config[get_unit_type(total_hrs)]
-#     #     html = re.sub(pattern.format(CMD_TOTAL_HRS), f'{total_val} {total_unit}', html)
-#
-#     if re.search(pattern.format(CMD_RANGE_HRS), html):
-#         html = re.sub(pattern.format(CMD_RANGE_HRS), val_unit_range(revlog, days_ago), html)
-#
 #     if re.search(pattern.format(CMD_DAY_HRS), html):
 #         html = re.sub(pattern.format(CMD_DAY_HRS), val_unit_range(revlog, days=0), html)
 #
@@ -330,11 +319,63 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             updated_html,
         )
 
-    if re.search(fr'(?<!%){CMD_TOTAL_HRS}', updated_html):
-        sub_html(CMD_TOTAL_HRS, filtered_revlog(addon_config[Config.EXCLUDED_DIDS]))
+    cmd = CMD_TOTAL_HRS
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS]))
 
-    if re.search(fr'(?<!%){CMD_RANGE_HRS}', updated_html):
-        sub_html(CMD_RANGE_HRS, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_from_data(cell_data)))
+    cmd = CMD_RANGE_HRS
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_from_data(cell_data)))
+
+    cmd = CMD_DAY_HRS
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_from_data(cell_data)))
+        pass
+
+    cmd = ''
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_from_data(cell_data)))
+        pass
+
+    cmd = ''
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        pass
+
+    cmd = ''
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        pass
+
+    cmd = ''
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        pass
+
+    cmd = ''
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        pass
+
+    cmd = ''
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        pass
+
+    cmd = ''
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        pass
+
+    cmd = ''
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        pass
+
+    cmd = ''
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        pass
+
+    cmd = ''
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        pass
+
+    cmd = ''
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        pass
 
     print(f'Commands completed. Elapsed time: {((time() - initial_time) * 1000):2f}ms')
     print()
