@@ -8,6 +8,7 @@ CURRENT_VERSION = '1.3.9'
 ANKI_LEGACY_VER = 35
 ANKI_DEFAULT_ROLLOVER = 4
 UNIQUE_DATE = '2006-10-05'
+
 CMD_RANGE = '%range'
 CMD_DATE = '%from_date'
 CMD_YEAR = '%from_year'
