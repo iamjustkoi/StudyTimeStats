@@ -36,7 +36,7 @@ The add-on can also filter text in the custom labels input to show information b
 These macros will each index the received review logs and output its individual value-unit combination (e.g. "%total_hrs" -> "3.14 hrs").
 + `%total_hrs` - total study time
 + `%range_hrs` - ranged study time
-+ `%prev_cal_hrs` - total study time of the last calendar range
++ `%prev_range_hrs` - total study time of the last calendar range
 
 Total time for a specific range (current week, current month, etc):
 + `%week_hrs`, `%two_week_hrs`, `%month_hrs`, `%year_hrs`
