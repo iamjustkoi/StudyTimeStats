@@ -32,22 +32,31 @@ The add-on can also filter text in the custom labels input to show information b
 + `%from_month` - range filter's month name using a compact format (Sep)
 + `%from_full_month` - range filter's full month name (September)
 + `%days` - total days the range filter checks against (17)
+
 ##### Advanced
-These macros will each index the received review logs and output its individual value-unit combination (e.g. "%total_hrs" -> "3.14 hrs").
+
+These macros will each index the received review logs and output its individual value-unit combination (e.g. "
+%total_hrs" -> "3.14 hrs").
+
 + `%total_hrs` - total study time
 + `%range_hrs` - ranged study time
 + `%prev_range_hrs` - total study time of the last calendar range
 
-Total time for a specific range (current week, current month, etc):
-+ `%week_hrs`, `%two_week_hrs`, `%month_hrs`, `%year_hrs`
+Total time for a specific range (current day, current week, current month, etc):
+
++ `day_hrs`, `%week_hrs`, `%two_week_hrs`, `%month_hrs`, `%year_hrs`
 
 Total time for a specific, previous range (previous week, previous month, etc):
-+ `%prev_day_hrs`, `%prev_week_hrs`, `%prev_two_week_hrs`, `%prev_month_hrs`, `%prev_year_hrs` 
+
++ `%prev_day_hrs`, `%prev_week_hrs`, `%prev_two_week_hrs`, `%prev_month_hrs`, `%prev_year_hrs`
 
 Custom date:
-+ `%from_custom_hrs:<YYYY-MM-DD>` - total study time from a unique, input date (e.g. "%from_custom_hrs:2022-03-14" -> "22.5 hrs" (from 2022, March 14th))
+
++ `%from_custom_hrs:<YYYY-MM-DD>` - total study time from a unique, input date (e.g. "%from_custom_hrs:2022-03-14" -> "
+  22.5 hrs" (from 2022, March 14th))
 
 ##### Misc
+
 + `%%` - returns a single % symbol and doesn't apply the text macro (%, %range, etc)
 
 #### Bugs/Issues:
