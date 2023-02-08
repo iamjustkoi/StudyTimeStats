@@ -2,6 +2,7 @@
 # Full license text available in the "LICENSE" file, packaged with the add-on.
 import re
 from datetime import datetime, timedelta
+from time import time
 from typing import Sequence
 
 from aqt import gui_hooks, mw
@@ -315,17 +316,14 @@ def _range_from_data(cell_data: dict) -> tuple[int, int]:
 
 
 def filtered_html(html: str, addon_config: dict, cell_data: dict):
-    cids = filtered_cids(addon_config[Config.EXCLUDED_DIDS], addon_config[Config.INCLUDE_DELETED])
-    # pattern = r'(?<!%){}'
     updated_html = html
+
+    initial_time = time()
 
     def sub_html(macro: str, revlog: list):
         nonlocal updated_html
         total_hrs = _total_hrs_in_revlog(revlog)
         unit_key = _unit_key_for_time(total_hrs)
-        print(f'{macro=}')
-        print(f'{len(revlog)=}')
-        print(f'{total_hrs=}')
         updated_html = re.sub(
             fr'(?<!%){macro}',
             f'{_formatted_time(total_hrs)} {cell_data[unit_key]}',
@@ -333,24 +331,23 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
         )
 
     if re.search(fr'(?<!%){CMD_TOTAL_HRS}', updated_html):
-        sub_html(CMD_TOTAL_HRS, filtered_revlog(cids))
+        sub_html(CMD_TOTAL_HRS, filtered_revlog(addon_config[Config.EXCLUDED_DIDS]))
 
     if re.search(fr'(?<!%){CMD_RANGE_HRS}', updated_html):
-        sub_html(CMD_RANGE_HRS, filtered_revlog(cids, _range_from_data(cell_data)))
+        sub_html(CMD_RANGE_HRS, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_from_data(cell_data)))
+
+    print(f'Commands completed. Elapsed time: {((time() - initial_time) * 1000):2f}ms')
+    print()
 
     return updated_html
 
 
-def filtered_cids(excluded_dids: list = None, include_deleted: bool = False) -> list[Sequence]:
-    excluded_dids = _args_from_ids(excluded_dids)
-
+def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] = None, include_deleted=False) \
+        -> list[Sequence]:
     if include_deleted and mw.state != 'overview':
-        # Including deleted and viewing a specific deck: grab all dids that aren't excluded
-        excluded_cids_cmd = f'SELECT id FROM cards WHERE did in {excluded_dids}'
-        excluded_cids = mw.col.db.all(excluded_cids_cmd)
-        filter_cmd = f'WHERE cid not in {_args_from_ids(excluded_cids)}'
+        filtered_did_cmd = f'WHERE cards.did NOT IN {_args_from_ids(excluded_dids) if excluded_dids else ""}'
+
     else:
-        # Grab all parent and child dids for the current deck, or all dids if viewing all decks, currently
         if mw.state == 'overview':
             included_dids = [
                 i for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))
@@ -361,57 +358,18 @@ def filtered_cids(excluded_dids: list = None, include_deleted: bool = False) -> 
                 name_id.id for name_id in mw.col.decks.all_names_and_ids()
                 if str(name_id) not in excluded_dids
             ]
-        filter_cmd = f'''
-            LEFT JOIN Cards 
-            ON Revlog.cid = Cards.id 
-            WHERE Cards.did IN {_args_from_ids(included_dids)};
-        '''
 
-    return mw.col.db.all(f'SELECT DISTINCT cid FROM revlog {filter_cmd}')
+        filtered_did_cmd = f'WHERE cards.did IN {_args_from_ids(included_dids)}'
 
+    revlog_cmd = f'''
+        SELECT revlog.id, revlog.time
+        FROM revlog
+        INNER JOIN cards
+        ON revlog.cid = cards.id
+        {filtered_did_cmd}       
+    ''' + (f' AND revlog.id BETWEEN {time_range_ms[0]} AND {time_range_ms[1]};' if time_range_ms else ';')
 
-def filtered_revlog(cids: list, time_range_ms: tuple[int, int] = None) \
-        -> list[Sequence]:
-    revlog_cmd = f'SELECT id, time FROM revlog WHERE cid in {_args_from_ids(cids)}'
-    revlog_cmd += f' AND id BETWEEN {time_range_ms[0]} AND {time_range_ms[1]}' if time_range_ms else ''
     return mw.col.db.all(revlog_cmd)
-
-
-# def full_revlog(addon_config) -> list:
-#     """
-#     Retrieves Anki review data using the currently displayed decks and excluded decks filters.
-#
-#     :param addon_config: config to use as a reference for excluded deck ids
-#     :return: a sequence with the format: [[log_id, review_time], ...]
-#     """
-#     excluded_dids = _args_from_ids(addon_config[Config.EXCLUDED_DIDS])
-#
-#     # Get deleted cards on overview, otherwise use standard known-cards per-deck
-#     if addon_config[Config.INCLUDE_DELETED] and mw.state != 'overview':
-#         excluded_cids_cmd = f'SELECT id FROM cards WHERE did in {excluded_dids}'
-#         excluded_cids = mw.col.db.all(excluded_cids_cmd)
-#         cids_cmd = f'SELECT cid FROM revlog WHERE cid not in {_args_from_ids(excluded_cids)}'
-#     else:
-#         if mw.state == 'overview':
-#             # grab all parent and child dids for the current deck
-#             dids = [str(i) for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))]
-#         else:
-#             # grab all dids
-#             dids = [str(name_id.id) for name_id in mw.col.decks.all_names_and_ids()]
-#
-#         for excluded_did in excluded_dids:
-#             if excluded_did in dids:
-#                 dids.remove(excluded_did)
-#
-#         cids_cmd = f'SELECT id FROM cards WHERE did in {_args_from_ids(dids)}'
-#
-#     all_cids = mw.col.db.all(cids_cmd)
-#     # Remove duplicates via set-builder syntax
-#     unique_cids = {cid[0] for cid in all_cids}
-#
-#     revlog_cmd = f'SELECT id, time FROM revlog WHERE cid in {_args_from_ids(list(unique_cids))}'
-#
-#     return mw.col.db.all(revlog_cmd)
 
 
 def days_since_week_start(
