@@ -225,12 +225,17 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             Config.RANGE: cell_data[Config.RANGE],
             Config.USE_CALENDAR: True,
             Config.WEEK_START: cell_data[Config.WEEK_START],
+            Config.DAYS: cell_data[Config.DAYS],
         }
         sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
 
-    # cmd = CMD_PREV_DAY_HRS
-    # if re.search(fr'(?<!%){cmd}', updated_html):
-    #     pass
+    cmd = CMD_PREV_DAY_HRS
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        placeholder_data = {
+            Config.RANGE: Range.CUSTOM,
+            Config.DAYS: 1,
+        }
+        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
     #
     # cmd = CMD_PREV_WEEK_HRS
     # if re.search(fr'(?<!%){cmd}', updated_html):
@@ -299,11 +304,16 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
         return 0, int(to_date.timestamp() * 1000)
 
     elif cell_data[Config.RANGE] == Range.CUSTOM:
-        from_days = cell_data[Config.DAYS] * iterations + (cell_data[Config.DAYS] > 1) - 1
+        from_days = cell_data[Config.DAYS] * iterations + cell_data[Config.DAYS] - 1
         from_ms = int((to_date - timedelta(days=from_days)).timestamp() * 1000)
 
         to_days = cell_data[Config.DAYS] * (iterations - 1)
         to_ms = int((to_date - timedelta(days=to_days)).timestamp() * 1000)
+
+        print(
+            f'range={datetime.fromtimestamp(from_ms / 1000).strftime("%x(%H:%M)")} <=> '
+            f'{datetime.fromtimestamp(to_ms / 1000).strftime("%x(%H:%M)")}'
+        )
 
         return from_ms, to_ms
 
