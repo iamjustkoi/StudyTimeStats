@@ -310,13 +310,14 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
     else:
         if cell_data[Config.USE_CALENDAR]:
             if cell_data[Config.RANGE] in (Range.WEEK, Range.TWO_WEEKS):
-                weeks = 1 + (cell_data[Config.RANGE] == Range.TWO_WEEKS)
-
+                weeks = 1 if cell_data[Config.RANGE] != Range.TWO_WEEKS else 2
                 days_since_start = days_since_week_start(weeks, cell_data[Config.WEEK_START], to_date)
 
+                # Go to the first day of the week, then subtract by the number of iterations * days in a week
                 delta_days = days_since_start + ((iterations - 1) * (Range.DAYS_IN[Range.WEEK] * weeks))
                 from_ms = int((to_date - timedelta(days=(delta_days + 1))).timestamp() * 1000)
 
+                # Go forward again by 1 week, if iterating, else just use the current day
                 to_delta_days = (delta_days - (Range.DAYS_IN[Range.WEEK] * weeks) + 1) if iterations > 1 else 0
                 to_ms = int((to_date - timedelta(days=to_delta_days)).timestamp() * 1000)
 
