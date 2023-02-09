@@ -431,8 +431,7 @@ def days_since_week_start(
     :param from_date: changes the reference date to this datetime
     :return: days since week start
     """
-    from_adjusted_date = date_with_rollover(from_date)
-    ref_day = from_adjusted_date.weekday()
+    ref_day = from_date.weekday()
     # Adds an extra week if the current day is already past the week start
     return (total_weeks * 7) + ((ref_day - week_start_day) - (7 * (ref_day >= week_start_day)))
 
