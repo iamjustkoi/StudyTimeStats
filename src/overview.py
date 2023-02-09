@@ -305,10 +305,6 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
         to_days = cell_data[Config.DAYS] * (iterations - 1)
         to_ms = int((to_date - timedelta(days=to_days)).timestamp() * 1000)
 
-        print(
-            f'range={datetime.fromtimestamp(from_ms / 1000).strftime("%x")} <=> '
-            f'{datetime.fromtimestamp(to_ms / 1000).strftime("%x")}'
-        )
         return from_ms, to_ms
 
     else:
@@ -352,13 +348,10 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
                     # update to_ms to be the previous year's time
 
                     for i in range(iterations - 1):
-                        print(f'year.i={i}')
-                        print(f'{current_year=}')
                         current_year -= 1
                         delta_days += calendar.isleap(current_year - 1) and 366 or 365
                         to_ms = int(to_date.replace(year=current_year, month=12, day=31).timestamp() * 1000)
 
-                print(f'{delta_days=}')
                 from_ms = int((to_date.replace(month=1, day=1) - timedelta(days=delta_days)).timestamp() * 1000)
 
                 return from_ms, to_ms
@@ -371,10 +364,6 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
             to_days = Range.DAYS_IN[cell_data[Config.RANGE]] * (iterations - 1)
             to_ms = int((to_date - timedelta(days=to_days)).timestamp() * 1000)
 
-            print(
-                f'range={datetime.fromtimestamp(from_ms / 1000).strftime("%x")} <=> '
-                f'{datetime.fromtimestamp(to_ms / 1000).strftime("%x")}'
-            )
             return from_ms, to_ms
 
 
