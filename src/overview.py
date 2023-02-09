@@ -444,5 +444,5 @@ def date_with_rollover(date: datetime = datetime.today(), is_day_end=True):
     :param date: date to adjust
     :return: an adjusted datetime object
     """
-    return date.replace(hour=23, minute=59, second=59) - timedelta(hours=_offset_hour()) if is_day_end \
+    return date.replace(hour=23, minute=59, second=59) + timedelta(hours=_offset_hour()) if is_day_end \
         else date - timedelta(hours=_offset_hour())
