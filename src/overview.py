@@ -2,6 +2,7 @@
 # Full license text available in the "LICENSE" file, packaged with the add-on.
 import re
 from datetime import datetime, timedelta
+import calendar
 from time import time
 from typing import Sequence
 
@@ -146,178 +147,25 @@ def stats_html():
     return HTML_SHELL.replace("{cell_data}", cell_data_html())
 
 
-# def legacy_filtered_html(html: str, revlog: list, range_type, use_cal=False, week_start=0, custom_days=7):
-#
-#     pattern = r'(?<!%){}'
-#
-#     if re.search(pattern.format(CMD_DAY_HRS), html):
-#         html = re.sub(pattern.format(CMD_DAY_HRS), val_unit_range(revlog, days=0), html)
-#
-#     # html = re.sub(pattern.format(___), ___, html)
-#
-#     if re.search(pattern.format(CMD_WEEK_HRS), html):
-#         html = re.sub(
-#             pattern.format(CMD_WEEK_HRS), val_unit_range(revlog, get_days_ago(Range.WEEK)), html
-#         )
-#
-#     if re.search(pattern.format(CMD_TWO_WEEKS_HRS), html):
-#         html = re.sub(
-#             pattern.format(CMD_TWO_WEEKS_HRS),
-#             val_unit_range(revlog, get_days_ago(Range.TWO_WEEKS)),
-#             html
-#         )
-#
-#     if re.search(pattern.format(CMD_MONTH_HRS), html):
-#         html = re.sub(
-#             pattern.format(CMD_MONTH_HRS), val_unit_range(revlog, get_days_ago(Range.MONTH)), html
-#         )
-#
-#     if re.search(pattern.format(CMD_YEAR_HRS), html):
-#         html = re.sub(
-#             pattern.format(CMD_YEAR_HRS), val_unit_range(revlog, get_days_ago(Range.YEAR)), html
-#         )
-#
-#     if re.search(pattern.format(CMD_PREV_RANGE_HRS), html):
-#         range_hrs = val_unit_range(revlog, range_type=range_type, start_at=1)
-#         html = re.sub(pattern.format(CMD_PREV_RANGE_HRS), range_hrs, html)
-#
-#     if re.search(pattern.format(CMD_PREV_WEEK_HRS), html):
-#         range_hrs = val_unit_range(revlog, range_type=Range.WEEK, start_at=1)
-#         html = re.sub(pattern.format(CMD_PREV_WEEK_HRS), range_hrs, html)
-#
-#     if re.search(pattern.format(CMD_PREV_TWO_WEEKS_HRS), html):
-#         range_hrs = val_unit_range(revlog, range_type=Range.TWO_WEEKS, start_at=1)
-#         html = re.sub(pattern.format(CMD_PREV_TWO_WEEKS_HRS), range_hrs, html)
-#
-#     if re.search(pattern.format(CMD_PREV_MONTH_HRS), html):
-#         range_hrs = val_unit_range(revlog, range_type=Range.MONTH, start_at=1)
-#         html = re.sub(pattern.format(CMD_PREV_MONTH_HRS), range_hrs, html)
-#
-#     if re.search(pattern.format(CMD_PREV_YEAR_HRS), html):
-#         range_hrs = val_unit_range(revlog, range_type=Range.YEAR, start_at=1)
-#         html = re.sub(pattern.format(CMD_PREV_YEAR_HRS), range_hrs, html)
-#
-#     # Use for not returning duplicates in double-passed variables:
-#     if re.search(pattern.format(CMD_PREV_DAY_HRS), html):
-#         ref_date = (datetime.today() - timedelta(days=1)).replace(hour=23, minute=59, second=59)
-#         ranged_hrs = _total_hrs_in_revlog(get_logs_in_range(revlog, 0, ref_date))
-#         range_val = _formatted_time(ranged_hrs)
-#         range_unit = addon_config[get_unit_type(ranged_hrs)]
-#         html = re.sub(pattern.format(CMD_PREV_DAY_HRS), f'{range_val} {range_unit}', html)
-#
-#     if re.search(pattern.format(CMD_RANGE), html):
-#         if range_type != Range.CUSTOM:
-#             range_text = Range.LABEL[range_type]
-#         else:
-#             range_text = f'{addon_config[Config.CUSTOM_DAYS]} {String.DAYS}'
-#         html = re.sub(pattern.format(CMD_RANGE), range_text, html)
-#
-#     if re.search(pattern.format(CMD_DATE), html):
-#         html = re.sub(
-#             pattern.format(CMD_DATE), (datetimedate.today() - timedelta(days=days_ago)).strftime('%x'), html
-#         )
-#
-#     if re.search(pattern.format(CMD_YEAR), html):
-#         html = re.sub(
-#             pattern.format(CMD_YEAR), (datetimedate.today() - timedelta(days=days_ago)).strftime('%Y'), html
-#         )
-#
-#     if re.search(pattern.format(CMD_FULL_DAY), html):
-#         html = re.sub(
-#             pattern.format(CMD_FULL_DAY), (datetimedate.today() - timedelta(days=days_ago)).strftime('%A'), html
-#         )
-#
-#     if re.search(pattern.format(CMD_DAY), html):
-#         html = re.sub(
-#             pattern.format(CMD_DAY), (datetimedate.today() - timedelta(days=days_ago)).strftime('%a'), html
-#         )
-#
-#     if re.search(pattern.format(CMD_MONTH), html):
-#         html = re.sub(
-#             pattern.format(CMD_MONTH), (datetimedate.today() - timedelta(days=days_ago)).strftime('%b'), html
-#         )
-#
-#     if re.search(pattern.format(CMD_FULL_MONTH), html):
-#         html = re.sub(
-#             pattern.format(CMD_FULL_MONTH), (datetimedate.today() - timedelta(days=days_ago)).strftime('%B'), html
-#         )
-#
-#     if re.search(pattern.format(CMD_DAYS), html):
-#         html = re.sub(pattern.format(CMD_DAYS), f'{days_ago}', html)
-#         # if re.search(r'(?<!%)%date\(.*,+.*\)', html):  # future filter?
-#
-#     # Removed assignment expression (:=) for Python 3.7 builds
-#     matches = re.search(pattern.format(fr'{CMD_FROM_DATE_HRS}\d\d\d\d-\d\d-\d\d'), html)
-#     if matches:
-#         try:
-#             day_range = (datetime.today() - datetime.fromisoformat(matches.group(2))).days
-#             ranged_hrs = _total_hrs_in_revlog(get_logs_in_range(revlog, day_range))
-#             range_val = _formatted_time(ranged_hrs)
-#             range_unit = addon_config[get_unit_type(ranged_hrs)]
-#             html = re.sub(pattern.format("".join(matches.groups())), f'{range_val} {range_unit}', html)
-#         except ValueError:
-#             aqt.utils.showWarning(f'{traceback.format_exc()}')
-#
-#     if re.search(r'%%', html):
-#         html = html.replace('%%', '%')
-#
-#     return html
-
-
-def _range_from_data(cell_data: dict, to_date=datetime.utcnow()) -> tuple[int, int]:
-    # range type ->
-    #   total: return 0 ~ date.now
-    #   use_cal ->
-    #       week/2weeks: return days_since_week_start(num_weeks) ~ date.now
-    #       month: return month_start_date ~ date.now
-    #       year: return year_start_date ~ date.now
-    #   not use_cal ->
-    #       return (date.now - Range[range type]) ~ date.now
-    to_date = date_with_rollover(to_date)
-    to_ms = int(to_date.timestamp() * 1000)
-
-    if cell_data[Config.RANGE] == Range.TOTAL:
-        return 0, to_ms
-
-    elif cell_data[Config.RANGE] == Range.CUSTOM:
-        from_ms = int((to_date - timedelta(days=cell_data[Config.DAYS])).timestamp() * 1000)
-        return from_ms, to_ms
-
-    else:
-        if cell_data[Config.USE_CALENDAR]:
-            if cell_data[Config.RANGE] in (Range.WEEK, Range.TWO_WEEKS):
-                weeks = 1 + (cell_data[Config.RANGE] == Range.TWO_WEEKS)
-                delta_days = (days_since_week_start(weeks, cell_data[Config.WEEK_START], to_date))
-                from_ms = int((to_date - timedelta(days=(delta_days + 1))).timestamp() * 1000)
-                return from_ms, to_ms
-
-            elif cell_data[Config.RANGE] == Range.MONTH:
-                from_ms = int((to_date.replace(day=1) - timedelta(days=1)).timestamp() * 1000)
-                return from_ms, to_ms
-
-            elif cell_data[Config.RANGE] == Range.YEAR:
-                from_ms = int((to_date.replace(month=1, day=1) - timedelta(days=1)).timestamp() * 1000)
-                return from_ms, to_ms
-
-        elif not cell_data[Config.USE_CALENDAR]:
-            from_ms = int((to_date - timedelta(days=Range.DAYS_IN[cell_data[Config.RANGE]])).timestamp() * 1000)
-            return from_ms, to_ms
-
-
 def filtered_html(html: str, addon_config: dict, cell_data: dict):
     updated_html = html
-
     initial_time = time()
 
     def sub_html(macro: str, revlog: list):
         nonlocal updated_html
         total_hrs = _total_hrs_in_revlog(revlog)
         unit_key = _unit_key_for_time(total_hrs)
+        print(f'{cell_data[Config.TITLE]=}')
+        print(f'{macro=}')
+        print(f'{cell_data[Config.RANGE]=}')
+        print(f'{total_hrs=}')
         updated_html = re.sub(
             fr'(?<!%){macro}',
             f'{_formatted_time(total_hrs)} {cell_data[unit_key]}',
             updated_html,
         )
+
+    # Time
 
     cmd = CMD_TOTAL_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
@@ -325,62 +173,209 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
 
     cmd = CMD_RANGE_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
-        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_from_data(cell_data)))
+        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(cell_data)))
 
     cmd = CMD_DAY_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
-        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_from_data(cell_data)))
-        pass
+        placeholder_data = {
+            Config.RANGE: Range.CUSTOM,
+            Config.DAYS: 1,
+        }
+        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)))
 
-    cmd = ''
+    cmd = CMD_WEEK_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
-        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_from_data(cell_data)))
-        pass
+        placeholder_data = {
+            Config.RANGE: Range.WEEK,
+            Config.USE_CALENDAR: True,
+            Config.WEEK_START: cell_data[Config.WEEK_START],
+        }
+        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)))
 
-    cmd = ''
+    cmd = CMD_TWO_WEEKS_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
-        pass
+        placeholder_data = {
+            Config.RANGE: Range.TWO_WEEKS,
+            Config.USE_CALENDAR: True,
+            Config.WEEK_START: cell_data[Config.WEEK_START],
+        }
+        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)))
 
-    cmd = ''
+    cmd = CMD_MONTH_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
-        pass
+        placeholder_data = {
+            Config.RANGE: Range.MONTH,
+            Config.USE_CALENDAR: True,
+            Config.WEEK_START: cell_data[Config.WEEK_START],
+        }
+        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)))
 
-    cmd = ''
+    cmd = CMD_YEAR_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
-        pass
+        placeholder_data = {
+            Config.RANGE: Range.YEAR,
+            Config.USE_CALENDAR: True,
+            Config.WEEK_START: cell_data[Config.WEEK_START],
+        }
+        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)))
 
-    cmd = ''
+    cmd = CMD_PREV_RANGE_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
-        pass
+        placeholder_data = {
+            Config.RANGE: cell_data[Config.RANGE],
+            Config.USE_CALENDAR: True,
+            Config.WEEK_START: cell_data[Config.WEEK_START],
+        }
+        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
 
-    cmd = ''
-    if re.search(fr'(?<!%){cmd}', updated_html):
-        pass
+    # cmd = CMD_PREV_DAY_HRS
+    # if re.search(fr'(?<!%){cmd}', updated_html):
+    #     pass
+    #
+    # cmd = CMD_PREV_WEEK_HRS
+    # if re.search(fr'(?<!%){cmd}', updated_html):
+    #     pass
+    #
+    # cmd = CMD_PREV_TWO_WEEKS_HRS
+    # if re.search(fr'(?<!%){cmd}', updated_html):
+    #     pass
+    #
+    # cmd = CMD_PREV_MONTH_HRS
+    # if re.search(fr'(?<!%){cmd}', updated_html):
+    #     pass
+    #
+    # cmd = CMD_PREV_YEAR_HRS
+    # if re.search(fr'(?<!%){cmd}', updated_html):
+    #     pass
+    #
+    # cmd = CMD_FROM_DATE_HRS
+    # if re.search(fr'(?<!%){cmd}', updated_html):
+    #     pass
 
-    cmd = ''
-    if re.search(fr'(?<!%){cmd}', updated_html):
-        pass
+    # Text
 
-    cmd = ''
-    if re.search(fr'(?<!%){cmd}', updated_html):
-        pass
+    # cmd = CMD_RANGE
+    # if re.search(fr'(?<!%){cmd}', updated_html):
+    #     pass
 
-    cmd = ''
-    if re.search(fr'(?<!%){cmd}', updated_html):
-        pass
+    # cmd = CMD_DATE
+    # if re.search(fr'(?<!%){cmd}', updated_html):
+    #     pass
 
-    cmd = ''
-    if re.search(fr'(?<!%){cmd}', updated_html):
-        pass
+    # cmd = CMD_YEAR
+    # if re.search(fr'(?<!%){cmd}', updated_html):
+    #     pass
 
-    cmd = ''
-    if re.search(fr'(?<!%){cmd}', updated_html):
-        pass
+    # cmd = CMD_FULL_DAY
+    # if re.search(fr'(?<!%){cmd}', updated_html):
+    #     pass
+
+    # cmd = CMD_DAY
+    # if re.search(fr'(?<!%){cmd}', updated_html):
+    #     pass
+
+    # cmd = CMD_DAYS
+    # if re.search(fr'(?<!%){cmd}', updated_html):
+    #     pass
+
+    # cmd = CMD_MONTH
+    # if re.search(fr'(?<!%){cmd}', updated_html):
+    #     pass
+
+    # cmd = CMD_FULL_MONTH
+    # if re.search(fr'(?<!%){cmd}', updated_html):
+    #     pass
 
     print(f'Commands completed. Elapsed time: {((time() - initial_time) * 1000):2f}ms')
     print()
 
     return updated_html
+
+
+def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
+    to_date = date_with_rollover(datetime.utcnow())
+
+    if cell_data[Config.RANGE] == Range.TOTAL:
+        return 0, int(to_date.timestamp() * 1000)
+
+    elif cell_data[Config.RANGE] == Range.CUSTOM:
+        from_days = cell_data[Config.DAYS] * iterations + (cell_data[Config.DAYS] > 1) - 1
+        from_ms = int((to_date - timedelta(days=from_days)).timestamp() * 1000)
+
+        to_days = cell_data[Config.DAYS] * (iterations - 1)
+        to_ms = int((to_date - timedelta(days=to_days)).timestamp() * 1000)
+
+        print(
+            f'range={datetime.fromtimestamp(from_ms / 1000).strftime("%x")} <=> '
+            f'{datetime.fromtimestamp(to_ms / 1000).strftime("%x")}'
+        )
+        return from_ms, to_ms
+
+    else:
+        if cell_data[Config.USE_CALENDAR]:
+            if cell_data[Config.RANGE] in (Range.WEEK, Range.TWO_WEEKS):
+                weeks = 1 + (cell_data[Config.RANGE] == Range.TWO_WEEKS)
+
+                days_since_start = days_since_week_start(weeks, cell_data[Config.WEEK_START], to_date)
+
+                delta_days = days_since_start + ((iterations - 1) * (Range.DAYS_IN[Range.WEEK] * weeks))
+                from_ms = int((to_date - timedelta(days=(delta_days + 1))).timestamp() * 1000)
+
+                to_delta_days = (delta_days - (Range.DAYS_IN[Range.WEEK] * weeks) + 1) if iterations > 1 else 0
+                to_ms = int((to_date - timedelta(days=to_delta_days)).timestamp() * 1000)
+
+                return from_ms, to_ms
+
+            elif cell_data[Config.RANGE] == Range.MONTH:
+                # Approximating using 30 days then grabbing the resulting month's range
+                delta_days = (30 * (iterations - 1))
+
+                # inclusive (goes back 1 more day)
+                from_date = (to_date - timedelta(days=delta_days)).replace(day=1) + timedelta(days=-1)
+
+                # If iterations are set, use the first day of the month for the end of the range, instead
+                if iterations > 1:
+                    month_range = calendar.monthrange(from_date.year, from_date.month)[1]
+                    to_date = (from_date + timedelta(days=month_range))
+
+                from_ms = int(from_date.timestamp() * 1000)
+                to_ms = int(to_date.timestamp() * 1000)
+                return from_ms, to_ms
+
+            elif cell_data[Config.RANGE] == Range.YEAR:
+                # inclusive (extra day added)
+                delta_days = 1
+                to_ms = int(to_date.timestamp() * 1000)
+
+                if iterations > 1:
+                    current_year = to_date.year
+                    # update to_ms to be the previous year's time
+
+                    for i in range(iterations - 1):
+                        print(f'year.i={i}')
+                        print(f'{current_year=}')
+                        current_year -= 1
+                        delta_days += calendar.isleap(current_year - 1) and 366 or 365
+                        to_ms = int(to_date.replace(year=current_year, month=12, day=31).timestamp() * 1000)
+
+                print(f'{delta_days=}')
+                from_ms = int((to_date.replace(month=1, day=1) - timedelta(days=delta_days)).timestamp() * 1000)
+
+                return from_ms, to_ms
+
+        elif not cell_data[Config.USE_CALENDAR]:
+            from_days = Range.DAYS_IN[cell_data[Config.RANGE]] * iterations + (
+                    Range.DAYS_IN[cell_data[Config.RANGE]] > 1)
+            from_ms = int((to_date - timedelta(days=from_days)).timestamp() * 1000)
+
+            to_days = Range.DAYS_IN[cell_data[Config.RANGE]] * (iterations - 1)
+            to_ms = int((to_date - timedelta(days=to_days)).timestamp() * 1000)
+
+            print(
+                f'range={datetime.fromtimestamp(from_ms / 1000).strftime("%x")} <=> '
+                f'{datetime.fromtimestamp(to_ms / 1000).strftime("%x")}'
+            )
+            return from_ms, to_ms
 
 
 def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] = None, include_deleted=False) \
