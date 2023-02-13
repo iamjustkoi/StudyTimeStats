@@ -1,6 +1,7 @@
 # MIT License: Copyright (c) 2022-2023 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
 # Full license text available in the "LICENSE" file, packaged with the add-on.
 import re
+import traceback
 from datetime import datetime, timedelta
 import calendar
 from time import time
@@ -236,15 +237,25 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             Config.DAYS: 1,
         }
         sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
-    #
-    # cmd = CMD_PREV_WEEK_HRS
-    # if re.search(fr'(?<!%){cmd}', updated_html):
-    #     pass
-    #
-    # cmd = CMD_PREV_TWO_WEEKS_HRS
-    # if re.search(fr'(?<!%){cmd}', updated_html):
-    #     pass
-    #
+
+    cmd = CMD_PREV_WEEK_HRS
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        placeholder_data = {
+            Config.RANGE: Range.WEEK,
+            Config.USE_CALENDAR: True,
+            Config.WEEK_START: cell_data[Config.WEEK_START],
+        }
+        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
+
+    cmd = CMD_PREV_TWO_WEEKS_HRS
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        placeholder_data = {
+            Config.RANGE: Range.TWO_WEEKS,
+            Config.USE_CALENDAR: True,
+            Config.WEEK_START: cell_data[Config.WEEK_START],
+        }
+        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
+
     # cmd = CMD_PREV_MONTH_HRS
     # if re.search(fr'(?<!%){cmd}', updated_html):
     #     pass
@@ -253,9 +264,25 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
     # if re.search(fr'(?<!%){cmd}', updated_html):
     #     pass
     #
-    # cmd = CMD_FROM_DATE_HRS
-    # if re.search(fr'(?<!%){cmd}', updated_html):
-    #     pass
+
+    cmd = fr'{CMD_FROM_DATE_HRS}(\d\d\d\d-\d\d-\d\d)'
+    max_warn_count = 3
+    for match in re.findall(fr'(?<!%){cmd}', updated_html):
+        try:
+            # minus a day for inclusive checking
+            from_date = date_with_rollover(datetime.fromisoformat(match)) - timedelta(days=1)
+            from_time_ms = int(from_date.timestamp() * 1000)
+            to_time_ms = int(date_with_rollover(datetime.today()).timestamp() * 1000)
+
+            sub_html(
+                fr'{CMD_FROM_DATE_HRS}{match}',
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_time_ms, to_time_ms)),
+            )
+        except ValueError:
+            if max_warn_count > 0:
+                aqt.utils.showWarning(f'{traceback.format_exc()}')
+                max_warn_count -= 1
+            sub_html(cmd, [])
 
     # Text
 
@@ -320,15 +347,18 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
     else:
         if cell_data[Config.USE_CALENDAR]:
             if cell_data[Config.RANGE] in (Range.WEEK, Range.TWO_WEEKS):
-                weeks = 1 if cell_data[Config.RANGE] != Range.TWO_WEEKS else 2
-                days_since_start = days_since_week_start(weeks, cell_data[Config.WEEK_START], to_date)
+                total_weekdays = Range.DAYS_IN[cell_data[Config.RANGE]]
 
-                # Go to the first day of the week, then subtract by the number of iterations * days in a week
-                delta_days = days_since_start + ((iterations - 1) * (Range.DAYS_IN[Range.WEEK] * weeks))
-                from_ms = int((to_date - timedelta(days=(delta_days + 1))).timestamp() * 1000)
+                days_since_start = to_date.weekday() - cell_data[Config.WEEK_START]
+                # Plus an extra interval, if past the current week's start-day
+                days_since_start += 7 * (days_since_start > 0) + (7 * (total_weekdays == 14))
+
+                # Days since the first day of the week + (iterations * weekdays) + weekdays
+                delta_days = days_since_start + ((iterations - 1) * total_weekdays) + total_weekdays
+                from_ms = int((to_date - timedelta(days=delta_days)).timestamp() * 1000)
 
                 # Go forward again by 1 week, if iterating, else just use the current day
-                to_delta_days = (delta_days - (Range.DAYS_IN[Range.WEEK] * weeks) + 1) if iterations > 1 else 0
+                to_delta_days = delta_days - ((iterations - 1) * total_weekdays) if iterations > 1 else 0
                 to_ms = int((to_date - timedelta(days=to_delta_days)).timestamp() * 1000)
 
                 return from_ms, to_ms
@@ -414,21 +444,19 @@ def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] =
 
 
 def days_since_week_start(
-    total_weeks: int,
     week_start_day: int,
-    from_date: datetime
+    current_day: int
 ):
     """
     Gets days since the last week-start date based on a set number of weeks.
 
-    :param total_weeks: range of weeks to use as a reference point
     :param week_start_day: start of the week to count total days from
-    :param from_date: changes the reference date to this datetime
+    :param current_day: an integer representation of the current week-day
     :return: days since week start
     """
-    ref_day = from_date.weekday()
+
     # Adds an extra week if the current day is already past the week start
-    return (total_weeks * 7) + ((ref_day - week_start_day) - (7 * (ref_day >= week_start_day)))
+    return current_day - week_start_day - (7 * (current_day >= week_start_day))
 
 
 def date_with_rollover(date: datetime = datetime.today()):
