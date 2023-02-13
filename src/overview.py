@@ -431,13 +431,11 @@ def days_since_week_start(
     return (total_weeks * 7) + ((ref_day - week_start_day) - (7 * (ref_day >= week_start_day)))
 
 
-def date_with_rollover(date: datetime = datetime.today(), is_day_end=True):
+def date_with_rollover(date: datetime = datetime.today()):
     """
     Retrieves a date-time adjusted to its day-end hour and Anki/add-on preferences for end of day.
 
-    :param is_day_end:
     :param date: date to adjust
     :return: an adjusted datetime object
     """
-    return date.replace(hour=23, minute=59, second=59) + timedelta(hours=_offset_hour()) if is_day_end \
-        else date - timedelta(hours=_offset_hour())
+    return date.replace(hour=23, minute=59, second=59) + timedelta(hours=_offset_hour())
