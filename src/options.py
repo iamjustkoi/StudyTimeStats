@@ -32,10 +32,7 @@ from ..res.ui.cell_item import Ui_CellWidget
 from ..res.ui.options_dialog import Ui_OptionsDialog
 
 
-def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem = None):
-    if cell_item is None:
-        cell_item = CellItem(list_widget, False)
-
+def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem):
     list_widget.addItem(cell_item.list_item)
     list_widget.setItemWidget(cell_item.list_item, cell_item)
     list_widget.sortItems()
@@ -44,8 +41,8 @@ def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem = None):
 
 def _remove_cell_from_list(list_widget: QListWidget, cell_item: CellItem):
     for i in range(list_widget.count()):
-        item: CellItem.CellListItem = list_widget.item(i)
-        if item and item.cell_item == cell_item:
+        item = list_widget.item(i)
+        if item and isinstance(item, CellItem.CellListItem) and item.cell_item == cell_item:
             list_widget.takeItem(i)
             break
 
@@ -255,17 +252,6 @@ Retrieves currently excluded deck id's.
                 dids.append(self.manager.decks.id(deck_item.label.text(), create=False))
         return dids
 
-    #     def _redraw_calendar_checkbox(self):
-    #         """
-    # Redraws the calendar date checkbox using the updated label's width.
-    #         """
-    #         width = self.ui.use_calendar_checkbox.width()
-    #         height = self.ui.use_calendar_checkbox.height()
-    #         x = self.ui.use_calendar_checkbox.pos().x()
-    #         y = self.ui.use_calendar_checkbox.pos().y()
-    #
-    #         self.ui.use_calendar_checkbox.setGeometry(QRect(x, y, width, height))
-
     def accept(self) -> None:
         """
 Saves all user config values and closes the window.
@@ -308,44 +294,6 @@ Copies a link to the clipboard based on the input button.
             cb.setText(KOFI_URL)
         elif button.objectName() == self.ui.like_button.objectName():
             cb.setText(ANKI_URL)
-
-    #     def open_color_dialog(self, preview: QLabel):
-    #         """
-    # Opens a color picker dialog and updates the selected config color.
-    #         :param preview: QLabel to update when showing the selected color value
-    #         """
-    #         is_primary = preview.objectName() == self.ui.primary_color_preview.objectName()
-    #         selected_color = self._primary_color if is_primary else self._secondary_color
-    #
-    #         color = QColorDialog().getColor(initial=QColor(selected_color), options=QColorDialog.ShowAlphaChannel)
-    #
-    #         if color.isValid():
-    #             color_name = color.name(QColor.HexRgb)
-    #             set_label_background(preview, color_name)
-    #             if is_primary:
-    #                 self._primary_color = color_name
-    #             else:
-    #                 self._secondary_color = color_name
-
-    # def on_range_type_change(self, idx: int):
-    #     """
-    # Updates dialog ui based on the current range-type selection.
-    #     :param idx: range-type index
-    #     """
-    #     if idx == Range.CUSTOM:
-    #         self.ui.custom_range_spinbox.show()
-    #         self.ui.use_calendar_checkbox.hide()
-    #         # self.ui.appearance_grid_layout.replaceWidget(self.ui.use_calendar_checkbox,
-    #         self.ui.custom_range_spinbox)
-    #         self.ui.range_select_layout.layout().replaceWidget(self.ui.use_calendar_checkbox,
-    #                                                            self.ui.custom_range_spinbox)
-    #     else:
-    #         self.ui.custom_range_spinbox.hide()
-    #         self.ui.use_calendar_checkbox.show()
-    #         self.ui.range_select_layout.layout().replaceWidget(self.ui.custom_range_spinbox,
-    #                                                            self.ui.use_calendar_checkbox)
-    #
-    #     self.update_calendar_range_extras()
 
     def on_restore_defaults(self):
         """
@@ -453,8 +401,9 @@ class CellItem(QWidget):
     color_changed = pyqtSignal()
 
     button_colors: dict = {}
-    data: dict = {k: v for k, v in Config.DEFAULT_CELL_DATA.items()}
+    data: dict = {}
     direction = 'vertical'
+    index = 0
 
     class CellListItem(QListWidgetItem):
         cell_item: CellItem
@@ -472,9 +421,6 @@ class CellItem(QWidget):
 
             return False
 
-        # def setData(self, role: int, value: typing.Any):
-        #     super().setData(role, value)
-
     def __init__(self, list_widget: QListWidget, is_empty: bool = False, data: dict = None):
         super().__init__()
 
@@ -482,17 +428,23 @@ class CellItem(QWidget):
         self.is_empty = is_empty
         self.widget = Ui_CellWidget()
         self.widget.setupUi(CellWidget=self)
+        self.list_widget = list_widget
 
-        self.list_item = CellItem.CellListItem(list_widget, cell_item=self)
+        self.list_item = CellItem.CellListItem(self.list_widget, cell_item=self)
 
         # print(f'{aqt.mw.pm=}')
         # print(f'{aqt.mw.pm.night_mode()=}')
         # print(f'{aqt.mw.pm.theme()=}')
 
-        if is_empty:
-            self.widget.addButton.clicked.connect(lambda *_: _add_cell_to_list(list_widget, None))
+        def add_cell():
+            _add_cell_to_list(self.list_widget, CellItem(self.list_widget, False))
 
-            self.widget.addButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{ADD_ICON_PATH}'))
+        if is_empty:
+            self.widget.addButton.clicked.connect(lambda *_: add_cell())
+
+            self.widget.addButton.setRawIcon(
+                QIcon(f'{Path(__file__).parent.resolve()}\\{ADD_ICON_PATH}')
+            )
             self.widget.addButton.setTint(Color.BUTTON_ICON[theme_manager.get_night_mode()])
             self.widget.addButton.setHoverTint(Color.HOVER[theme_manager.get_night_mode()])
 
@@ -500,20 +452,20 @@ class CellItem(QWidget):
             self.widget.mainFrame.setVisible(False)
             self.setMinimumHeight(self.widget.addButton.height())
         else:
-            self.build_hover_buttons(list_widget)
+            self.build_hover_buttons()
             self.build_color_pickers()
             self.build_direction_buttons()
             self.build_range_inputs()
             self.build_code_button()
 
-            self.data = data if data else self.data
+            self.data = {k: v for k, v in Config.DEFAULT_CELL_DATA.items()} if not data else data
             self.load_data(self.data)
 
             self.widget.addButton.setVisible(False)
             self.widget.mainFrame.setVisible(True)
             self.setMinimumHeight(self.widget.mainFrame.height())
 
-            self.build_signals(list_widget)
+            self.build_signals()
 
         self.list_item.setSizeHint(self.sizeHint())
         self.list_item.setFlags(Qt.ItemFlag.NoItemFlags)
@@ -555,8 +507,8 @@ class CellItem(QWidget):
         self.widget.mainFrame.adjustSize()
         self.list_item.setSizeHint(self.sizeHint())
 
-    def build_hover_buttons(self, list_widget: QListWidget):
-        self.widget.removeButton.clicked.connect(lambda *_: self.open_delete_confirm_button(list_widget))
+    def build_hover_buttons(self):
+        self.widget.removeButton.clicked.connect(lambda *_: self.open_delete_confirm_button(self.list_widget))
 
         self.widget.removeButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{REMOVE_ICON_PATH}'))
         self.widget.removeButton.setTint(Color.BUTTON_ICON[theme_manager.get_night_mode()])
@@ -626,10 +578,11 @@ class CellItem(QWidget):
         self.widget.codeButton.clicked.connect(lambda _: self.toggle_code_editor())
         self.toggle_code_editor(True)
 
-    def build_signals(self, list_widget: QListWidget):
+    def build_signals(self):
         def broadcast_change_signal(data=None, *__):
-            list_widget.currentRowChanged.emit(list_widget.currentRow())
+            self.list_widget.currentRowChanged.emit(self.index)
 
+        # lambda *__: broadcast_change_signal(cell=self)
         self.widget.titleLineEdit.textChanged.connect(broadcast_change_signal)
         self.widget.outputLineEdit.textChanged.connect(broadcast_change_signal)
         self.widget.hourEdit.textChanged.connect(broadcast_change_signal)
