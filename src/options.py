@@ -7,6 +7,7 @@ import webbrowser
 from datetime import date
 from pathlib import Path
 
+import aqt.theme
 from aqt.qt import (
     QColor,
     QColorDialog,
@@ -24,7 +25,6 @@ from aqt.qt import (
     Qt,
     pyqtSignal,
 )
-from aqt.theme import theme_manager
 
 from .config import ANKI_VERSION, TimeStatsConfigManager
 from .consts import *
@@ -435,6 +435,11 @@ class CellItem(QWidget):
         # print(f'{aqt.mw.pm=}')
         # print(f'{aqt.mw.pm.night_mode()=}')
         # print(f'{aqt.mw.pm.theme()=}')
+        print(f'{theme_manager.get_night_mode()=}')
+        print(
+            f'Color.BUTTON_ICON[{int(theme_manager.get_night_mode())}]='
+            f'{Color.BUTTON_ICON[theme_manager.get_night_mode()]}'
+        )
 
         def add_cell():
             _add_cell_to_list(self.list_widget, CellItem(self.list_widget, False))
@@ -541,7 +546,20 @@ class CellItem(QWidget):
         _append_color_change_signal(self.widget.outputColorButton)
 
     def build_direction_buttons(self):
-        mask_color = "#000000"
+        mask_color = '#000000'
+
+        style = f'''
+            QPushButton:disabled {{
+                background: {Color.BUTTON_ACTIVE[theme_manager.get_night_mode()]};
+        ''' + (
+            '''            
+                width: 24px;
+                height: 24px;
+                margin-right: 2px;
+                margin-left: 2px;
+                border-radius: 1px;
+            ''' if aqt.QT_VERSION_STR[0] == '5' else '\n    }'
+        )
 
         vert_lines = QIcon(f'{Path(__file__).parent.resolve()}\\{VERT_LINES_PATH}')
         vert_pixmap = vert_lines.pixmap(self.widget.directionVerticalButton.size(), QIcon.Normal, QIcon.On)
@@ -549,9 +567,7 @@ class CellItem(QWidget):
         vert_pixmap.fill(QColor(Color.BUTTON_ICON[theme_manager.get_night_mode()]))
         vert_pixmap.setMask(mask)
         self.widget.directionVerticalButton.setIcon(QIcon(vert_pixmap))
-        self.widget.directionVerticalButton.setStyleSheet(
-            f'QPushButton:disabled {{background: {Color.BUTTON_ACTIVE[theme_manager.get_night_mode()]};}}'
-        )
+        self.widget.directionVerticalButton.setStyleSheet(style)
 
         horiz_lines = QIcon(f'{Path(__file__).parent.resolve()}\\{HORIZ_LINES_PATH}')
         horiz_pixmap = horiz_lines.pixmap(self.widget.directionHorizontalButton.size(), QIcon.Normal, QIcon.On)
@@ -559,9 +575,7 @@ class CellItem(QWidget):
         horiz_pixmap.fill(QColor(Color.BUTTON_ICON[theme_manager.get_night_mode()]))
         horiz_pixmap.setMask(mask)
         self.widget.directionHorizontalButton.setIcon(QIcon(horiz_pixmap))
-        self.widget.directionHorizontalButton.setStyleSheet(
-            f'QPushButton:disabled {{background: {Color.BUTTON_ACTIVE[theme_manager.get_night_mode()]};}}'
-        )
+        self.widget.directionHorizontalButton.setStyleSheet(style)
 
         self.widget.directionVerticalButton.clicked.connect(lambda _: self.toggle_direction_buttons())
         self.widget.directionHorizontalButton.clicked.connect(lambda _: self.toggle_direction_buttons())
