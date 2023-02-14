@@ -271,13 +271,19 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
         try:
             # minus a day for inclusive checking
             from_date = date_with_rollover(datetime.fromisoformat(match)) - timedelta(days=1)
-            from_time_ms = int(from_date.timestamp() * 1000)
-            to_time_ms = int(date_with_rollover(datetime.today()).timestamp() * 1000)
+            from_ms = int(from_date.timestamp() * 1000)
+            to_ms = int(date_with_rollover(datetime.today()).timestamp() * 1000)
+
+            # print(
+            #     f'range={datetime.fromtimestamp(from_ms / 1000).strftime("%x(%H:%M)")} <=> '
+            #     f'{datetime.fromtimestamp(to_ms / 1000).strftime("%x(%H:%M)")}'
+            # )
 
             sub_html(
                 fr'{CMD_FROM_DATE_HRS}{match}',
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_time_ms, to_time_ms)),
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
             )
+
         except ValueError:
             if max_warn_count > 0:
                 aqt.utils.showWarning(f'{traceback.format_exc()}')
@@ -326,18 +332,17 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
 
 def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
     to_date = date_with_rollover(datetime.utcnow())
+    from_ms, to_ms = 0, 0
 
     if cell_data[Config.RANGE] == Range.TOTAL:
         return 0, int(to_date.timestamp() * 1000)
 
-    elif cell_data[Config.RANGE] == Range.CUSTOM:
-        from_days = (cell_data[Config.DAYS] * iterations) + 1
+    if cell_data[Config.RANGE] == Range.CUSTOM:
+        from_days = (cell_data[Config.DAYS] * iterations)
         from_ms = int((to_date - timedelta(days=from_days)).timestamp() * 1000)
 
         to_days = cell_data[Config.DAYS] * (iterations - 1)
         to_ms = int((to_date - timedelta(days=to_days)).timestamp() * 1000)
-
-        return from_ms, to_ms
 
     else:
         if cell_data[Config.USE_CALENDAR]:
@@ -362,8 +367,12 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
                 # Approximating using 30 days then grabbing the resulting month's range
                 delta_days = (30 * (iterations - 1))
 
-                # inclusive (goes back 1 more day)
-                from_date = (to_date - timedelta(days=delta_days)).replace(day=1) + timedelta(days=-1)
+                # - inclusive (goes back 1 more day)
+                # - get the date with a rollover, again, since the new time uses a replacement for the day
+                #    (not just using a time delta, anymore)
+                from_date = date_with_rollover(
+                    (to_date - timedelta(days=delta_days)).replace(day=1) - timedelta(days=1)
+                )
 
                 # If iterations are set, use the first day of the month for the end of the range, instead
                 if iterations > 1:
@@ -372,7 +381,6 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
 
                 from_ms = int(from_date.timestamp() * 1000)
                 to_ms = int(to_date.timestamp() * 1000)
-                return from_ms, to_ms
 
             elif cell_data[Config.RANGE] == Range.YEAR:
                 # inclusive (extra day added)
@@ -390,17 +398,20 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
 
                 from_ms = int((to_date.replace(month=1, day=1) - timedelta(days=delta_days)).timestamp() * 1000)
 
-                return from_ms, to_ms
-
         elif not cell_data[Config.USE_CALENDAR]:
-            from_days = Range.DAYS_IN[cell_data[Config.RANGE]] * iterations + (
-                    Range.DAYS_IN[cell_data[Config.RANGE]] > 1)
+            from_days = Range.DAYS_IN[cell_data[Config.RANGE]] * iterations + \
+                        (Range.DAYS_IN[cell_data[Config.RANGE]] > 1)
             from_ms = int((to_date - timedelta(days=from_days)).timestamp() * 1000)
 
             to_days = Range.DAYS_IN[cell_data[Config.RANGE]] * (iterations - 1)
             to_ms = int((to_date - timedelta(days=to_days)).timestamp() * 1000)
 
-            return from_ms, to_ms
+    # print(
+    #     f'range={datetime.fromtimestamp(from_ms / 1000).strftime("%x(%H:%M)")} <=> '
+    #     f'{datetime.fromtimestamp(to_ms / 1000).strftime("%x(%H:%M)")}'
+    # )
+
+    return from_ms, to_ms
 
 
 def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] = None, include_deleted=False) \
