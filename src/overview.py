@@ -348,23 +348,23 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
     if re.search(fr'(?<!%){cmd}', updated_html):
         sub_html_text(cmd, datetime.fromtimestamp(range_time_ms()[0] / 1000).strftime('%Y'))
 
-    # cmd = CMD_FULL_DAY
-    # if re.search(fr'(?<!%){cmd}', updated_html):
-    #     pass
+    cmd = CMD_FULL_DAY
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        sub_html_text(cmd, datetime.fromtimestamp(range_time_ms()[0] / 1000).strftime('%A'))
 
-    # cmd = CMD_DAY
-    # if re.search(fr'(?<!%){cmd}', updated_html):
-    #     pass
+    cmd = CMD_DAY
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        sub_html_text(cmd, datetime.fromtimestamp(range_time_ms()[0] / 1000).strftime('%a'))
+
+    cmd = CMD_MONTH
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        sub_html_text(cmd, datetime.fromtimestamp(range_time_ms()[0] / 1000).strftime('%b'))
+
+    cmd = CMD_FULL_MONTH
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        sub_html_text(cmd, datetime.fromtimestamp(range_time_ms()[0] / 1000).strftime('%B'))
 
     # cmd = CMD_DAYS
-    # if re.search(fr'(?<!%){cmd}', updated_html):
-    #     pass
-
-    # cmd = CMD_MONTH
-    # if re.search(fr'(?<!%){cmd}', updated_html):
-    #     pass
-
-    # cmd = CMD_FULL_MONTH
     # if re.search(fr'(?<!%){cmd}', updated_html):
     #     pass
 
