@@ -152,7 +152,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
     updated_html = html
     initial_time = time()
 
-    def sub_html(macro: str, revlog: list):
+    def sub_html_time(macro: str, revlog: list):
         nonlocal updated_html
         total_hrs = _total_hrs_in_revlog(revlog)
         unit_key = _unit_key_for_time(total_hrs)
@@ -170,11 +170,11 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
 
     cmd = CMD_TOTAL_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
-        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS]))
+        sub_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS]))
 
     cmd = CMD_RANGE_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
-        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(cell_data)))
+        sub_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(cell_data)))
 
     cmd = CMD_DAY_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
@@ -182,7 +182,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             Config.RANGE: Range.CUSTOM,
             Config.DAYS: 1,
         }
-        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)))
+        sub_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)))
 
     cmd = CMD_WEEK_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
@@ -191,7 +191,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             Config.USE_CALENDAR: True,
             Config.WEEK_START: cell_data[Config.WEEK_START],
         }
-        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)))
+        sub_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)))
 
     cmd = CMD_TWO_WEEKS_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
@@ -200,7 +200,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             Config.USE_CALENDAR: True,
             Config.WEEK_START: cell_data[Config.WEEK_START],
         }
-        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)))
+        sub_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)))
 
     cmd = CMD_MONTH_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
@@ -209,7 +209,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             Config.USE_CALENDAR: True,
             Config.WEEK_START: cell_data[Config.WEEK_START],
         }
-        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)))
+        sub_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)))
 
     cmd = CMD_YEAR_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
@@ -218,7 +218,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             Config.USE_CALENDAR: True,
             Config.WEEK_START: cell_data[Config.WEEK_START],
         }
-        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)))
+        sub_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)))
 
     cmd = CMD_PREV_RANGE_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
@@ -228,7 +228,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             Config.WEEK_START: cell_data[Config.WEEK_START],
             Config.DAYS: cell_data[Config.DAYS],
         }
-        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
+        sub_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
 
     cmd = CMD_PREV_DAY_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
@@ -236,7 +236,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             Config.RANGE: Range.CUSTOM,
             Config.DAYS: 1,
         }
-        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
+        sub_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
 
     cmd = CMD_PREV_WEEK_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
@@ -245,7 +245,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             Config.USE_CALENDAR: True,
             Config.WEEK_START: cell_data[Config.WEEK_START],
         }
-        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
+        sub_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
 
     cmd = CMD_PREV_TWO_WEEKS_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
@@ -254,7 +254,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             Config.USE_CALENDAR: True,
             Config.WEEK_START: cell_data[Config.WEEK_START],
         }
-        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
+        sub_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
 
     cmd = CMD_PREV_MONTH_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
@@ -262,7 +262,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             Config.RANGE: Range.MONTH,
             Config.USE_CALENDAR: True,
         }
-        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
+        sub_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
 
     cmd = CMD_PREV_YEAR_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
@@ -270,7 +270,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             Config.RANGE: Range.YEAR,
             Config.USE_CALENDAR: True,
         }
-        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
+        sub_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
 
     def process_range(from_str: str, to_str: str = None):
         max_warn_count = 3
@@ -282,14 +282,14 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             if to_str:
                 to_date = date_with_rollover(datetime.fromisoformat(to_str))
                 to_ms = int(to_date.timestamp() * 1000)
-                sub_html(
+                sub_html_time(
                     fr'{CMD_FROM_DATE_HRS}{from_str}:{to_str}',
                     filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
                 )
 
             else:
                 to_ms = int(date_with_rollover(datetime.today()).timestamp() * 1000)
-                sub_html(
+                sub_html_time(
                     fr'{CMD_FROM_DATE_HRS}{from_str}',
                     filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
                 )
@@ -298,7 +298,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             if max_warn_count > 0:
                 aqt.utils.showWarning(f'{traceback.format_exc()}')
                 max_warn_count -= 1
-            sub_html(cmd, [])
+            sub_html_time(cmd, [])
 
     cmd = fr'{CMD_FROM_DATE_HRS}(\d\d\d\d-\d\d-\d\d)[^:]'
     for match in re.findall(fr'(?<!%){cmd}', updated_html):
@@ -312,9 +312,10 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
 
     # Text
 
-    # cmd = CMD_RANGE
-    # if re.search(fr'(?<!%){cmd}', updated_html):
-    #     pass
+    cmd = CMD_RANGE
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        sub_html_time(cmd, )
+        pass
 
     # cmd = CMD_DATE
     # if re.search(fr'(?<!%){cmd}', updated_html):
