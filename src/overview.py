@@ -274,11 +274,6 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             from_ms = int(from_date.timestamp() * 1000)
             to_ms = int(date_with_rollover(datetime.today()).timestamp() * 1000)
 
-            # print(
-            #     f'range={datetime.fromtimestamp(from_ms / 1000).strftime("%x(%H:%M)")} <=> '
-            #     f'{datetime.fromtimestamp(to_ms / 1000).strftime("%x(%H:%M)")}'
-            # )
-
             sub_html(
                 fr'{CMD_FROM_DATE_HRS}{match}',
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
@@ -405,11 +400,6 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
 
             to_days = Range.DAYS_IN[cell_data[Config.RANGE]] * (iterations - 1)
             to_ms = int((to_date - timedelta(days=to_days)).timestamp() * 1000)
-
-    # print(
-    #     f'range={datetime.fromtimestamp(from_ms / 1000).strftime("%x(%H:%M)")} <=> '
-    #     f'{datetime.fromtimestamp(to_ms / 1000).strftime("%x(%H:%M)")}'
-    # )
 
     return from_ms, to_ms
 
