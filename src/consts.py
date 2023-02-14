@@ -2,6 +2,7 @@
 # Full license text available in the "LICENSE" file, packaged with the add-on.
 
 import aqt
+from aqt.theme import theme_manager
 
 CURRENT_VERSION = '1.3.9'
 
@@ -130,11 +131,12 @@ class Direction:
 
 class Color:
     # [Light, Dark]
-    HOVER = ['#565656', '#b0b0b0']
-    BUTTON_ICON = ['#040404', '#8a8a8a']
+    HOVER = ['#040404', '#b0b0b0']
+    BUTTON_ICON = ['#808080', '#8a8a8a']
     TITLE_DEFAULT = ['#000000', '#FFFFFF']
     OUTPUT_DEFAULT = ['#76bfb4', '#76bfb4']
-    BUTTON_ACTIVE = ['rgba(0, 0, 0, 5%)', 'rgba(255, 255, 255, 10%)']
+    # BUTTON_ACTIVE = ['rgba(0, 0, 0, 5%)', 'rgba(255, 255, 255, 10%)']
+    BUTTON_ACTIVE = ['#cacaca', '#5b5b5b']
 
 
 class Config:
@@ -169,8 +171,8 @@ class Config:
     DEFAULT_CELL_DATA = {
         TITLE: String.PAST_RANGE,
         OUTPUT: String.PAST_HRS,
-        TITLE_COLOR: Color.TITLE_DEFAULT[aqt.mw.pm.night_mode()],
-        OUTPUT_COLOR: Color.OUTPUT_DEFAULT[aqt.mw.pm.night_mode()],
+        TITLE_COLOR: Color.TITLE_DEFAULT[theme_manager.get_night_mode()],
+        OUTPUT_COLOR: Color.OUTPUT_DEFAULT[theme_manager.get_night_mode()],
         DIRECTION: Direction.VERTICAL,
         RANGE: Range.TOTAL,
         USE_CALENDAR: True,
