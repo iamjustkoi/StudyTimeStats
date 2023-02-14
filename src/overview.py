@@ -305,23 +305,6 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
         match: str
         process_range(match)
 
-        # try:
-        #     # minus a day for inclusive checking
-        #     from_date = date_with_rollover(datetime.fromisoformat(match)) - timedelta(days=1)
-        #     from_ms = int(from_date.timestamp() * 1000)
-        #     to_ms = int(date_with_rollover(datetime.today()).timestamp() * 1000)
-        #
-        #     sub_html(
-        #         fr'{CMD_FROM_DATE_HRS}{match}',
-        #         filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
-        #     )
-        #
-        # except ValueError:
-        #     if max_warn_count > 0:
-        #         aqt.utils.showWarning(f'{traceback.format_exc()}')
-        #         max_warn_count -= 1
-        #     sub_html(cmd, [])
-
     cmd = fr'{CMD_FROM_DATE_HRS}(\d\d\d\d-\d\d-\d\d):(\d\d\d\d-\d\d-\d\d)'
     for match in re.findall(fr'(?<!%){cmd}', updated_html):
         match: tuple[str]
