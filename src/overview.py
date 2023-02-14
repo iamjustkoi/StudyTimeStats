@@ -158,10 +158,6 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
         nonlocal updated_html
         total_hrs = _total_hrs_in_revlog(revlog)
         unit_key = _unit_key_for_time(total_hrs)
-        print(f'{cell_data[Config.TITLE]=}')
-        print(f'{macro=}')
-        print(f'{cell_data[Config.RANGE]=}')
-        print(f'{total_hrs=}')
         updated_html = re.sub(
             fr'(?<!%){macro}',
             f'{_formatted_time(total_hrs)} {cell_data[unit_key]}',
@@ -205,7 +201,10 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
 
         if cached_range_time_ms == (0, 0):
             if cell_data[Config.RANGE] == Range.TOTAL:
-                cached_range_time_ms = int(mw.col.db.first('''SELECT id FROM revlog ORDER BY id''')[0]), 0
+                review_id = mw.col.db.first('''SELECT id FROM revlog ORDER BY id''')
+                if not review_id:
+                    review_id = [0]
+                cached_range_time_ms = int(review_id[0]), 0
             else:
                 cached_range_time_ms = range_from_data(cell_data)
 
