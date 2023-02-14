@@ -167,7 +167,7 @@ class Config:
     MIN_UNIT = 'minUnit'
     HTML = 'html'
     DEFAULT_CELL_DATA = {
-        TITLE: String.TOTAL,
+        TITLE: String.PAST_RANGE,
         OUTPUT: String.PAST_HRS,
         TITLE_COLOR: Color.TITLE_DEFAULT[aqt.mw.pm.night_mode()],
         OUTPUT_COLOR: Color.OUTPUT_DEFAULT[aqt.mw.pm.night_mode()],
