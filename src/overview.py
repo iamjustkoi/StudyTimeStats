@@ -327,18 +327,26 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
 
         sub_html_text(cmd, repl)
 
+    cached_range_time_ms: tuple[int, int] = 0, 0
+
+    def range_time_ms():
+        nonlocal cached_range_time_ms
+
+        if cached_range_time_ms == (0, 0):
+            if cell_data[Config.RANGE] == Range.TOTAL:
+                cached_range_time_ms = int(mw.col.db.first('''SELECT id FROM revlog ORDER BY id''')[0]), 0
+            else:
+                cached_range_time_ms = range_from_data(cell_data)
+
+        return cached_range_time_ms
+
     cmd = CMD_DATE
     if re.search(fr'(?<!%){cmd}', updated_html):
-        from_ms, to_ms = range_from_data(cell_data)
+        sub_html_text(cmd, datetime.fromtimestamp(range_time_ms()[0] / 1000).strftime("%x"))
 
-        if cell_data[Config.RANGE] == Range.TOTAL:
-            from_ms = int(mw.col.db.first('''SELECT id FROM revlog ORDER BY id''')[0])
-
-        sub_html_text(cmd, datetime.fromtimestamp(from_ms / 1000).strftime("%x"))
-
-    # cmd = CMD_YEAR
-    # if re.search(fr'(?<!%){cmd}', updated_html):
-    #     pass
+    cmd = CMD_YEAR
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        sub_html_text(cmd, datetime.fromtimestamp(range_time_ms()[0] / 1000).strftime('%Y'))
 
     # cmd = CMD_FULL_DAY
     # if re.search(fr'(?<!%){cmd}', updated_html):
@@ -447,6 +455,13 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
 
 def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] = None, include_deleted=False) \
         -> list[Sequence]:
+    """
+    Grabs a list of review data logs which each have the format: [timestamp, timerange].
+    :param excluded_dids:
+    :param time_range_ms:
+    :param include_deleted:
+    :return:
+    """
     if include_deleted and mw.state != 'overview':
         # If not currently viewing a deck, including deleted decks, grab all non-excluded deck ids
         filtered_did_cmd = f'WHERE cards.did NOT IN {_args_from_ids(excluded_dids) if excluded_dids else ""}'
