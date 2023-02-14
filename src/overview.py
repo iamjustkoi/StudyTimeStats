@@ -256,34 +256,76 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
         }
         sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
 
-    # cmd = CMD_PREV_MONTH_HRS
-    # if re.search(fr'(?<!%){cmd}', updated_html):
-    #     pass
-    #
-    # cmd = CMD_PREV_YEAR_HRS
-    # if re.search(fr'(?<!%){cmd}', updated_html):
-    #     pass
-    #
+    cmd = CMD_PREV_MONTH_HRS
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        placeholder_data = {
+            Config.RANGE: Range.MONTH,
+            Config.USE_CALENDAR: True,
+        }
+        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
 
-    cmd = fr'{CMD_FROM_DATE_HRS}(\d\d\d\d-\d\d-\d\d)'
-    max_warn_count = 3
-    for match in re.findall(fr'(?<!%){cmd}', updated_html):
+    cmd = CMD_PREV_YEAR_HRS
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        placeholder_data = {
+            Config.RANGE: Range.YEAR,
+            Config.USE_CALENDAR: True,
+        }
+        sub_html(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
+
+    def process_range(from_str: str, to_str: str = None):
+        max_warn_count = 3
         try:
             # minus a day for inclusive checking
-            from_date = date_with_rollover(datetime.fromisoformat(match)) - timedelta(days=1)
+            from_date = date_with_rollover(datetime.fromisoformat(from_str)) - timedelta(days=1)
             from_ms = int(from_date.timestamp() * 1000)
-            to_ms = int(date_with_rollover(datetime.today()).timestamp() * 1000)
 
-            sub_html(
-                fr'{CMD_FROM_DATE_HRS}{match}',
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
-            )
+            if to_str:
+                to_date = date_with_rollover(datetime.fromisoformat(to_str))
+                to_ms = int(to_date.timestamp() * 1000)
+                sub_html(
+                    fr'{CMD_FROM_DATE_HRS}{from_str}:{to_str}',
+                    filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
+                )
+
+            else:
+                to_ms = int(date_with_rollover(datetime.today()).timestamp() * 1000)
+                sub_html(
+                    fr'{CMD_FROM_DATE_HRS}{from_str}',
+                    filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
+                )
 
         except ValueError:
             if max_warn_count > 0:
                 aqt.utils.showWarning(f'{traceback.format_exc()}')
                 max_warn_count -= 1
             sub_html(cmd, [])
+
+    cmd = fr'{CMD_FROM_DATE_HRS}(\d\d\d\d-\d\d-\d\d)[^:]'
+    for match in re.findall(fr'(?<!%){cmd}', updated_html):
+        match: str
+        process_range(match)
+
+        # try:
+        #     # minus a day for inclusive checking
+        #     from_date = date_with_rollover(datetime.fromisoformat(match)) - timedelta(days=1)
+        #     from_ms = int(from_date.timestamp() * 1000)
+        #     to_ms = int(date_with_rollover(datetime.today()).timestamp() * 1000)
+        #
+        #     sub_html(
+        #         fr'{CMD_FROM_DATE_HRS}{match}',
+        #         filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
+        #     )
+        #
+        # except ValueError:
+        #     if max_warn_count > 0:
+        #         aqt.utils.showWarning(f'{traceback.format_exc()}')
+        #         max_warn_count -= 1
+        #     sub_html(cmd, [])
+
+    cmd = fr'{CMD_FROM_DATE_HRS}(\d\d\d\d-\d\d-\d\d):(\d\d\d\d-\d\d-\d\d)'
+    for match in re.findall(fr'(?<!%){cmd}', updated_html):
+        match: tuple[str]
+        process_range(match[0], match[1])
 
     # Text
 
