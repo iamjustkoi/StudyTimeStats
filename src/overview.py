@@ -166,6 +166,34 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             updated_html,
         )
 
+    def process_range(from_str: str, to_str: str = None):
+        max_warn_count = 3
+        try:
+            # minus a day for inclusive checking
+            from_date = date_with_rollover(datetime.fromisoformat(from_str)) - timedelta(days=1)
+            from_ms = int(from_date.timestamp() * 1000)
+
+            if to_str:
+                to_date = date_with_rollover(datetime.fromisoformat(to_str))
+                to_ms = int(to_date.timestamp() * 1000)
+                sub_html_time(
+                    fr'{CMD_FROM_DATE_HRS}{from_str}:{to_str}',
+                    filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
+                )
+
+            else:
+                to_ms = int(date_with_rollover(datetime.today()).timestamp() * 1000)
+                sub_html_time(
+                    fr'{CMD_FROM_DATE_HRS}{from_str}',
+                    filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
+                )
+
+        except ValueError:
+            if max_warn_count > 0:
+                aqt.utils.showWarning(f'{traceback.format_exc()}')
+                max_warn_count -= 1
+            sub_html_time(cmd, [])
+
     # Time
 
     cmd = CMD_TOTAL_HRS
