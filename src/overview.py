@@ -364,9 +364,14 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
     if re.search(fr'(?<!%){cmd}', updated_html):
         sub_html_text(cmd, datetime.fromtimestamp(range_time_ms()[0] / 1000).strftime('%B'))
 
-    # cmd = CMD_DAYS
-    # if re.search(fr'(?<!%){cmd}', updated_html):
-    #     pass
+    cmd = CMD_DAYS
+    if re.search(fr'(?<!%){cmd}', updated_html):
+        from_date = datetime.fromtimestamp(range_time_ms()[0] / 1000)
+        to_date = date_with_rollover(datetime.today())
+        delta_days = (to_date - from_date).days
+
+        update_html_text(cmd, str(delta_days))
+        pass
 
     print(f'Commands completed. Elapsed time: {((time() - initial_time) * 1000):2f}ms')
     print()
