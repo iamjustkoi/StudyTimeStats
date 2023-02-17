@@ -316,7 +316,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
         }
         update_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)))
 
-    cmd = fr'{CMD_FROM_DATE_HRS}(\d\d\d\d-\d\d-\d\d)[^:]'
+    cmd = fr'{CMD_FROM_DATE_HRS}(\d\d\d\d-\d\d-\d\d)(?!:)'
     for match in re.findall(fr'(?<!%){cmd}', updated_html):
         match: str
         process_range(match)
@@ -339,9 +339,15 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
 
         update_html_text(cmd, repl)
 
-    cmd = CMD_DATE
-    if re.search(fr'(?<!%){cmd}', updated_html):
-        update_html_text(cmd, datetime.fromtimestamp(range_time_ms()[0] / 1000).strftime("%x"))
+    cmd = CMD_DATE + '(?!:)'
+    if re.findall(fr'(?<!%){cmd}', updated_html):
+        update_html_text(fr'(?<!%){cmd}', datetime.fromtimestamp(range_time_ms()[0] / 1000).strftime("%x"))
+
+    cmd = CMD_DATE_STRF
+    for match in re.findall(fr'(?<!%){cmd}', updated_html):
+        match: str
+        date_format = match[match.find("\"") + 1:match.rfind("\"")]
+        update_html_text(match, datetime.fromtimestamp(range_time_ms()[0] / 1000).strftime(date_format))
 
     cmd = CMD_YEAR
     if re.search(fr'(?<!%){cmd}', updated_html):
@@ -370,7 +376,6 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
         delta_days = (to_date - from_date).days
 
         update_html_text(cmd, str(delta_days))
-        pass
 
     print(f'Commands completed. Elapsed time: {((time() - initial_time) * 1000):2f}ms')
     print()
