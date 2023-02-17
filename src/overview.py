@@ -164,6 +164,11 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             updated_html,
         )
 
+    def update_html_reviews(macro: str, revlog: list):
+        nonlocal updated_html
+        total_reviews = len(revlog)
+        updated_html = re.sub(fr'(?<!%){macro}', str(total_reviews), updated_html)
+
     def update_html_text(macro: str, text: str):
         nonlocal updated_html
         updated_html = re.sub(fr'(?<!%){macro}', text, updated_html)
@@ -325,6 +330,16 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
     for match in re.findall(fr'(?<!%){cmd}', updated_html):
         match: tuple[str]
         process_range(match[0], match[1])
+
+    # Reviews
+
+    cmd = CMD_TOTAL_REVIEWS
+    if re.findall(fr'(?<!%){cmd}', updated_html):
+        update_html_reviews(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS]))
+
+    cmd = CMD_RANGE_REVIEWS
+    if re.findall(fr'(?<!%){cmd}', updated_html):
+        update_html_reviews(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(cell_data)))
 
     # Text
 

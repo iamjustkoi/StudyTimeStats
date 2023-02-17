@@ -69,6 +69,7 @@ CELL_HTML_SHELL = '''<div class="{{CellClass}}">
 
 # MACROS
 
+# Text
 CMD_RANGE = '%range'
 CMD_DATE = '%from_date'
 CMD_YEAR = '%from_year'
@@ -79,6 +80,8 @@ CMD_DATE_STRF = r'%from_date:strf\{".*\"}'
 
 CMD_MONTH = '%from_month'
 CMD_FULL_MONTH = '%from_full_month'
+
+# Time
 
 CMD_TOTAL_HRS = '%total_hrs'
 
@@ -97,6 +100,10 @@ CMD_PREV_MONTH_HRS = '%prev_month_hrs'
 CMD_PREV_YEAR_HRS = '%prev_year_hrs'
 
 CMD_FROM_DATE_HRS = '%from_custom_hrs:'
+
+# Reviews
+CMD_TOTAL_REVIEWS = '%total_reviews'
+CMD_RANGE_REVIEWS = '%range_reviews'
 
 
 class String:
