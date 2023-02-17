@@ -138,6 +138,12 @@
                <property name="showDropIndicator" stdset="0">
                 <bool>false</bool>
                </property>
+               <property name="dragEnabled">
+                <bool>true</bool>
+               </property>
+               <property name="dragDropMode">
+                <enum>QAbstractItemView::InternalMove</enum>
+               </property>
                <property name="selectionMode">
                 <enum>QAbstractItemView::NoSelection</enum>
                </property>

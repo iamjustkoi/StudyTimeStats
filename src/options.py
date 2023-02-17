@@ -471,6 +471,9 @@ class CellItem(QWidget):
             self.widget.mainFrame.setVisible(True)
             self.setMinimumHeight(self.widget.mainFrame.height())
 
+            self.widget.dragHandle.index = self.index
+            self.widget.dragHandle.list_widget = list_widget
+
             self.build_signals()
 
         self.list_item.setSizeHint(self.sizeHint())

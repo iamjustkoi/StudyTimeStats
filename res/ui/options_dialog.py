@@ -75,6 +75,8 @@ class Ui_OptionsDialog(object):
         self.cellListWidget.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustIgnored)
         self.cellListWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.cellListWidget.setProperty("showDropIndicator", False)
+        self.cellListWidget.setDragEnabled(True)
+        self.cellListWidget.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.cellListWidget.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.cellListWidget.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
         self.cellListWidget.setObjectName("cellListWidget")

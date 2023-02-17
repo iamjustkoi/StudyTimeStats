@@ -6,6 +6,11 @@ from aqt.qt import (
     QIcon,
 )
 
+from aqt.qt import (
+    QMouseEvent,
+    QListWidget,
+)
+
 
 class HoverButton(QToolButton):
     """
@@ -65,3 +70,50 @@ class HoverButton(QToolButton):
     def leaveEvent(self, *args, **kwargs):
         super().leaveEvent(*args, *kwargs)
         self._updateIcon(False)
+
+
+class DragHandle(QToolButton):
+    start_pos = None
+    list_widget: QListWidget = None
+    is_dragging = False
+    index = -1
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.setCursor(Qt.OpenHandCursor)
+
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        self.start_pos = event.pos()
+
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        offset = self.start_pos.y() - event.pos().y() if self.start_pos else 0
+
+        if abs(offset) > 5:
+            # moved beyond range (enough to consider a drag check/updates)
+            self.drag(offset)
+
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+        self.is_dragging = False
+        self.start_pos = None
+        self.setCursor(Qt.OpenHandCursor)
+
+    def drag(self, offset: int, padding=2):
+        # print(f'{pos=}')
+        if not self.is_dragging:
+            self.is_dragging = True
+            self.setCursor(Qt.ClosedHandCursor)
+
+        if self.list_widget and abs(offset) > (self.parentWidget().height() / 2) + padding:
+            target_idx = self.index + (-1 if offset < 0 else 1)
+
+            if target_idx != self.list_widget.count() - 1:
+                drag_item = self.list_widget.item(self.index)
+                target_item = self.list_widget.item(target_idx)
+
+                if drag_item and target_item:
+                    drag_item.cell_item.index = target_idx
+                    target_item.cell_item.index = self.index
+
+                self.index = target_idx
+                self.list_widget.sortItems()
+
