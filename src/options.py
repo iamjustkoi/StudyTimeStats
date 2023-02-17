@@ -107,7 +107,7 @@ Addon options QDialog class for accessing and changing the addon's config values
         # Restore Defaults Button
         self.ui.confirm_button_box.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.on_restore_defaults)
 
-        # Setup Row List
+        # Setup Cell List
         self.ui.cellListWidget.setStyleSheet('#cellListWidget { background: transparent; border: none; }')
         self.ui.cellListWidget.verticalScrollBar().setSingleStep(12)
 
