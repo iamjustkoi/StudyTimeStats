@@ -76,7 +76,7 @@ class DragHandle(QToolButton):
     start_pos = None
     list_widget: QListWidget = None
     is_dragging = False
-    index = -1
+    list_item = None
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -97,23 +97,22 @@ class DragHandle(QToolButton):
         self.start_pos = None
         self.setCursor(Qt.OpenHandCursor)
 
-    def drag(self, offset: int, padding=2):
-        # print(f'{pos=}')
+    def drag(self, offset: int, padding=4):
         if not self.is_dragging:
             self.is_dragging = True
             self.setCursor(Qt.ClosedHandCursor)
 
-        if self.list_widget and abs(offset) > (self.parentWidget().height() / 2) + padding:
-            target_idx = self.index + (-1 if offset < 0 else 1)
+        if self.list_widget and self.list_item and abs(offset) > ((self.parentWidget().height() / 2) + padding):
+            drag_idx = self.list_widget.row(self.list_item)
+            target_idx = drag_idx + (1 if offset < 0 else -1)
 
             if target_idx != self.list_widget.count() - 1:
-                drag_item = self.list_widget.item(self.index)
+                # target index isn't the last cell item (empty cell)
                 target_item = self.list_widget.item(target_idx)
 
-                if drag_item and target_item:
-                    drag_item.cell_item.index = target_idx
-                    target_item.cell_item.index = self.index
+                if target_item:
+                    self.list_item.cell_item.index = target_idx
+                    target_item.cell_item.index = drag_idx
 
-                self.index = target_idx
                 self.list_widget.sortItems()
 

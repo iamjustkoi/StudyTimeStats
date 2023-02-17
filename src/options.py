@@ -37,6 +37,8 @@ def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem):
     list_widget.setItemWidget(cell_item.list_item, cell_item)
     list_widget.sortItems()
     list_widget.currentRowChanged.emit(list_widget.currentRow())
+    # update empty
+    list_widget.item(list_widget.count() - 1).cell_item.index = list_widget.count() - 1
 
 
 def _remove_cell_from_list(list_widget: QListWidget, cell_item: CellItem):
@@ -45,6 +47,9 @@ def _remove_cell_from_list(list_widget: QListWidget, cell_item: CellItem):
         if item and isinstance(item, CellItem.CellListItem) and item.cell_item == cell_item:
             list_widget.takeItem(i)
             break
+
+    # update empty
+    list_widget.item(list_widget.count() - 1).cell_item.index = list_widget.count() - 1
 
     list_widget.sortItems()
     list_widget.currentRowChanged.emit(list_widget.currentRow())
@@ -425,7 +430,7 @@ class CellItem(QWidget):
     def __init__(self, list_widget: QListWidget, is_empty: bool = False, data: dict = None):
         super().__init__()
 
-        self.index = data.get('idx', list_widget.count()) if data else list_widget.count()
+        self.index = list_widget.count() - 1
         self.is_empty = is_empty
         self.widget = Ui_CellWidget()
         self.widget.setupUi(CellWidget=self)
@@ -471,8 +476,8 @@ class CellItem(QWidget):
             self.widget.mainFrame.setVisible(True)
             self.setMinimumHeight(self.widget.mainFrame.height())
 
-            self.widget.dragHandle.index = self.index
             self.widget.dragHandle.list_widget = list_widget
+            self.widget.dragHandle.list_item = self.list_item
 
             self.build_signals()
 
