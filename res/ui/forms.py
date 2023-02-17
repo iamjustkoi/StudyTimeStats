@@ -77,10 +77,18 @@ class DragHandle(QToolButton):
     list_widget: QListWidget = None
     is_dragging = False
     list_item = None
+    icon_color = '#FFFFFF'
 
     def __init__(self, *args):
         super().__init__(*args)
         self.setCursor(Qt.OpenHandCursor)
+        
+    def setIcon(self, icon: QIcon) -> None:
+        pixmap = icon.pixmap(self.size(), QIcon.Normal, QIcon.On)
+        mask = pixmap.createMaskFromColor(QColor('black'), Qt.MaskOutColor)
+        pixmap.fill(QColor(self.icon_color))
+        pixmap.setMask(mask)
+        super().setIcon(QIcon(pixmap))
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         self.start_pos = event.pos()

@@ -468,6 +468,7 @@ class CellItem(QWidget):
             self.build_direction_buttons()
             self.build_range_inputs()
             self.build_code_button()
+            self.build_drag_handles()
 
             self.data = {k: v for k, v in Config.DEFAULT_CELL_DATA.items()} if not data else data
             self.load_data(self.data)
@@ -475,9 +476,6 @@ class CellItem(QWidget):
             self.widget.addButton.setVisible(False)
             self.widget.mainFrame.setVisible(True)
             self.setMinimumHeight(self.widget.mainFrame.height())
-
-            self.widget.dragHandle.list_widget = list_widget
-            self.widget.dragHandle.list_item = self.list_item
 
             self.build_signals()
 
@@ -600,6 +598,13 @@ class CellItem(QWidget):
     def build_code_button(self):
         self.widget.codeButton.clicked.connect(lambda _: self.toggle_code_editor())
         self.toggle_code_editor(True)
+
+    def build_drag_handles(self):
+        self.widget.dragHandle.icon_color = Color.BUTTON_ICON[theme_manager.get_night_mode()]
+        self.widget.dragHandle.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{VERT_HANDLES_PATH}'))
+        self.widget.dragHandle.setStyleSheet(FLAT_ICON_STYLE)
+        self.widget.dragHandle.list_widget = self.list_widget
+        self.widget.dragHandle.list_item = self.list_item
 
     def build_signals(self):
         def broadcast_change_signal(data=None, *__):

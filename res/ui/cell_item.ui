@@ -89,14 +89,14 @@
       <enum>QFrame::Sunken</enum>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="unitLabel">
         <property name="text">
          <string>Units</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="4" column="0">
        <widget class="QLabel" name="rangeLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
@@ -109,7 +109,7 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="4">
+      <item row="7" column="4">
        <widget class="HoverButton" name="codeButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -141,7 +141,7 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
+      <item row="7" column="0">
        <widget class="QLabel" name="directionLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
@@ -154,7 +154,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="3" column="1">
        <widget class="QFrame" name="frame_3">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -224,7 +224,7 @@
         </layout>
        </widget>
       </item>
-      <item row="4" column="1">
+      <item row="5" column="1">
        <widget class="QComboBox" name="startDayDropdown">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -281,7 +281,7 @@
         </item>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="4" column="1">
        <widget class="QFrame" name="frame">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -512,7 +512,7 @@
         </property>
        </spacer>
       </item>
-      <item row="4" column="0">
+      <item row="5" column="0">
        <widget class="QLabel" name="startDayLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
@@ -538,7 +538,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="outputLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
@@ -551,7 +551,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
+      <item row="2" column="2">
        <widget class="QToolButton" name="outputColorButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -573,10 +573,10 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="2" column="1">
        <widget class="QLineEdit" name="outputLineEdit"/>
       </item>
-      <item row="7" column="0" colspan="5">
+      <item row="8" column="0" colspan="5">
        <widget class="QPlainTextEdit" name="codeTextEdit">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -598,7 +598,7 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="1">
+      <item row="7" column="1">
        <widget class="QFrame" name="directionFrame">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
@@ -674,16 +674,19 @@
         </layout>
        </widget>
       </item>
-      <item row="1" column="4" rowspan="4">
+      <item row="2" column="4">
        <widget class="DragHandle" name="dragHandle">
+        <property name="maximumSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
         <property name="cursor">
          <cursorShape>OpenHandCursor</cursorShape>
         </property>
         <property name="mouseTracking">
          <bool>true</bool>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: transparent;</string>
         </property>
         <property name="icon">
          <iconset>
@@ -704,7 +707,7 @@
   </customwidget>
   <customwidget>
    <class>DragHandle</class>
-   <extends>QToolButton</extends>
+   <extends>QPushButton</extends>
    <header>.forms.h</header>
   </customwidget>
  </customwidgets>
