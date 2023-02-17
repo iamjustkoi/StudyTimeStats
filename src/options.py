@@ -115,6 +115,7 @@ Addon options QDialog class for accessing and changing the addon's config values
         updated_about_header = self.ui.about_label_header.text().format(version=CURRENT_VERSION)
         self.ui.about_label_header.setText(updated_about_header)
 
+        # Apply button
         self.apply_button = self.ui.confirm_button_box.button(QDialogButtonBox.Apply)
         self.apply_button.setEnabled(False)
         self.apply_button.clicked.connect(self.apply)
