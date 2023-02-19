@@ -153,6 +153,18 @@ def get_formatted_hrs_or_min(hours: float, precision=2):
     return f'{val:n}'
 
 
+def get_hrs_and_min(hours: float):
+    hour_only = int(hours)
+    min_and_sec = (hours - hour_only) * 60
+    min_only = int(min_and_sec)
+    sec_only = (min_and_sec - min_only) * 60
+    return str(hour_only) + ':' + "{:02.0f}".format(min_only) if hours > 1 else str(min_only) + ':' + "{:02.0f}".format(sec_only)
+
+
+def get_hrs_only(hours: float, precision=0):
+    return int(round(hours, precision))
+
+
 def get_stats_html():
     """
     Uses the addon config and current get_time_stats to retrieve the html to display on Anki's main window.
@@ -196,7 +208,7 @@ def get_formatted_range_hrs(revlog: [[int, int]], days: int = 0, range_type: int
             days -= 1
 
     ranged_hrs = get_hrs_in_revlog(get_logs_in_range(revlog, days, from_date))
-    range_val = get_formatted_hrs_or_min(ranged_hrs)
+    range_val = get_hrs_and_min(ranged_hrs)
     range_unit = config[get_unit_type(ranged_hrs)]
 
     return f'{range_val} {range_unit}'
@@ -220,7 +232,7 @@ def get_formatted_html_macros(html_string: str):
 
     if re.search(fr'(?<!%){CMD_TOTAL_HRS}', html_string):
         total_hrs = get_hrs_in_revlog(revlog)
-        total_val = get_formatted_hrs_or_min(total_hrs)
+        total_val = get_hrs_only(total_hrs)
         total_unit = addon_config[get_unit_type(total_hrs)]
         html_string = re.sub(pattern.format(CMD_TOTAL_HRS), f'{total_val} {total_unit}', html_string)
 
