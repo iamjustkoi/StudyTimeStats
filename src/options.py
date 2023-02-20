@@ -656,7 +656,7 @@ class CellItem(QWidget):
             self.set_button_color(button, color.name())
 
     def on_use_calendar_update(self, *__):
-        if self.widget.rangeDropdown.currentIndex() in (Range.WEEK, Range.TWO_WEEKS) \
+        if self.widget.rangeDropdown.currentIndex() - 1 in (Range.WEEK, Range.TWO_WEEKS) \
                 and self.widget.calendarCheckbox.isChecked():
             self.widget.startDayLabel.show()
             self.widget.startDayDropdown.show()
