@@ -12,6 +12,8 @@ from aqt.deckbrowser import DeckBrowser, DeckBrowserContent
 from aqt.overview import Overview, OverviewContent
 from aqt.webview import AnkiWebView
 
+from anki.consts import REVLOG_RESCHED
+
 from .config import ANKI_VERSION, TimeStatsConfigManager
 from .consts import *
 
@@ -486,7 +488,7 @@ def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] =
     """
     if include_deleted and mw.state != 'overview':
         # If not currently viewing a deck, including deleted decks, grab all non-excluded deck ids
-        filtered_did_cmd = f'WHERE cards.did NOT IN {_args_from_ids(excluded_dids) if excluded_dids else ""}'
+        filtered_did_cmd = f'AND cards.did NOT IN {_args_from_ids(excluded_dids) if excluded_dids else ""}'
     else:
         # Grab the current parent/children deck ids (inclusive) if viewing a deck, else grab all deck ids (inclusive)
         if mw.state == 'overview':
@@ -499,18 +501,21 @@ def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] =
                 name_id.id for name_id in mw.col.decks.all_names_and_ids()
                 if str(name_id) not in excluded_dids
             ]
-        filtered_did_cmd = f'WHERE cards.did IN {_args_from_ids(included_dids)}'
+        filtered_did_cmd = f'AND cards.did IN {_args_from_ids(included_dids)}'
 
     # SQL
     # Select id (unix time), time (elapsed review time) from review logs
     # Join revlog cid with cards id, and use when comparing the cid vs the did of the review
     #   (revlog doesn't contain a deck id column)
+    # Where review type isn't a reschedule (or potentially unlisted others above it)
+    # (Optional: select cards in included decks)
     # Select id (unix time) between the (optional) unix time range, else end query (;)
     revlog_cmd = f'''
         SELECT revlog.id, revlog.time
         FROM revlog
         INNER JOIN cards
         ON revlog.cid = cards.id
+        WHERE revlog.type <= {REVLOG_RESCHED}
         {filtered_did_cmd}       
     ''' + (f' AND revlog.id BETWEEN {time_range_ms[0]} AND {time_range_ms[1]};' if time_range_ms else ';')
 
