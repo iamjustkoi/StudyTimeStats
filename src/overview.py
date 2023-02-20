@@ -209,9 +209,12 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
         if cached_range_time_ms == (0, 0):
             if cell_data[Config.RANGE] == Range.TOTAL:
                 review_id = mw.col.db.first('''SELECT id FROM revlog ORDER BY id''')
+
                 if not review_id:
                     review_id = [0]
-                cached_range_time_ms = int(review_id[0]), 0
+
+                cached_range_time_ms = int(review_id[0]), range_from_data(cell_data)[1]
+
             else:
                 cached_range_time_ms = range_from_data(cell_data)
 
@@ -225,7 +228,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
 
     cmd = CMD_RANGE_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
-        update_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(cell_data)))
+        update_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_time_ms()))
 
     cmd = CMD_DAY_HRS
     if re.search(fr'(?<!%){cmd}', updated_html):
@@ -341,7 +344,25 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
 
     cmd = CMD_RANGE_REVIEWS
     if re.findall(fr'(?<!%){cmd}', updated_html):
-        update_html_reviews(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(cell_data)))
+        update_html_reviews(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_time_ms()))
+
+    # Avg
+    cmd = CMD_DAY_AVG_HRS
+    if re.findall(fr'(?<!%){cmd}', updated_html):
+        logs = filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_time_ms())
+        from_date = datetime.fromtimestamp(range_time_ms()[0] / 1000)
+        to_date = datetime.fromtimestamp(range_time_ms()[1] / 1000)
+        days_in_logs = (to_date - from_date).days
+        avg_hrs = _total_hrs_in_revlog(logs) / (days_in_logs if days_in_logs > 0 else 1)
+        unit_key = _unit_key_for_time(avg_hrs)
+        update_html_text(cmd, f'{_formatted_time(avg_hrs)} {cell_data[unit_key]}')
+
+    cmd = CMD_CARD_AVG_HRS
+    if re.findall(fr'(?<!%){cmd}', updated_html):
+        logs = filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_time_ms())
+        avg_hrs = _total_hrs_in_revlog(logs) / len(logs)
+        unit_key = _unit_key_for_time(avg_hrs)
+        update_html_text(cmd, f'{_formatted_time(avg_hrs)} {cell_data[unit_key]}')
 
     # Text
 
@@ -407,7 +428,7 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
     if cell_data[Config.RANGE] == Range.TOTAL:
         return 0, int(to_date.timestamp() * 1000)
 
-    if cell_data[Config.RANGE] == Range.CUSTOM:
+    elif cell_data[Config.RANGE] == Range.CUSTOM:
         from_days = (cell_data[Config.DAYS] * iterations)
         from_ms = int((to_date - timedelta(days=from_days)).timestamp() * 1000)
 
@@ -426,6 +447,7 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
 
                 # Days since the first day of the week + (iterations * weekdays) + weekdays
                 delta_days = days_since_start + 1 + ((iterations - 1) * total_weekdays) + (7 * (total_weekdays == 14))
+
                 from_ms = int((to_date - timedelta(days=delta_days)).timestamp() * 1000)
 
                 # Go forward again by 1 week, if iterating, else just use the current day
@@ -475,6 +497,11 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
             to_days = Range.DAYS_IN[cell_data[Config.RANGE]] * (iterations - 1)
             to_ms = int((to_date - timedelta(days=to_days)).timestamp() * 1000)
 
+    # print(
+    #     f'range={datetime.fromtimestamp(from_ms / 1000).strftime("%x(%H:%M)")} '
+    #     f'-> {datetime.fromtimestamp(to_ms / 1000).strftime("%x(%H:%M)")}'
+    # )
+
     return from_ms, to_ms
 
 
@@ -518,7 +545,8 @@ def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] =
         ON revlog.cid = cards.id
         WHERE revlog.type < {REVLOG_RESCHED}
         {filtered_did_cmd}
-        {f'AND revlog.id BETWEEN {time_range_ms[0]} AND {time_range_ms[1]};' if time_range_ms else ';'}
+        {f'AND revlog.id BETWEEN {time_range_ms[0]} AND {time_range_ms[1]}' if time_range_ms else ''}
+        ORDER BY revlog.cid;
     '''
 
     return mw.col.db.all(revlog_cmd)
