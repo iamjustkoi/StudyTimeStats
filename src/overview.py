@@ -420,11 +420,12 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
                 total_weekdays = Range.DAYS_IN[cell_data[Config.RANGE]]
 
                 days_since_start = to_date.weekday() - cell_data[Config.WEEK_START]
+
                 # Plus an extra interval, if past the current week's start-day
                 days_since_start += 7 * (days_since_start > 0) + (7 * (total_weekdays == 14))
 
                 # Days since the first day of the week + (iterations * weekdays) + weekdays
-                delta_days = days_since_start + ((iterations - 1) * total_weekdays) + total_weekdays
+                delta_days = days_since_start + 1 + ((iterations - 1) * total_weekdays) + (7 * (total_weekdays == 14))
                 from_ms = int((to_date - timedelta(days=delta_days)).timestamp() * 1000)
 
                 # Go forward again by 1 week, if iterating, else just use the current day
