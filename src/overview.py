@@ -305,17 +305,6 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             match: tuple[str]
             _process_range(match[0], match[1])
 
-    def review_macros():
-        # Reviews
-
-        cmd = CMD_TOTAL_REVIEWS
-        if re.findall(fr'(?<!%){cmd}', updated_html):
-            _update_html_reviews(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS]))
-
-        cmd = CMD_RANGE_REVIEWS
-        if re.findall(fr'(?<!%){cmd}', updated_html):
-            _update_html_reviews(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_time_ms()))
-
         # Avg
         cmd = CMD_DAY_AVG_HRS
         if re.findall(fr'(?<!%){cmd}', updated_html):
@@ -333,6 +322,17 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             avg_hrs = _total_hrs_in_revlog(logs) / len(logs)
             unit_key = _unit_key_for_time(avg_hrs)
             _update_html_text(cmd, f'{_formatted_time(avg_hrs)} {cell_data[unit_key]}')
+
+    def review_macros():
+        # Reviews
+
+        cmd = CMD_TOTAL_REVIEWS
+        if re.findall(fr'(?<!%){cmd}', updated_html):
+            _update_html_reviews(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS]))
+
+        cmd = CMD_RANGE_REVIEWS
+        if re.findall(fr'(?<!%){cmd}', updated_html):
+            _update_html_reviews(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_time_ms()))
 
     def text_macros():
         # Text
