@@ -346,7 +346,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
     cmd = CMD_RANGE
     if re.search(fr'(?<!%){cmd}', updated_html):
         if cell_data[Config.RANGE] == Range.CUSTOM:
-            repl = f'{addon_config[Config.CUSTOM_DAYS]} {String.DAYS}'
+            repl = f'{cell_data[Config.DAYS]} {String.DAYS}'
         elif cell_data[Config.RANGE] == Range.TOTAL:
             repl = String.TOTAL
         else:
