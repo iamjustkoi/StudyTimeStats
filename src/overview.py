@@ -515,9 +515,10 @@ def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] =
         FROM revlog
         INNER JOIN cards
         ON revlog.cid = cards.id
-        WHERE revlog.type <= {REVLOG_RESCHED}
-        {filtered_did_cmd}       
-    ''' + (f' AND revlog.id BETWEEN {time_range_ms[0]} AND {time_range_ms[1]};' if time_range_ms else ';')
+        WHERE revlog.type < {REVLOG_RESCHED}
+        {filtered_did_cmd}
+        {f'AND revlog.id BETWEEN {time_range_ms[0]} AND {time_range_ms[1]};' if time_range_ms else ';'}
+    '''
 
     return mw.col.db.all(revlog_cmd)
 
