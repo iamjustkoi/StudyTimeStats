@@ -91,7 +91,10 @@ CMD_WEEK_HRS = '%week_hrs'
 CMD_TWO_WEEKS_HRS = '%two_week_hrs'
 CMD_MONTH_HRS = '%month_hrs'
 CMD_YEAR_HRS = '%year_hrs'
-CMD_RANGE_AVG_HRS = '%range_avg_hrs'
+
+# Avg
+CMD_CARD_AVG_HRS = '%card_avg_hrs'
+CMD_DAY_AVG_HRS = '%day_avg_hrs'
 
 CMD_PREV_RANGE_HRS = '%prev_range_hrs'
 CMD_PREV_DAY_HRS = '%prev_day_hrs'
