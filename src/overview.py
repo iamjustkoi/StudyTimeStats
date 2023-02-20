@@ -429,8 +429,6 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
                 to_delta_days = delta_days - ((iterations - 1) * total_weekdays) if iterations > 1 else 0
                 to_ms = int((to_date - timedelta(days=to_delta_days)).timestamp() * 1000)
 
-                return from_ms, to_ms
-
             elif cell_data[Config.RANGE] == Range.MONTH:
                 # Approximating using 30 days then grabbing the resulting month's range
                 delta_days = (30 * (iterations - 1))
