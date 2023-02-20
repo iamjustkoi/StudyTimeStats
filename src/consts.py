@@ -91,6 +91,7 @@ CMD_WEEK_HRS = '%week_hrs'
 CMD_TWO_WEEKS_HRS = '%two_week_hrs'
 CMD_MONTH_HRS = '%month_hrs'
 CMD_YEAR_HRS = '%year_hrs'
+CMD_RANGE_AVG_HRS = '%range_avg_hrs'
 
 CMD_PREV_RANGE_HRS = '%prev_range_hrs'
 CMD_PREV_DAY_HRS = '%prev_day_hrs'
@@ -98,12 +99,11 @@ CMD_PREV_WEEK_HRS = '%prev_week_hrs'
 CMD_PREV_TWO_WEEKS_HRS = '%prev_two_week_hrs'
 CMD_PREV_MONTH_HRS = '%prev_month_hrs'
 CMD_PREV_YEAR_HRS = '%prev_year_hrs'
-
 CMD_FROM_DATE_HRS = '%from_custom_hrs:'
 
 # Reviews
-CMD_TOTAL_REVIEWS = '%total_reviews'
-CMD_RANGE_REVIEWS = '%range_reviews'
+CMD_TOTAL_REVIEWS = '%total_rev'
+CMD_RANGE_REVIEWS = '%range_rev'
 
 
 class String:
