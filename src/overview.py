@@ -494,12 +494,12 @@ def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] =
         if mw.state == 'overview':
             included_dids = [
                 i for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))
-                if str(i) not in excluded_dids
+                if i not in excluded_dids
             ]
         else:
             included_dids = [
                 name_id.id for name_id in mw.col.decks.all_names_and_ids()
-                if str(name_id) not in excluded_dids
+                if name_id.id not in excluded_dids
             ]
         filtered_did_cmd = f'AND cards.did IN {_args_from_ids(included_dids)}'
 
