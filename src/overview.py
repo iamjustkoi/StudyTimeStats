@@ -522,6 +522,11 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             _update_html_text(cmd, str(delta_days))
 
     def calc_macro(precision=2):
+        """
+        Evaluates and formats calc expressions in the cell's html.
+
+        :param precision: The precision of the resulting value.
+        """
         match = re.search(fr'(?<!%){Macro.CMD_CALC}(.*)}}', updated_html)
         if match:
             expression = match.group(1)
