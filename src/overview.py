@@ -527,7 +527,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
 
         :param precision: The precision of the resulting value.
         """
-        for match in re.findall(fr'(?<!%){Macro.CMD_CALC}(.*)\}}', updated_html):
+        for match in re.findall(fr'(?<!%){Macro.CMD_EVAL}(.*)}}', updated_html):
             expression = match
             raw_match = match.replace('+', r'\+').replace('*', r'\*').replace('-', r'\-')
             is_using_hours = False
@@ -558,12 +558,12 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             if is_using_hours:
                 unit_key = _unit_key_for_time(result)
                 _update_html_text(
-                    fr'{Macro.CMD_CALC}{raw_match}\}}',
+                    fr'{Macro.CMD_EVAL}{raw_match}\}}',
                     f'{_formatted_time(result)} {cell_data[unit_key]}',
                 )
             else:
                 _update_html_text(
-                    fr'{Macro.CMD_CALC}{raw_match}\}}',
+                    fr'{Macro.CMD_EVAL}{raw_match}\}}',
                     f'{round(result, precision):n}',
                 )
 
