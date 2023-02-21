@@ -239,11 +239,16 @@
          <string>The day a new week should start on.</string>
         </property>
         <property name="currentText">
-         <string>Monday</string>
+         <string>Sunday</string>
         </property>
         <property name="sizeAdjustPolicy">
          <enum>QComboBox::AdjustToContents</enum>
         </property>
+        <item>
+         <property name="text">
+          <string>Sunday</string>
+         </property>
+        </item>
         <item>
          <property name="text">
           <string>Monday</string>
@@ -272,11 +277,6 @@
         <item>
          <property name="text">
           <string>Saturday</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Sunday</string>
          </property>
         </item>
        </widget>
