@@ -6,7 +6,7 @@ import re
 from anki import buildinfo
 from aqt import AnkiQt
 
-from .consts import CMD_FROM_DATE_HRS, Config
+from .consts import Macro, Config
 
 ANKI_VERSION = int(buildinfo.version.replace('2.1.', ''))
 
@@ -16,7 +16,7 @@ def _reformat_conf(config: dict):
         data = config[field]
         if isinstance(data, str):
             if re.match(fr'.*(?<!%)%from_custom_date:.*', data):
-                config[field] = data.replace('%from_custom_date:', CMD_FROM_DATE_HRS)
+                config[field] = data.replace('%from_custom_date:', Macro.CMD_FROM_DATE_HRS)
         elif isinstance(data, dict):
             _reformat_conf(data)
     return config

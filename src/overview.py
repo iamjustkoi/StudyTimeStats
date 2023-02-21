@@ -1,7 +1,6 @@
 # MIT License: Copyright (c) 2022-2023 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
 # Full license text available in the "LICENSE" file, packaged with the add-on.
 import re
-import traceback
 from datetime import datetime, timedelta
 import calendar
 from time import time
@@ -158,15 +157,15 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
 
     def time_macros():
         # Time
-        cmd = CMD_TOTAL_HRS
+        cmd = Macro.CMD_TOTAL_HRS
         if re.search(fr'(?<!%){cmd}', updated_html):
             _update_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS]))
 
-        cmd = CMD_RANGE_HRS
+        cmd = Macro.CMD_RANGE_HRS
         if re.search(fr'(?<!%){cmd}', updated_html):
             _update_html_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_time_ms()))
 
-        cmd = CMD_DAY_HRS
+        cmd = Macro.CMD_DAY_HRS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.CUSTOM,
@@ -177,7 +176,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
             )
 
-        cmd = CMD_WEEK_HRS
+        cmd = Macro.CMD_WEEK_HRS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.WEEK,
@@ -189,7 +188,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
             )
 
-        cmd = CMD_TWO_WEEKS_HRS
+        cmd = Macro.CMD_TWO_WEEKS_HRS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.TWO_WEEKS,
@@ -201,7 +200,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
             )
 
-        cmd = CMD_MONTH_HRS
+        cmd = Macro.CMD_MONTH_HRS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.MONTH,
@@ -213,7 +212,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
             )
 
-        cmd = CMD_YEAR_HRS
+        cmd = Macro.CMD_YEAR_HRS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.YEAR,
@@ -225,7 +224,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
             )
 
-        cmd = CMD_PREV_RANGE_HRS
+        cmd = Macro.CMD_PREV_RANGE_HRS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: cell_data[Config.RANGE],
@@ -238,7 +237,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
-        cmd = CMD_PREV_DAY_HRS
+        cmd = Macro.CMD_PREV_DAY_HRS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.CUSTOM,
@@ -249,7 +248,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
-        cmd = CMD_PREV_WEEK_HRS
+        cmd = Macro.CMD_PREV_WEEK_HRS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.WEEK,
@@ -261,7 +260,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
-        cmd = CMD_PREV_TWO_WEEKS_HRS
+        cmd = Macro.CMD_PREV_TWO_WEEKS_HRS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.TWO_WEEKS,
@@ -273,7 +272,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
-        cmd = CMD_PREV_MONTH_HRS
+        cmd = Macro.CMD_PREV_MONTH_HRS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.MONTH,
@@ -284,7 +283,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
-        cmd = CMD_PREV_YEAR_HRS
+        cmd = Macro.CMD_PREV_YEAR_HRS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.YEAR,
@@ -295,18 +294,18 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
-        cmd = fr'{CMD_FROM_DATE_HRS}:(\d\d\d\d-\d\d-\d\d)(?!:)'
+        cmd = fr'{Macro.CMD_FROM_DATE_HRS}:(\d\d\d\d-\d\d-\d\d)(?!:)'
         for match in re.findall(fr'(?<!%){cmd}', updated_html):
             match: str
-            _process_range(match, replace_cb=_update_html_time, cmd=CMD_FROM_DATE_HRS)
+            _process_range(match, replace_cb=_update_html_time, cmd=Macro.CMD_FROM_DATE_HRS)
 
-        cmd = fr'{CMD_FROM_DATE_HRS}:(\d\d\d\d-\d\d-\d\d):(\d\d\d\d-\d\d-\d\d)'
+        cmd = fr'{Macro.CMD_FROM_DATE_HRS}:(\d\d\d\d-\d\d-\d\d):(\d\d\d\d-\d\d-\d\d)'
         for match in re.findall(fr'(?<!%){cmd}', updated_html):
             match: tuple[str]
-            _process_range(match[0], match[1], replace_cb=_update_html_time, cmd=CMD_FROM_DATE_HRS)
+            _process_range(match[0], match[1], replace_cb=_update_html_time, cmd=Macro.CMD_FROM_DATE_HRS)
 
         # Avg
-        cmd = CMD_DAY_AVG_HRS
+        cmd = Macro.CMD_DAY_AVG_HRS
         if re.findall(fr'(?<!%){cmd}', updated_html):
             logs = filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_time_ms())
             from_date = datetime.fromtimestamp(_range_time_ms()[0] / 1000)
@@ -316,7 +315,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             unit_key = _unit_key_for_time(avg_hrs)
             _update_html_text(cmd, f'{_formatted_time(avg_hrs)} {cell_data[unit_key]}')
 
-        cmd = CMD_CARD_AVG_HRS
+        cmd = Macro.CMD_CARD_AVG_HRS
         if re.findall(fr'(?<!%){cmd}', updated_html):
             logs = filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_time_ms())
             avg_hrs = _total_hrs_in_revlog(logs) / len(logs)
@@ -325,15 +324,15 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
 
     def review_macros():
         # Reviews
-        cmd = CMD_TOTAL_REVIEWS
+        cmd = Macro.CMD_TOTAL_REVIEWS
         if re.findall(fr'(?<!%){cmd}', updated_html):
             _update_html_reviews(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS]))
 
-        cmd = CMD_RANGE_REVIEWS
+        cmd = Macro.CMD_RANGE_REVIEWS
         if re.findall(fr'(?<!%){cmd}', updated_html):
             _update_html_reviews(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_time_ms()))
 
-        cmd = CMD_DAY_REVIEWS
+        cmd = Macro.CMD_DAY_REVIEWS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.CUSTOM,
@@ -344,7 +343,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
             )
 
-        cmd = CMD_WEEK_REVIEWS
+        cmd = Macro.CMD_WEEK_REVIEWS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.WEEK,
@@ -356,7 +355,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
             )
 
-        cmd = CMD_TWO_WEEKS_REVIEWS
+        cmd = Macro.CMD_TWO_WEEKS_REVIEWS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.TWO_WEEKS,
@@ -368,7 +367,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
             )
 
-        cmd = CMD_MONTH_REVIEWS
+        cmd = Macro.CMD_MONTH_REVIEWS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.MONTH,
@@ -380,7 +379,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
             )
 
-        cmd = CMD_YEAR_REVIEWS
+        cmd = Macro.CMD_YEAR_REVIEWS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.YEAR,
@@ -392,7 +391,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
             )
 
-        cmd = CMD_PREV_RANGE_REVIEWS
+        cmd = Macro.CMD_PREV_RANGE_REVIEWS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: cell_data[Config.RANGE],
@@ -405,7 +404,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
-        cmd = CMD_PREV_DAY_REVIEWS
+        cmd = Macro.CMD_PREV_DAY_REVIEWS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.CUSTOM,
@@ -416,7 +415,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
-        cmd = CMD_PREV_WEEK_REVIEWS
+        cmd = Macro.CMD_PREV_WEEK_REVIEWS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.WEEK,
@@ -428,7 +427,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
-        cmd = CMD_PREV_TWO_WEEKS_REVIEWS
+        cmd = Macro.CMD_PREV_TWO_WEEKS_REVIEWS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.TWO_WEEKS,
@@ -440,7 +439,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
-        cmd = CMD_PREV_MONTH_REVIEWS
+        cmd = Macro.CMD_PREV_MONTH_REVIEWS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.MONTH,
@@ -451,7 +450,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
-        cmd = CMD_PREV_YEAR_REVIEWS
+        cmd = Macro.CMD_PREV_YEAR_REVIEWS
         if re.search(fr'(?<!%){cmd}', updated_html):
             placeholder_data = {
                 Config.RANGE: Range.YEAR,
@@ -462,19 +461,19 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
-        cmd = fr'{CMD_FROM_DATE_REVIEWS}:(\d\d\d\d-\d\d-\d\d)(?!:)'
+        cmd = fr'{Macro.CMD_FROM_DATE_REVIEWS}:(\d\d\d\d-\d\d-\d\d)(?!:)'
         for match in re.findall(fr'(?<!%){cmd}', updated_html):
             match: str
-            _process_range(match, replace_cb=_update_html_reviews, cmd=CMD_FROM_DATE_REVIEWS)
+            _process_range(match, replace_cb=_update_html_reviews, cmd=Macro.CMD_FROM_DATE_REVIEWS)
 
-        cmd = fr'{CMD_FROM_DATE_REVIEWS}:(\d\d\d\d-\d\d-\d\d):(\d\d\d\d-\d\d-\d\d)'
+        cmd = fr'{Macro.CMD_FROM_DATE_REVIEWS}:(\d\d\d\d-\d\d-\d\d):(\d\d\d\d-\d\d-\d\d)'
         for match in re.findall(fr'(?<!%){cmd}', updated_html):
             match: tuple[str]
-            _process_range(match[0], match[1], replace_cb=_update_html_reviews, cmd=CMD_FROM_DATE_REVIEWS)
+            _process_range(match[0], match[1], replace_cb=_update_html_reviews, cmd=Macro.CMD_FROM_DATE_REVIEWS)
 
     def text_macros():
         # Text
-        cmd = CMD_RANGE
+        cmd = Macro.CMD_RANGE
         if re.search(fr'(?<!%){cmd}', updated_html):
             if cell_data[Config.RANGE] == Range.CUSTOM:
                 repl = f'{cell_data[Config.DAYS]} {String.DAYS}'
@@ -485,37 +484,37 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
 
             _update_html_text(cmd, repl)
 
-        cmd = CMD_DATE + '(?!:)'
+        cmd = Macro.CMD_DATE + '(?!:)'
         if re.findall(fr'(?<!%){cmd}', updated_html):
             _update_html_text(fr'(?<!%){cmd}', datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime("%x"))
 
-        cmd = CMD_DATE_STRF
+        cmd = Macro.CMD_DATE_STRF
         for match in re.findall(fr'(?<!%){cmd}', updated_html):
             match: str
             date_format = match[match.find("\"") + 1:match.rfind("\"")]
             _update_html_text(match, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime(date_format))
 
-        cmd = CMD_YEAR
+        cmd = Macro.CMD_YEAR
         if re.search(fr'(?<!%){cmd}', updated_html):
             _update_html_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%Y'))
 
-        cmd = CMD_FULL_DAY
+        cmd = Macro.CMD_FULL_DAY
         if re.search(fr'(?<!%){cmd}', updated_html):
             _update_html_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%A'))
 
-        cmd = CMD_DAY
+        cmd = Macro.CMD_DAY
         if re.search(fr'(?<!%){cmd}', updated_html):
             _update_html_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%a'))
 
-        cmd = CMD_MONTH
+        cmd = Macro.CMD_MONTH
         if re.search(fr'(?<!%){cmd}', updated_html):
             _update_html_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%b'))
 
-        cmd = CMD_FULL_MONTH
+        cmd = Macro.CMD_FULL_MONTH
         if re.search(fr'(?<!%){cmd}', updated_html):
             _update_html_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%B'))
 
-        cmd = CMD_DAYS
+        cmd = Macro.CMD_DAYS
         if re.search(fr'(?<!%){cmd}', updated_html):
             from_date = datetime.fromtimestamp(_range_time_ms()[0] / 1000)
             to_date = date_with_rollover(datetime.today())
@@ -551,7 +550,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
         nonlocal updated_html
         updated_html = re.sub(fr'(?<!%){macro}', text, updated_html)
 
-    def _process_range(from_date_str: str, to_date_str: str = None, replace_cb=None, cmd=CMD_FROM_DATE_HRS):
+    def _process_range(from_date_str: str, to_date_str: str = None, replace_cb=None, cmd=Macro.CMD_FROM_DATE_HRS):
         try:
             # minus a day for inclusive checking
             from_date_raw = datetime.fromisoformat(from_date_str)

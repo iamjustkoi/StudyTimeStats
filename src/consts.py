@@ -67,46 +67,59 @@ CELL_HTML_SHELL = '''<div class="{{CellClass}}">
 </div>
 '''
 
-# MACROS
 
-# Text
-CMD_RANGE = '%range'
-CMD_DATE = '%from_date'
-CMD_YEAR = '%from_year'
-CMD_FULL_DAY = '%from_full_day'
-CMD_DAY = '%from_day'
-CMD_DAYS = '%days'
-CMD_DATE_STRF = r'%from_date:strf\{".*\"}'
+class Macro:
+    # Text
+    CMD_RANGE = '%range'
+    CMD_DATE = '%from_date'
+    CMD_YEAR = '%from_year'
+    CMD_FULL_DAY = '%from_full_day'
+    CMD_DAY = '%from_day'
+    CMD_DAYS = '%days'
+    CMD_DATE_STRF = r'%from_date:strf\{".*\"}'
 
-CMD_MONTH = '%from_month'
-CMD_FULL_MONTH = '%from_full_month'
+    CMD_MONTH = '%from_month'
+    CMD_FULL_MONTH = '%from_full_month'
 
-# Time
+    # Time
 
-CMD_TOTAL_HRS = '%total_hrs'
+    CMD_TOTAL_HRS = '%total_hrs'
 
-CMD_RANGE_HRS = '%range_hrs'
-CMD_DAY_HRS = '%day_hrs'
-CMD_WEEK_HRS = '%week_hrs'
-CMD_TWO_WEEKS_HRS = '%two_week_hrs'
-CMD_MONTH_HRS = '%month_hrs'
-CMD_YEAR_HRS = '%year_hrs'
+    CMD_RANGE_HRS = '%range_hrs'
+    CMD_DAY_HRS = '%day_hrs'
+    CMD_WEEK_HRS = '%week_hrs'
+    CMD_TWO_WEEKS_HRS = '%two_week_hrs'
+    CMD_MONTH_HRS = '%month_hrs'
+    CMD_YEAR_HRS = '%year_hrs'
 
-# Avg
-CMD_CARD_AVG_HRS = '%card_avg_hrs'
-CMD_DAY_AVG_HRS = '%day_avg_hrs'
+    # Avg
+    CMD_CARD_AVG_HRS = '%card_avg_hrs'
+    CMD_DAY_AVG_HRS = '%day_avg_hrs'
 
-CMD_PREV_RANGE_HRS = '%prev_range_hrs'
-CMD_PREV_DAY_HRS = '%prev_day_hrs'
-CMD_PREV_WEEK_HRS = '%prev_week_hrs'
-CMD_PREV_TWO_WEEKS_HRS = '%prev_two_week_hrs'
-CMD_PREV_MONTH_HRS = '%prev_month_hrs'
-CMD_PREV_YEAR_HRS = '%prev_year_hrs'
-CMD_FROM_DATE_HRS = '%from_custom_hrs:'
+    CMD_PREV_RANGE_HRS = '%prev_range_hrs'
+    CMD_PREV_DAY_HRS = '%prev_day_hrs'
+    CMD_PREV_WEEK_HRS = '%prev_week_hrs'
+    CMD_PREV_TWO_WEEKS_HRS = '%prev_two_week_hrs'
+    CMD_PREV_MONTH_HRS = '%prev_month_hrs'
+    CMD_PREV_YEAR_HRS = '%prev_year_hrs'
+    CMD_FROM_DATE_HRS = '%from_custom_hrs'
 
-# Reviews
-CMD_TOTAL_REVIEWS = '%total_rev'
-CMD_RANGE_REVIEWS = '%range_rev'
+    # Reviews
+    CMD_TOTAL_REVIEWS = '%total_rev'
+    CMD_RANGE_REVIEWS = '%range_rev'
+    CMD_DAY_REVIEWS = '%day_rev'
+    CMD_WEEK_REVIEWS = '%week_rev'
+    CMD_TWO_WEEKS_REVIEWS = '%two_week_rev'
+    CMD_MONTH_REVIEWS = '%month_rev'
+    CMD_YEAR_REVIEWS = '%year_rev'
+
+    CMD_PREV_RANGE_REVIEWS = '%prev_range_rev'
+    CMD_PREV_DAY_REVIEWS = '%prev_day_rev'
+    CMD_PREV_WEEK_REVIEWS = '%prev_week_rev'
+    CMD_PREV_TWO_WEEKS_REVIEWS = '%prev_two_week_rev'
+    CMD_PREV_MONTH_REVIEWS = '%prev_month_rev'
+    CMD_PREV_YEAR_REVIEWS = '%prev_year_rev'
+    CMD_FROM_DATE_REVIEWS = '%from_custom_rev'
 
 
 class String:
