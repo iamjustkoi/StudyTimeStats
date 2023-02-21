@@ -295,15 +295,15 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
-        cmd = fr'{CMD_FROM_DATE_HRS}(\d\d\d\d-\d\d-\d\d)(?!:)'
+        cmd = fr'{CMD_FROM_DATE_HRS}:(\d\d\d\d-\d\d-\d\d)(?!:)'
         for match in re.findall(fr'(?<!%){cmd}', updated_html):
             match: str
-            _process_range(match)
+            _process_range(match, replace_cb=_update_html_time, cmd=CMD_FROM_DATE_HRS)
 
-        cmd = fr'{CMD_FROM_DATE_HRS}(\d\d\d\d-\d\d-\d\d):(\d\d\d\d-\d\d-\d\d)'
+        cmd = fr'{CMD_FROM_DATE_HRS}:(\d\d\d\d-\d\d-\d\d):(\d\d\d\d-\d\d-\d\d)'
         for match in re.findall(fr'(?<!%){cmd}', updated_html):
             match: tuple[str]
-            _process_range(match[0], match[1])
+            _process_range(match[0], match[1], replace_cb=_update_html_time, cmd=CMD_FROM_DATE_HRS)
 
         # Avg
         cmd = CMD_DAY_AVG_HRS
@@ -325,7 +325,6 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
 
     def review_macros():
         # Reviews
-
         cmd = CMD_TOTAL_REVIEWS
         if re.findall(fr'(?<!%){cmd}', updated_html):
             _update_html_reviews(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS]))
@@ -333,6 +332,145 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
         cmd = CMD_RANGE_REVIEWS
         if re.findall(fr'(?<!%){cmd}', updated_html):
             _update_html_reviews(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_time_ms()))
+
+        cmd = CMD_DAY_REVIEWS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            placeholder_data = {
+                Config.RANGE: Range.CUSTOM,
+                Config.DAYS: 1,
+            }
+            _update_html_reviews(
+                cmd,
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
+            )
+
+        cmd = CMD_WEEK_REVIEWS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            placeholder_data = {
+                Config.RANGE: Range.WEEK,
+                Config.USE_CALENDAR: True,
+                Config.WEEK_START: cell_data[Config.WEEK_START],
+            }
+            _update_html_reviews(
+                cmd,
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
+            )
+
+        cmd = CMD_TWO_WEEKS_REVIEWS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            placeholder_data = {
+                Config.RANGE: Range.TWO_WEEKS,
+                Config.USE_CALENDAR: True,
+                Config.WEEK_START: cell_data[Config.WEEK_START],
+            }
+            _update_html_reviews(
+                cmd,
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
+            )
+
+        cmd = CMD_MONTH_REVIEWS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            placeholder_data = {
+                Config.RANGE: Range.MONTH,
+                Config.USE_CALENDAR: True,
+                Config.WEEK_START: cell_data[Config.WEEK_START],
+            }
+            _update_html_reviews(
+                cmd,
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
+            )
+
+        cmd = CMD_YEAR_REVIEWS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            placeholder_data = {
+                Config.RANGE: Range.YEAR,
+                Config.USE_CALENDAR: True,
+                Config.WEEK_START: cell_data[Config.WEEK_START],
+            }
+            _update_html_reviews(
+                cmd,
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
+            )
+
+        cmd = CMD_PREV_RANGE_REVIEWS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            placeholder_data = {
+                Config.RANGE: cell_data[Config.RANGE],
+                Config.USE_CALENDAR: True,
+                Config.WEEK_START: cell_data[Config.WEEK_START],
+                Config.DAYS: cell_data[Config.DAYS],
+            }
+            _update_html_reviews(
+                cmd,
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+            )
+
+        cmd = CMD_PREV_DAY_REVIEWS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            placeholder_data = {
+                Config.RANGE: Range.CUSTOM,
+                Config.DAYS: 1,
+            }
+            _update_html_reviews(
+                cmd,
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+            )
+
+        cmd = CMD_PREV_WEEK_REVIEWS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            placeholder_data = {
+                Config.RANGE: Range.WEEK,
+                Config.USE_CALENDAR: True,
+                Config.WEEK_START: cell_data[Config.WEEK_START],
+            }
+            _update_html_reviews(
+                cmd,
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+            )
+
+        cmd = CMD_PREV_TWO_WEEKS_REVIEWS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            placeholder_data = {
+                Config.RANGE: Range.TWO_WEEKS,
+                Config.USE_CALENDAR: True,
+                Config.WEEK_START: cell_data[Config.WEEK_START],
+            }
+            _update_html_reviews(
+                cmd,
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+            )
+
+        cmd = CMD_PREV_MONTH_REVIEWS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            placeholder_data = {
+                Config.RANGE: Range.MONTH,
+                Config.USE_CALENDAR: True,
+            }
+            _update_html_reviews(
+                cmd,
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+            )
+
+        cmd = CMD_PREV_YEAR_REVIEWS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            placeholder_data = {
+                Config.RANGE: Range.YEAR,
+                Config.USE_CALENDAR: True,
+            }
+            _update_html_reviews(
+                cmd,
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+            )
+
+        cmd = fr'{CMD_FROM_DATE_REVIEWS}:(\d\d\d\d-\d\d-\d\d)(?!:)'
+        for match in re.findall(fr'(?<!%){cmd}', updated_html):
+            match: str
+            _process_range(match, replace_cb=_update_html_reviews, cmd=CMD_FROM_DATE_REVIEWS)
+
+        cmd = fr'{CMD_FROM_DATE_REVIEWS}:(\d\d\d\d-\d\d-\d\d):(\d\d\d\d-\d\d-\d\d)'
+        for match in re.findall(fr'(?<!%){cmd}', updated_html):
+            match: tuple[str]
+            _process_range(match[0], match[1], replace_cb=_update_html_reviews, cmd=CMD_FROM_DATE_REVIEWS)
 
     def text_macros():
         # Text
@@ -384,8 +522,13 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             delta_days = (to_date - from_date).days
             _update_html_text(cmd, str(delta_days))
 
-    def _update_html_time(macro: str, revlog: list):
+    def _update_html_time(macro: str, revlog: list = None):
         nonlocal updated_html
+
+        if revlog is None:
+            updated_html = re.sub(fr'(?<!%){macro}', f'ERR', updated_html)
+            return
+
         total_hrs = _total_hrs_in_revlog(revlog)
         unit_key = _unit_key_for_time(total_hrs)
         updated_html = re.sub(
@@ -394,8 +537,13 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             updated_html,
         )
 
-    def _update_html_reviews(macro: str, revlog: list):
+    def _update_html_reviews(macro: str, revlog: list = None):
         nonlocal updated_html
+
+        if revlog is None:
+            updated_html = re.sub(fr'(?<!%){macro}', f'ERR', updated_html)
+            return
+
         total_reviews = len(revlog)
         updated_html = re.sub(fr'(?<!%){macro}', str(total_reviews), updated_html)
 
@@ -403,33 +551,35 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
         nonlocal updated_html
         updated_html = re.sub(fr'(?<!%){macro}', text, updated_html)
 
-    def _process_range(from_date_str: str, to_date_str: str = None, cmd=CMD_FROM_DATE_HRS):
-        max_warn_count = 3
+    def _process_range(from_date_str: str, to_date_str: str = None, replace_cb=None, cmd=CMD_FROM_DATE_HRS):
         try:
             # minus a day for inclusive checking
-            from_date = date_with_rollover(datetime.fromisoformat(from_date_str)) - timedelta(days=1)
+            from_date_raw = datetime.fromisoformat(from_date_str)
+            from_date = date_with_rollover(from_date_raw) - timedelta(days=1)
             from_ms = int(from_date.timestamp() * 1000)
 
             if to_date_str:
-                to_date = date_with_rollover(datetime.fromisoformat(to_date_str))
+                to_date_raw = datetime.fromisoformat(to_date_str)
+                to_date = date_with_rollover(to_date_raw)
                 to_ms = int(to_date.timestamp() * 1000)
-                _update_html_time(
-                    fr'{CMD_FROM_DATE_HRS}{from_date_str}:{to_date_str}',
-                    filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
-                )
+                if replace_cb:
+                    replace_cb(
+                        fr'{cmd}:{from_date_str}:{to_date_str}',
+                        filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
+                    )
 
             else:
-                to_ms = int(date_with_rollover(datetime.today()).timestamp() * 1000)
-                _update_html_time(
-                    fr'{CMD_FROM_DATE_HRS}{from_date_str}',
-                    filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
-                )
+                to_date_raw = datetime.today()
+                to_ms = int(date_with_rollover(to_date_raw).timestamp() * 1000)
+                if replace_cb:
+                    replace_cb(
+                        fr'{cmd}:{from_date_str}(?!:)',
+                        filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
+                    )
 
         except ValueError:
-            if max_warn_count > 0:
-                aqt.utils.showWarning(f'{traceback.format_exc()}')
-                max_warn_count -= 1
-            _update_html_time(cmd, [])
+            if replace_cb:
+                replace_cb(fr'{cmd}:{from_date_str}(:{to_date_str})?', None)
 
     def _range_time_ms():
         nonlocal _cached_range_time_ms
