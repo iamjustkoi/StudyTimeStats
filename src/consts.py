@@ -121,7 +121,7 @@ class Macro:
     CMD_FROM_DATE_REVIEWS = '%from_custom_rev'
 
     # Misc
-    CMD_CALC = '%calc{'
+    CMD_EVAL = '%eval{'
 
 
 class String:
