@@ -82,7 +82,6 @@ class Macro:
     CMD_FULL_MONTH = '%from_full_month'
 
     # Time
-
     CMD_TOTAL_HRS = '%total_hrs'
 
     CMD_RANGE_HRS = '%range_hrs'
@@ -120,6 +119,9 @@ class Macro:
     CMD_PREV_MONTH_REVIEWS = '%prev_month_rev'
     CMD_PREV_YEAR_REVIEWS = '%prev_year_rev'
     CMD_FROM_DATE_REVIEWS = '%from_custom_rev'
+
+    # Misc
+    CMD_CALC = '%calc{'
 
 
 class String:

@@ -521,6 +521,31 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             delta_days = (to_date - from_date).days
             _update_html_text(cmd, str(delta_days))
 
+    def calc_macro(precision=2):
+        match = re.search(fr'(?<!%){Macro.CMD_CALC}(.*)}}', updated_html)
+        if match:
+            expression = match.group(1)
+            is_using_hours = False
+            result = 0
+
+            if ' min' in expression:
+                is_using_hours = True
+                expression = re.sub(r'(\d+)\s+min', lambda m: str(int(m.group(1)) * 60), expression)
+
+            if ' hrs' in expression:
+                is_using_hours = True
+                expression = re.sub(r'\s+hrs', '', expression)
+
+            # ! INSECURE !
+            #  Leaving open-ended, for now, may want to do some more checks depending on use-cases
+            result = eval(expression)
+
+            if is_using_hours:
+                unit_key = _unit_key_for_time(result)
+                _update_html_text(fr'{Macro.CMD_CALC}(.*)}}', f'{_formatted_time(result)} {cell_data[unit_key]}')
+            else:
+                _update_html_text(fr'{Macro.CMD_CALC}(.*)}}', f'{round(result, precision):n}')
+
     def _update_html_time(macro: str, revlog: list = None):
         nonlocal updated_html
 
@@ -600,6 +625,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
     time_macros()
     review_macros()
     text_macros()
+    calc_macro()
 
     print(f'Commands completed. Elapsed time: {((time() - initial_time) * 1000):2f}ms')
     print()
