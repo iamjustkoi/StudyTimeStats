@@ -527,29 +527,45 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
 
         :param precision: The precision of the resulting value.
         """
-        match = re.search(fr'(?<!%){Macro.CMD_CALC}(.*)}}', updated_html)
-        if match:
-            expression = match.group(1)
+        for match in re.findall(fr'(?<!%){Macro.CMD_CALC}(.*)\}}', updated_html):
+            expression = match
+            raw_match = match.replace('+', r'\+').replace('*', r'\*').replace('-', r'\-')
             is_using_hours = False
             result = 0
 
-            if ' min' in expression:
-                is_using_hours = True
-                expression = re.sub(r'(\d+)\s+min', lambda m: str(int(m.group(1)) * 60), expression)
+            expression = expression.lstrip('0')
 
-            if ' hrs' in expression:
+            if f' {cell_data[Config.MIN_UNIT]}' in expression:
                 is_using_hours = True
-                expression = re.sub(r'\s+hrs', '', expression)
+                expression = re.sub(
+                    fr'(\d+)\s+{cell_data[Config.MIN_UNIT]}',
+                    lambda m: str(int(m.group(1)) * 60),
+                    expression,
+                )
+
+            if f' {cell_data[Config.HRS_UNIT]}' in expression:
+                is_using_hours = True
+                expression = re.sub(fr'\s+{cell_data[Config.HRS_UNIT]}', '', expression)
 
             # ! INSECURE !
             #  Leaving open-ended, for now, may want to do some more checks depending on use-cases
-            result = eval(expression)
+            try:
+                result = eval(expression)
+            except ValueError:
+                result = "ERR"
+                is_using_hours = False
 
             if is_using_hours:
                 unit_key = _unit_key_for_time(result)
-                _update_html_text(fr'{Macro.CMD_CALC}(.*)}}', f'{_formatted_time(result)} {cell_data[unit_key]}')
+                _update_html_text(
+                    fr'{Macro.CMD_CALC}{raw_match}\}}',
+                    f'{_formatted_time(result)} {cell_data[unit_key]}',
+                )
             else:
-                _update_html_text(fr'{Macro.CMD_CALC}(.*)}}', f'{round(result, precision):n}')
+                _update_html_text(
+                    fr'{Macro.CMD_CALC}{raw_match}\}}',
+                    f'{round(result, precision):n}',
+                )
 
     def _update_html_time(macro: str, revlog: list = None):
         nonlocal updated_html
