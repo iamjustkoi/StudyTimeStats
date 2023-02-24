@@ -607,7 +607,7 @@ class CellItem(QWidget):
         self.widget.dragHandle.list_item = self.list_item
 
     def build_signals(self):
-        def broadcast_change_signal(data=None, *__):
+        def broadcast_change_signal(__data=None, *__):
             self.list_widget.currentRowChanged.emit(self.index)
 
         # lambda *__: broadcast_change_signal(cell=self)
