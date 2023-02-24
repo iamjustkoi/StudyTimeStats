@@ -12,6 +12,11 @@ ANKI_VERSION = int(buildinfo.version.replace('2.1.', ''))
 
 
 def _reformat_conf(config: dict):
+    """
+    Handles addon config update pipelines.
+    :param config: The current config for the addon.
+    :return: An updated addon config with some redone formatting.
+    """
     for field in config:
         data = config[field]
         if isinstance(data, str):
