@@ -140,7 +140,7 @@ def cell_data_html():
             Output=cell_data[Config.OUTPUT],
         )
 
-        cells_html += filtered_html(cell_html, addon_config, cell_data)
+        cells_html += parsed_html(cell_html, addon_config, cell_data)
 
     return cells_html
 
@@ -149,7 +149,7 @@ def stats_html():
     return HTML_SHELL.replace("{cell_data}", cell_data_html())
 
 
-def filtered_html(html: str, addon_config: dict, cell_data: dict):
+def parsed_html(html: str, addon_config: dict, cell_data: dict):
     updated_html = html
     _cached_range_time_ms: tuple[int, int] = 0, 0
 
