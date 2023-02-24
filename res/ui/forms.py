@@ -123,4 +123,6 @@ class DragHandle(QToolButton):
                     target_item.cell_item.index = drag_idx
 
                 self.list_widget.sortItems()
+                # Broadcast change
+                self.list_widget.currentRowChanged.emit(self.list_item.cell_item.index)
 
