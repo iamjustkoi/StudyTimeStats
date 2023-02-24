@@ -322,6 +322,21 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             unit_key = _unit_key_for_time(avg_hrs)
             _update_html_text(cmd, f'{_formatted_time(avg_hrs)} {cell_data[unit_key]}')
 
+        cmd = "%test_weekly_highest"
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            sql_cmd = f'''
+            SELECT MIN(id), SUM(time)
+            FROM revlog 
+            WHERE id BETWEEN 0 AND {int(datetime.today().timestamp() * 1000)} 
+            GROUP BY strftime('%W', datetime(id / 1000, 'unixepoch'));
+            ORDER by id DESC
+            '''
+            print(f'sql_cmd={sql_cmd}')
+            all_times = mw.col.db.all(sql_cmd)
+            for log in all_times:
+                print(f' --[{log[0]}({datetime.fromtimestamp(log[0] / 1000).strftime("%x")}), {log[1]}]')
+            print(f'{len(all_times)=}')
+
     def review_macros():
         # Reviews
         cmd = Macro.CMD_TOTAL_REVIEWS
@@ -521,13 +536,13 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
             delta_days = (to_date - from_date).days
             _update_html_text(cmd, str(delta_days))
 
-    def calc_macro(precision=2):
+    def eval_macros(precision=2):
         """
         Evaluates and formats calc expressions in the cell's html.
 
         :param precision: The precision of the resulting value.
         """
-        for match in re.findall(fr'(?<!%){Macro.CMD_EVAL}(.*)}}', updated_html):
+        for match in (matches := re.findall(fr'(?<!%){Macro.CMD_EVAL}([^}}]*)}}', updated_html)):
             expression = match
             raw_match = match.replace('+', r'\+').replace('*', r'\*').replace('-', r'\-')
             is_using_hours = False
@@ -646,7 +661,7 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
     time_macros()
     review_macros()
     text_macros()
-    calc_macro()
+    eval_macros()
 
     print(f'Commands completed. Elapsed time: {((time() - initial_time) * 1000):2f}ms')
     print()
