@@ -91,6 +91,8 @@ class Macro:
     CMD_MONTH_HRS = '%month_hrs'
     CMD_YEAR_HRS = '%year_hrs'
 
+    CMD_ETA_HRS = '%eta_hrs'
+
     # Avg
     CMD_CARD_AVG_HRS = '%card_avg_hrs'
     CMD_DAY_AVG_HRS = '%day_avg_hrs'
