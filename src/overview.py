@@ -11,7 +11,7 @@ from aqt.deckbrowser import DeckBrowser, DeckBrowserContent
 from aqt.overview import Overview, OverviewContent
 from aqt.webview import AnkiWebView
 
-from anki.consts import REVLOG_RESCHED
+from anki.consts import QUEUE_TYPE_NEW, REVLOG_RESCHED
 
 from .config import ANKI_VERSION, TimeStatsConfigManager
 from .consts import *
@@ -294,6 +294,48 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
                 filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
+        cmd = Macro.CMD_ETA_HRS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            logs = filtered_revlog(addon_config[Config.EXCLUDED_DIDS])
+            avg_hrs_per_card = _total_hrs_in_revlog(logs) / len(logs)
+
+            lrn_count, rev_count = mw.col.sched.counts()[:2]
+
+            '''
+            DeckTreeNode: {
+                fields: {
+                    newCount: {id: number, type: string}, 
+                    level: {id: number, type: string}, 
+                    deckId: {id: number, type: string}, 
+                    collapsed: {id: number, type: string}, 
+                    learnCount: {id: number, type: string}, 
+                    intradayLearning: {id: number, type: string}, 
+                    interdayLearningUncapped: {id: number, type: string}, 
+                    newUncapped: {id: number, type: string}, 
+                    totalIncludingChildren: {id: number, type: string}, 
+                    reviewUncapped: {id: number, type: string}, 
+                    filtered: {id: number, type: string}, ...}
+                }
+            '''
+
+            total_new_count = 0
+            from anki.decks import DeckTreeNode
+
+            for node in mw.col.decks.deck_tree().children:
+                # new_count = mw.col.sched.deck_due_tree(node.deck_id).new_count
+                sql_query = f'select count() from cards where queue={QUEUE_TYPE_NEW} and did in ({node.deck_id})'
+                new_count = mw.col.db.scalar(sql_query)
+                # config_dict_for_deck_id does not handle every version
+                delays = len(mw.col.decks.config_dict_for_deck_id(node.deck_id)['new']['delays'])
+                total_new_count += delays * new_count
+
+            print(f'{total_new_count=}')
+
+            eta_hrs = avg_hrs_per_card * total_new_count
+
+            unit_key = _unit_key_for_time(eta_hrs)
+            _update_html_text(cmd, f'{_formatted_time(eta_hrs)} {cell_data[unit_key]}')
+
         cmd = fr'{Macro.CMD_FROM_DATE_HRS}:(\d\d\d\d-\d\d-\d\d)(?!:)'
         for match in re.findall(fr'(?<!%){cmd}', updated_html):
             match: str
@@ -324,15 +366,15 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
 
         cmd = "%test_weekly_highest"
         if re.search(fr'(?<!%){cmd}', updated_html):
-            sql_cmd = f'''
+            sql_query = f'''
             SELECT MIN(id), SUM(time)
             FROM revlog 
             WHERE id BETWEEN 0 AND {int(datetime.today().timestamp() * 1000)} 
             GROUP BY strftime('%W', datetime(id / 1000, 'unixepoch'));
             ORDER by id DESC
             '''
-            print(f'sql_cmd={sql_cmd}')
-            all_times = mw.col.db.all(sql_cmd)
+            print(f'sql_cmd={sql_query}')
+            all_times = mw.col.db.all(sql_query)
             for log in all_times:
                 print(f' --[{log[0]}({datetime.fromtimestamp(log[0] / 1000).strftime("%x")}), {log[1]}]')
             print(f'{len(all_times)=}')
