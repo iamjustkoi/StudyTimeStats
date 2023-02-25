@@ -670,14 +670,14 @@ def filtered_html(html: str, addon_config: dict, cell_data: dict):
 
 
 def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
-    to_date = date_with_rollover(datetime.utcnow())
+    to_date = date_with_rollover(datetime.today())
     from_ms, to_ms = 0, 0
 
     if cell_data[Config.RANGE] == Range.TOTAL:
         return 0, int(to_date.timestamp() * 1000)
 
     elif cell_data[Config.RANGE] == Range.CUSTOM:
-        from_days = (cell_data[Config.DAYS] * iterations)
+        from_days = cell_data[Config.DAYS] * iterations
         from_ms = int((to_date - timedelta(days=from_days)).timestamp() * 1000)
 
         to_days = cell_data[Config.DAYS] * (iterations - 1)
