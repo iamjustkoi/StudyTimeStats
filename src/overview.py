@@ -77,6 +77,16 @@ def _total_hrs_in_revlog(revlog: [[int, int]]):
 
 
 def _conf_for_did(did: int):
+    """
+    Returns the configuration for the requested deck id (did).
+    If a configuration is already associated with the deck, it is returned as-is.
+    Otherwise, the default configuration is returned.
+
+    Custom method used instead of Anki's method to hopefully future-proof it a bit.
+
+    :param did: Integer representation for a deck's id.
+    :return: A json object with the config values for a given deck, or the default deck's config.
+    """
     deck = mw.col.decks.get(did, default=False)
     assert deck
     if "conf" in deck:
