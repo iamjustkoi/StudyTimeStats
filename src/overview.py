@@ -76,6 +76,20 @@ def _total_hrs_in_revlog(revlog: [[int, int]]):
     return sum([log[1] for log in revlog[0:]]) / 1000 / 60 / 60
 
 
+def _conf_for_did(did: int):
+    deck = mw.col.decks.get(did, default=False)
+    assert deck
+    if "conf" in deck:
+        conf = mw.col.decks.get_config(int(deck["conf"]))
+        if not conf:
+            # fall back on default
+            conf = mw.col.decks.get_config("0")
+        conf["dyn"] = False
+        return conf
+    # dynamic decks have embedded conf
+    return deck
+
+
 def build_hooks():
     gui_hooks.deck_browser_will_render_content.append(append_to_browser)
     gui_hooks.overview_will_render_content.append(append_to_overview)
