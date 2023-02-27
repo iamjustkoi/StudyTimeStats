@@ -11,7 +11,7 @@ from aqt.deckbrowser import DeckBrowser, DeckBrowserContent
 from aqt.overview import Overview, OverviewContent
 from aqt.webview import AnkiWebView
 
-from anki.consts import QUEUE_TYPE_NEW, REVLOG_RESCHED
+from anki.consts import REVLOG_RESCHED
 
 from .config import ANKI_VERSION, TimeStatsConfigManager
 from .consts import *
@@ -323,39 +323,14 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
             logs = filtered_revlog(addon_config[Config.EXCLUDED_DIDS])
             avg_hrs_per_card = _total_hrs_in_revlog(logs) / len(logs)
 
-            lrn_count, rev_count = mw.col.sched.counts()[:2]
+            total_count = 0
+            due_tree = mw.col.sched.deck_due_tree()
+            for child in due_tree.children:
+                if child.deck_id not in addon_config[Config.EXCLUDED_DIDS]:
+                    delays = len(_conf_for_did(child.deck_id)['new'].get('delays', [0]))
+                    total_count += (delays * child.new_count) + child.learn_count + child.review_count
 
-            '''
-            DeckTreeNode: {
-                fields: {
-                    newCount: {id: number, type: string}, 
-                    level: {id: number, type: string}, 
-                    deckId: {id: number, type: string}, 
-                    collapsed: {id: number, type: string}, 
-                    learnCount: {id: number, type: string}, 
-                    intradayLearning: {id: number, type: string}, 
-                    interdayLearningUncapped: {id: number, type: string}, 
-                    newUncapped: {id: number, type: string}, 
-                    totalIncludingChildren: {id: number, type: string}, 
-                    reviewUncapped: {id: number, type: string}, 
-                    filtered: {id: number, type: string}, ...}
-                }
-            '''
-
-            total_new_count = 0
-            from anki.decks import DeckTreeNode
-
-            for node in mw.col.decks.deck_tree().children:
-                # new_count = mw.col.sched.deck_due_tree(node.deck_id).new_count
-                sql_query = f'select count() from cards where queue={QUEUE_TYPE_NEW} and did in ({node.deck_id})'
-                new_count = mw.col.db.scalar(sql_query)
-                # config_dict_for_deck_id does not handle every version
-                delays = len(mw.col.decks.config_dict_for_deck_id(node.deck_id)['new']['delays'])
-                total_new_count += delays * new_count
-
-            print(f'{total_new_count=}')
-
-            eta_hrs = avg_hrs_per_card * total_new_count
+            eta_hrs = avg_hrs_per_card * total_count
 
             unit_key = _unit_key_for_time(eta_hrs)
             _update_html_text(cmd, f'{_formatted_time(eta_hrs)} {cell_data[unit_key]}')
