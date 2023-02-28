@@ -812,15 +812,17 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
     return from_ms, to_ms
 
 
-def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] = None, include_deleted=False) \
+def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] = None) \
         -> list[Sequence]:
     """
     Grabs a list of review data logs which each have the format: [timestamp, timerange].
     :param excluded_dids:
     :param time_range_ms:
-    :param include_deleted:
     :return:
     """
+
+    include_deleted = TimeStatsConfigManager(mw).config.get(Config.INCLUDE_DELETED, False)
+
     if include_deleted and mw.state != 'overview':
         # If not currently viewing a deck, including deleted decks, grab all non-excluded deck ids
         filtered_did_cmd = f'AND cards.did NOT IN {_args_from_ids(excluded_dids) if excluded_dids else ""}'
