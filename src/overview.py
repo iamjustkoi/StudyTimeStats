@@ -699,6 +699,28 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
 
         return _cached_range_time_ms
 
+    def _max_log_from_modifier(modifier: str) -> Sequence:
+        """
+        Grabs a log with the highest total time found in the selected range, suggested by the given modifier.
+        :param modifier: A string value used to format review log timestamps and group them by the output formatting.
+        :return: A single sequence with the timestamp and total time in a grouped range: [timestamp, total time]
+        """
+        sql_query = f'''
+                    SELECT unix, MAX(time)
+                    FROM (
+                        SELECT CAST(
+                        STRFTIME('%s', id / 1000 + {_offset_hour() * 3600}, 'unixepoch', 'localtime', 
+                        '{modifier}') 
+                        AS int
+                        ) AS unix, 
+                        SUM(time) as time
+                        FROM revlog
+                        GROUP BY unix ORDER BY unix
+                    )
+        '''
+        print(f'sql_cmd={sql_query}')
+        return mw.col.db.first(sql_query)
+
     time_macros()
     review_macros()
     text_macros()
