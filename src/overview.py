@@ -812,20 +812,13 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
     return from_ms, to_ms
 
 
-def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] = None) \
-        -> list[Sequence]:
-    """
-    Grabs a list of review data logs which each have the format: [timestamp, timerange].
-    :param excluded_dids:
-    :param time_range_ms:
-    :return:
-    """
-
+def _excluded_did_limiter(excluded_dids: list = None):
     include_deleted = TimeStatsConfigManager(mw).config.get(Config.INCLUDE_DELETED, False)
 
     if include_deleted and mw.state != 'overview':
         # If not currently viewing a deck, including deleted decks, grab all non-excluded deck ids
         filtered_did_cmd = f'AND cards.did NOT IN {_args_from_ids(excluded_dids) if excluded_dids else ""}'
+
     else:
         # Grab the current parent/children deck ids (inclusive) if viewing a deck, else grab all deck ids (inclusive)
         if mw.state == 'overview':
@@ -838,7 +831,20 @@ def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] =
                 name_id.id for name_id in mw.col.decks.all_names_and_ids()
                 if name_id.id not in excluded_dids
             ]
+
         filtered_did_cmd = f'AND cards.did IN {_args_from_ids(included_dids)}'
+
+    return filtered_did_cmd
+
+
+def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] = None) \
+        -> list[Sequence]:
+    """
+    Grabs a list of review data logs which each have the format: [timestamp, timerange].
+    :param excluded_dids:
+    :param time_range_ms:
+    :return:
+    """
 
     # SQL
     # Select id (unix time), time (elapsed review time) from review logs
@@ -853,7 +859,7 @@ def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] =
         INNER JOIN cards
         ON revlog.cid = cards.id
         WHERE revlog.type < {REVLOG_RESCHED}
-        {filtered_did_cmd}
+        {_excluded_did_limiter(excluded_dids)}
         {f'AND revlog.id BETWEEN {time_range_ms[0]} AND {time_range_ms[1]}' if time_range_ms else ''}
         ORDER BY revlog.cid;
     '''
