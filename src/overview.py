@@ -363,20 +363,12 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
             unit_key = _unit_key_for_time(avg_hrs)
             _update_html_text(cmd, f'{_formatted_time(avg_hrs)} {cell_data[unit_key]}')
 
-        cmd = "%test_weekly_highest"
+        cmd = "%highest_day_hrs"
         if re.search(fr'(?<!%){cmd}', updated_html):
-            sql_query = f'''
-            SELECT MIN(id), SUM(time)
-            FROM revlog 
-            WHERE id BETWEEN 0 AND {int(datetime.today().timestamp() * 1000)} 
-            GROUP BY strftime('%W', datetime(id / 1000, 'unixepoch'));
-            ORDER by id DESC
-            '''
-            print(f'sql_cmd={sql_query}')
-            all_times = mw.col.db.all(sql_query)
-            for log in all_times:
-                print(f' --[{log[0]}({datetime.fromtimestamp(log[0] / 1000).strftime("%x")}), {log[1]}]')
-            print(f'{len(all_times)=}')
+            max_log = _max_log_from_modifier('start of day')
+            hours = max_log[1] / 60 / 60 / 1000
+            unit_key = _unit_key_for_time(hours)
+            _update_html_text(cmd, f'{_formatted_time(hours)} {cell_data[unit_key]}')
 
     def review_macros():
         # Reviews
