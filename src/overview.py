@@ -695,6 +695,10 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
         """
         Grabs a log with the highest total time found in the selected range, suggested by the given modifier.
         :param modifier: A string value used to format review log timestamps and group them by the output formatting.
+
+        (e.g. 'start of day', 'weekday', 'start of month', 'start of year', etc.)
+        https://www.sqlite.org/lang_datefunc.html#modifiers
+
         :return: A single sequence with the timestamp and total time in a grouped range: [timestamp, total time]
         """
         sql_query = f'''
