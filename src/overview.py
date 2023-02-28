@@ -859,22 +859,6 @@ def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] =
     return mw.col.db.all(revlog_cmd)
 
 
-def days_since_week_start(
-    week_start_day: int,
-    current_day: int
-):
-    """
-    Gets days since the last week-start date based on a set number of weeks.
-
-    :param week_start_day: start of the week to count total days from
-    :param current_day: an integer representation of the current week-day
-    :return: days since week start
-    """
-
-    # Adds an extra week if the current day is already past the week start
-    return current_day - week_start_day - (7 * (current_day >= week_start_day))
-
-
 def date_with_rollover(date: datetime = datetime.today()):
     """
     Retrieves a date-time adjusted to its day-end hour and Anki/add-on preferences for end of day.
