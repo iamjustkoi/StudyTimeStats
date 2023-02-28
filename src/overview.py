@@ -701,16 +701,22 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
 
         :return: A single sequence with the timestamp and total time in a grouped range: [timestamp, total time]
         """
+
         sql_query = f'''
                     SELECT unix, MAX(time)
                     FROM (
                         SELECT CAST(
-                        STRFTIME('%s', id / 1000 + {_offset_hour() * 3600}, 'unixepoch', 'localtime', 
-                        '{modifier}') 
-                        AS int
+                            STRFTIME(
+                            '%s', revlog.id / 1000 + {_offset_hour() * 3600}, 'unixepoch', 'localtime', '{modifier}'
+                            ) AS int
                         ) AS unix, 
-                        SUM(time) as time
+                        SUM(revlog.time) as time
+                        
                         FROM revlog
+                        INNER JOIN cards
+                        ON revlog.cid = cards.id                
+                        WHERE revlog.type < {REVLOG_RESCHED}
+                        {_excluded_did_limiter(addon_config[Config.EXCLUDED_DIDS])}
                         GROUP BY unix ORDER BY unix
                     )
         '''
