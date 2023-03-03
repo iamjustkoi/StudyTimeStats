@@ -370,6 +370,18 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
             unit_key = _unit_key_for_time(hours)
             _update_html_text(cmd, f'{_formatted_time(hours)} {cell_data[unit_key]}')
 
+        cmd = Macro.CMD_HIGHEST_WEEK_HRS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            # Set weekday to -1 of itself
+            #  btw: SQLite modifier uses 0 for Sundays while datetime uses 6
+            weekday_for_modifier = cell_data[Config.WEEK_START] - 1
+            weekday_for_modifier += 7 if weekday_for_modifier < 0 else 0
+            max_log = _max_log_from_modifier(['start of day', f'weekday {weekday_for_modifier}'], _range_time_ms())
+            hours = max_log[1] / 60 / 60 / 1000
+
+            unit_key = _unit_key_for_time(hours)
+            _update_html_text(cmd, f'{_formatted_time(hours)} {cell_data[unit_key]}')
+
     def review_macros():
         # Reviews
         cmd = Macro.CMD_TOTAL_REVIEWS
