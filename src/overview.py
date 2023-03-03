@@ -687,6 +687,10 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
                 replace_cb(fr'{cmd}:{from_date_str}(:{to_date_str})?', None)
 
     def _range_time_ms() -> tuple[int, int]:
+        """
+        Retrieves the current range from cell data and caches it for future range calls.
+        :return:  Tuple of range times in unix milliseconds, with the format: [from, to]
+        """
         nonlocal _cached_range_time_ms
 
         if _cached_range_time_ms == (0, 0):
