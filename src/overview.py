@@ -674,7 +674,7 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
             if replace_cb:
                 replace_cb(fr'{cmd}:{from_date_str}(:{to_date_str})?', None)
 
-    def _range_time_ms():
+    def _range_time_ms() -> tuple[int, int]:
         nonlocal _cached_range_time_ms
 
         if _cached_range_time_ms == (0, 0):
