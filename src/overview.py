@@ -388,6 +388,16 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
             unit_key = _unit_key_for_time(hours)
             _update_html_text(cmd, f'{_formatted_time(hours)} {cell_data[unit_key]}')
 
+        # TODO current grabbing a tiny bit of time from the previous year when filtering range by calendar year
+        #  (ignores the cut off time from the tally)
+        #  (but also, this might effect other times using "start of" fromats, if not accounting for rollover hours)
+        cmd = Macro.CMD_HIGHEST_YEAR_HRS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            max_log = _max_log_from_modifier(['start of day', 'start of year'])
+            hours = max_log[1] / 60 / 60 / 1000
+            unit_key = _unit_key_for_time(hours)
+            _update_html_text(cmd, f'{_formatted_time(hours)} {cell_data[unit_key]}')
+
     def review_macros():
         # Reviews
         cmd = Macro.CMD_TOTAL_REVIEWS
