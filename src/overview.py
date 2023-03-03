@@ -373,7 +373,7 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
         cmd = Macro.CMD_HIGHEST_WEEK_HRS
         if re.search(fr'(?<!%){cmd}', updated_html):
             # Set weekday to -1 of itself
-            #  btw: SQLite modifier uses 0 for Sundays while datetime uses 6
+            #  Note: SQLite's STRFTIME has Sunday at 0, while datetime (Python) has Monday at 0
             weekday_for_modifier = cell_data[Config.WEEK_START] - 1
             weekday_for_modifier += 7 if weekday_for_modifier < 0 else 0
             max_log = _max_log_from_modifier(['start of day', f'weekday {weekday_for_modifier}'], _range_time_ms())
@@ -719,12 +719,12 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
         :return: A single sequence with the timestamp and total time in a grouped range: [timestamp, total time]
         """
 
-        range_limit = f'AND revlog.cid BETWEEN {timerange[0]} AND {timerange[1]}' if timerange else ''
+        range_limit = f'AND revlog.id BETWEEN {timerange[0]} AND {timerange[1]}' if timerange else ''
 
         sql_query = f'''
                         SELECT CAST(
                             STRFTIME(
-                            '%s', revlog.id / 1000 + {_offset_hour() * 3600}, 
+                            '%s', revlog.id / 1000 - {_offset_hour() * 3600}, 
                             'unixepoch', 
                             'localtime',
                             '{"','".join(modifiers)}'
@@ -733,12 +733,13 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
                         SUM(revlog.time) as time
                         
                         FROM revlog
+                        
                         INNER JOIN cards
-                        ON revlog.cid = cards.id                
+                        ON revlog.cid = cards.id        
+                                
                         WHERE revlog.type < {REVLOG_RESCHED}
                         {_excluded_did_limit(addon_config[Config.EXCLUDED_DIDS])}
                         {range_limit}
-                        {_excluded_did_limiter(addon_config[Config.EXCLUDED_DIDS])}
                         GROUP BY unix ORDER BY time DESC LIMIT 1;
         '''
         print(f'sql_cmd={sql_query}')
@@ -886,7 +887,7 @@ def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] =
         INNER JOIN cards
         ON revlog.cid = cards.id
         WHERE revlog.type < {REVLOG_RESCHED}
-        {_excluded_did_limiter(excluded_dids)}
+        {_excluded_did_limit(excluded_dids)}
         {f'AND revlog.id BETWEEN {time_range_ms[0]} AND {time_range_ms[1]}' if time_range_ms else ''}
         ORDER BY revlog.cid;
     '''
