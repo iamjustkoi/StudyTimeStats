@@ -713,7 +713,7 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
 
         return _cached_range_time_ms
 
-    def _max_log_from_modifier(modifiers: list[str], timerange: tuple[int, int] = None) -> Sequence:
+    def _max_log_from_modifier(modifiers: list[str], timerange: tuple[int, int] = _range_time_ms()) -> Sequence:
         """
         Grabs a log with the highest total time found in the selected range, suggested by the given modifier.
         :param modifiers: A list of string values used to format review log timestamps
