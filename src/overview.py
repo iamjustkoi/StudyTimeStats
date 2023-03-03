@@ -365,7 +365,7 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
 
         cmd = Macro.CMD_HIGHEST_DAY_HRS
         if re.search(fr'(?<!%){cmd}', updated_html):
-            max_log = _max_log_from_modifier(['start of day'], _range_time_ms())
+            max_log = _max_log_from_modifier(['start of day'])
             hours = max_log[1] / 60 / 60 / 1000
             unit_key = _unit_key_for_time(hours)
             _update_html_text(cmd, f'{_formatted_time(hours)} {cell_data[unit_key]}')
@@ -378,7 +378,13 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
             weekday_for_modifier += 7 if weekday_for_modifier < 0 else 0
             max_log = _max_log_from_modifier(['start of day', f'weekday {weekday_for_modifier}'], _range_time_ms())
             hours = max_log[1] / 60 / 60 / 1000
+            unit_key = _unit_key_for_time(hours)
+            _update_html_text(cmd, f'{_formatted_time(hours)} {cell_data[unit_key]}')
 
+        cmd = Macro.CMD_HIGHEST_MONTH_HRS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            max_log = _max_log_from_modifier(['start of day', 'start of month'])
+            hours = max_log[1] / 60 / 60 / 1000
             unit_key = _unit_key_for_time(hours)
             _update_html_text(cmd, f'{_formatted_time(hours)} {cell_data[unit_key]}')
 
