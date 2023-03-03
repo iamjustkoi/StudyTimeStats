@@ -732,6 +732,7 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
                         INNER JOIN cards
                         ON revlog.cid = cards.id                
                         WHERE revlog.type < {REVLOG_RESCHED}
+                        {_excluded_did_limit(addon_config[Config.EXCLUDED_DIDS])}
                         {range_limit}
                         {_excluded_did_limiter(addon_config[Config.EXCLUDED_DIDS])}
                         GROUP BY unix ORDER BY time DESC LIMIT 1;
@@ -834,7 +835,7 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
     return from_ms, to_ms
 
 
-def _excluded_did_limiter(excluded_dids: list = None):
+def _excluded_did_limit(excluded_dids: list = None):
     include_deleted = TimeStatsConfigManager(mw).config.get(Config.INCLUDE_DELETED, False)
 
     if include_deleted and mw.state != 'overview':
