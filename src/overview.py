@@ -365,7 +365,7 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
 
         cmd = Macro.CMD_HIGHEST_DAY_HRS
         if re.search(fr'(?<!%){cmd}', updated_html):
-            max_log = _max_log_from_modifier('start of day')
+            max_log = _max_log_from_modifier(['start of day'], _range_time_ms())
             hours = max_log[1] / 60 / 60 / 1000
             unit_key = _unit_key_for_time(hours)
             _update_html_text(cmd, f'{_formatted_time(hours)} {cell_data[unit_key]}')
