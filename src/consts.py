@@ -96,6 +96,7 @@ class Macro:
     CMD_HIGHEST_DAY_HRS = '%highest_day_hrs'
     CMD_HIGHEST_WEEK_HRS = '%highest_week_hrs'
     CMD_HIGHEST_MONTH_HRS = '%highest_month_hrs'
+    CMD_HIGHEST_YEAR_HRS = '%highest_year_hrs'
 
     # Avg
     CMD_CARD_AVG_HRS = '%card_avg_hrs'
