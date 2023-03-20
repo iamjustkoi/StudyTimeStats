@@ -327,8 +327,12 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
             due_tree = mw.col.sched.deck_due_tree()
             for child in due_tree.children:
                 if child.deck_id not in addon_config[Config.EXCLUDED_DIDS]:
-                    delays = len(_conf_for_did(child.deck_id)['new'].get('delays', [0]))
-                    total_count += (delays * child.new_count) + child.learn_count + child.review_count
+                    deck_conf = _conf_for_did(child.deck_id)
+
+                    # Check for filtered/dynamic deck
+                    if deck_conf and deck_conf.get('new', None):
+                        delays = len(deck_conf['new'].get('delays', [0]))
+                        total_count += (delays * child.new_count) + child.learn_count + child.review_count
 
             eta_hrs = avg_hrs_per_card * total_count
 
