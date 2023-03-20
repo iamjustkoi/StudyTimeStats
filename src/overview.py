@@ -735,25 +735,31 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
         range_limit = f'AND revlog.id BETWEEN {timerange[0]} AND {timerange[1]}' if timerange else ''
 
         sql_query = f'''
-                        SELECT CAST(
-                            STRFTIME(
-                            '%s', revlog.id / 1000 - {_offset_hour() * 3600}, 
-                            'unixepoch', 
-                            'localtime',
-                            '{"','".join(modifiers)}'
-                            ) AS int
-                        ) AS unix, 
-                        SUM(revlog.time) as time
-                        
-                        FROM revlog
-                        
-                        INNER JOIN cards
-                        ON revlog.cid = cards.id        
-                                
-                        WHERE revlog.type < {REVLOG_RESCHED}
-                        {_excluded_did_limit(addon_config[Config.EXCLUDED_DIDS])}
-                        {range_limit}
-                        GROUP BY unix ORDER BY time DESC LIMIT 1;
+            SELECT CAST(
+                -- Formatted row ids as unix milliseconds, with offset hours
+                STRFTIME(
+                    '%s', (revlog.id / 1000),
+                    'unixepoch',
+                    'localtime',
+                    '{-_offset_hour()} hours',
+                    'start of day',
+                    '{"','".join(modifiers) if modifiers else None}'
+                ) AS int
+            ) AS startOfRange,
+            -- Total time in filtered range groups          
+            SUM(revlog.time) as time
+            -- Search in revlog table
+            FROM revlog
+            -- Map revlog cid to cards id for selecting deck-id's from the cards table
+            INNER JOIN cards
+            ON revlog.cid = cards.id
+            -- Select reviews only, excluding preset decks, between "range_limit" range
+            WHERE revlog.type < {REVLOG_RESCHED}
+            {_excluded_did_limit(addon_config[Config.EXCLUDED_DIDS])}
+            {range_limit}
+            -- Get highest value via group, sort, and the first (highest) row
+            GROUP BY startOfRange
+            ORDER BY time DESC LIMIT 1;
         '''
 
         print(f'sql_cmd={sql_query}')
