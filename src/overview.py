@@ -548,6 +548,12 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
             match: tuple[str]
             _process_range(match[0], match[1], replace_cb=_update_html_reviews, cmd=Macro.CMD_FROM_DATE_REVIEWS)
 
+        cmd = Macro.CMD_HIGHEST_DAY_REVIEWS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            max_log = _max_log_from_modifier(order_by='count')
+            reviews = max_log[2]
+            _update_html_text(cmd, f'{reviews}')
+
     def text_macros():
         # Text
         cmd = Macro.CMD_RANGE
