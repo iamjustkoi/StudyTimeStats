@@ -724,7 +724,7 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
 
         return _cached_range_time_ms
 
-    def _max_log_from_modifier(modifiers: list[str] = None, timerange: tuple[int, int] = _range_time_ms()) -> Sequence:
+    def _max_log_from_modifier(modifiers: [str] = None, timerange: tuple[int, int] = _range_time_ms()) -> Sequence:
         """
         Grabs a log with the highest total time found in the selected range, suggested by the given modifier.
         :param modifiers: A list of string values used to format review log timestamps
@@ -736,6 +736,7 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
         :return: A single sequence with the timestamp and total time in a grouped range: [timestamp, total time]
         """
 
+        modifiers = ['start of day'] if not modifiers else modifiers + ['start of day']
         range_limit = f'AND revlog.id BETWEEN {timerange[0]} AND {timerange[1]}' if timerange else ''
 
         sql_query = f'''
@@ -746,8 +747,7 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
                     'unixepoch',
                     'localtime',
                     '{-_offset_hour()} hours',
-                    'start of day',
-                    '{"','".join(modifiers) if modifiers else None}'
+                    '{"','".join(modifiers)}'
                 ) AS int
             ) AS startOfRange,
             -- Total time in filtered range groups          
