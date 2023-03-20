@@ -730,7 +730,11 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
 
         return _cached_range_time_ms
 
-    def _max_log_from_modifier(modifiers: [str] = None, timerange: tuple[int, int] = _range_time_ms()) -> Sequence:
+    def _max_log_from_modifier(
+        modifiers: [str] = None,
+        timerange: tuple[int, int] = _range_time_ms(),
+        order_by='time'
+    ) -> Sequence:
         """
         Grabs a log with the highest total time and total reviews found in the selected range,
         suggested by the given modifier. Uses 'start of day' modifier for all queries.
@@ -772,7 +776,7 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
             {range_limit}
             -- Get highest value via group, sort, and the first (highest) row
             GROUP BY startOfRange
-            ORDER BY time DESC LIMIT 1;
+            ORDER BY {order_by} DESC LIMIT 1;
         '''
 
         print(f'sql_cmd={sql_query}')
