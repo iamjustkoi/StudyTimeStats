@@ -732,14 +732,16 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
 
     def _max_log_from_modifier(modifiers: [str] = None, timerange: tuple[int, int] = _range_time_ms()) -> Sequence:
         """
-        Grabs a log with the highest total time found in the selected range, suggested by the given modifier.
+        Grabs a log with the highest total time and total reviews found in the selected range,
+        suggested by the given modifier. Uses 'start of day' modifier for all queries.
         :param modifiers: A list of string values used to format review log timestamps
         and group them using the selected modified outputs.
 
         (e.g. 'start of day', 'weekday', 'start of month', 'start of year', etc.)
         https://www.sqlite.org/lang_datefunc.html#modifiers
 
-        :return: A single sequence with the timestamp and total time in a grouped range: [timestamp, total time]
+        :return: A single sequence with the timestamp and total time in a grouped range:
+        [timestamp, total time, review count]
         """
 
         modifiers = ['start of day'] if not modifiers else modifiers + ['start of day']
@@ -757,7 +759,8 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
                 ) AS int
             ) AS startOfRange,
             -- Total time in filtered range groups          
-            SUM(revlog.time) as time
+            SUM(revlog.time) as time,
+            count(*) as count
             -- Search in revlog table
             FROM revlog
             -- Map revlog cid to cards id for selecting deck-id's from the cards table
