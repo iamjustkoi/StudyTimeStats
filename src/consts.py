@@ -127,6 +127,8 @@ class Macro:
     CMD_PREV_YEAR_REVIEWS = '%prev_year_rev'
     CMD_FROM_DATE_REVIEWS = '%from_custom_rev'
 
+    CMD_HIGHEST_DAY_REVIEWS = '%highest_day_rev'
+
     # Misc
     CMD_EVAL = '%eval{'
 
