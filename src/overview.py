@@ -777,6 +777,13 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
 
 
 def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
+    """
+    Retrieve a time range tuple. Adjusted for preferred rollover/offset hour.
+    :param cell_data: Template data used to distinguish target return data.
+    :param iterations: Number of range-type to go back by when selecting a specific range
+    (e.g. 1 week iteration = this week, 2 week iterations = previous week).
+    :return: Tuple with a time range via milliseconds since unix epoch: [from, to].
+    """
     to_date = date_with_rollover(datetime.today())
     from_ms, to_ms = 0, 0
 
