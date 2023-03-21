@@ -552,7 +552,29 @@ def parsed_html(html: str, addon_config: dict, cell_data: dict):
         if re.search(fr'(?<!%){cmd}', updated_html):
             max_log = _max_log_from_modifier(order_by='count')
             reviews = max_log[2]
-            _update_html_text(cmd, f'{reviews}')
+            _update_html_text(cmd, str(reviews))
+
+        cmd = Macro.CMD_HIGHEST_WEEK_REVIEWS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            # Set weekday to -1 of itself
+            #  Note: SQLite's STRFTIME has Sunday at 0, while datetime (Python) has Monday at 0
+            weekday_for_modifier = cell_data[Config.WEEK_START] - 1
+            weekday_for_modifier += 7 if weekday_for_modifier < 0 else 0
+            max_log = _max_log_from_modifier([f'weekday {weekday_for_modifier}'], order_by='count')
+            reviews = max_log[2]
+            _update_html_text(cmd, str(reviews))
+
+        cmd = Macro.CMD_HIGHEST_MONTH_REVIEWS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            max_log = _max_log_from_modifier(['start of month'], order_by='count')
+            reviews = max_log[2]
+            _update_html_text(cmd, str(reviews))
+
+        cmd = Macro.CMD_HIGHEST_YEAR_REVIEWS
+        if re.search(fr'(?<!%){cmd}', updated_html):
+            max_log = _max_log_from_modifier(['start of year'], order_by='count')
+            reviews = max_log[2]
+            _update_html_text(cmd, str(reviews))
 
     def text_macros():
         # Text
