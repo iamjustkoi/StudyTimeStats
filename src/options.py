@@ -632,9 +632,16 @@ class CellItem(QWidget):
     def toggle_code_editor(self, hide: bool = None):
         if hide is None:
             is_hidden = self.widget.codeTextEdit.isHidden()
-            self.widget.codeTextEdit.show() if is_hidden else self.widget.codeTextEdit.hide()
+            if is_hidden:
+                self.widget.codeTextEdit.show()
+                self.widget.codeButton.lockHoverTint(True)
+            else:
+                self.widget.codeTextEdit.hide()
+                self.widget.codeButton.lockHoverTint(False)
+
         else:
             self.widget.codeTextEdit.show() if not hide else self.widget.codeTextEdit.hide()
+            self.widget.codeButton.lockHoverTint(not hide)
 
         self._redraw()
 
