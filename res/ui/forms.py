@@ -69,7 +69,11 @@ class HoverButton(QToolButton):
 
     def leaveEvent(self, *args, **kwargs):
         super().leaveEvent(*args, *kwargs)
-        self._updateIcon(False)
+        if not self.locked:
+            self._updateIcon(False)
+
+    def lockHoverTint(self, locked: bool = True):
+        self.locked = locked
 
 
 class DragHandle(QToolButton):
