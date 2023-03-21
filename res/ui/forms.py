@@ -21,6 +21,7 @@ class HoverButton(QToolButton):
     hover_tint = "#8a8a8a"
     mask_color = "black"
     raw_icon = None
+    locked = False
 
     def _updateIcon(self, is_hovered: bool):
         """
