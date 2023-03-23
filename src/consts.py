@@ -20,7 +20,7 @@ CODE_ICON_PATH = '../res/img/code_icon.svg'
 CHEVRON_ICON_PATH = '../res/img/chevron_down.svg'
 VERT_LINES_PATH = '../res/img/vert_lines.svg'
 HORIZ_LINES_PATH = '../res/img/horiz_lines.svg'
-VERT_HANDLES_PATH = '../res/img/vert_grip.svg'
+HANDLES_PATH = '../res/img/vert_grip.svg'
 
 PATREON_URL = 'https://www.patreon.com/iamjustkoi'
 KOFI_URL = 'https://ko-fi.com/iamjustkoi'

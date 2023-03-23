@@ -628,7 +628,7 @@ class CellItem(QWidget):
 
     def build_drag_handles(self):
         self.widget.dragHandle.icon_color = Color.BUTTON_ICON[theme_manager.get_night_mode()]
-        self.widget.dragHandle.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{VERT_HANDLES_PATH}'))
+        self.widget.dragHandle.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{HANDLES_PATH}'))
         self.widget.dragHandle.setStyleSheet(FLAT_ICON_STYLE)
         self.widget.dragHandle.list_widget = self.list_widget
         self.widget.dragHandle.list_item = self.list_item
