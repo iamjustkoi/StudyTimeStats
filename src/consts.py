@@ -1,7 +1,6 @@
 # MIT License: Copyright (c) 2022-2023 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
 # Full license text available in the "LICENSE" file, packaged with the add-on.
 
-import aqt
 from aqt.theme import theme_manager
 
 CURRENT_VERSION = '2.0.0-b2'
@@ -18,6 +17,7 @@ ANKI_LIKE_ICON_PATH = '../res/img/anki_like.png'
 REMOVE_ICON_PATH = '../res/img/remove_icon.svg'
 ADD_ICON_PATH = '../res/img/add_icon.svg'
 CODE_ICON_PATH = '../res/img/code_icon.svg'
+CHEVRON_ICON_PATH = '../res/img/chevron_down.svg'
 VERT_LINES_PATH = '../res/img/vert_lines.svg'
 HORIZ_LINES_PATH = '../res/img/horiz_lines.svg'
 VERT_HANDLES_PATH = '../res/img/vert_grip.svg'
