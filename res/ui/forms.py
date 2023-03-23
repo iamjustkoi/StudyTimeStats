@@ -79,6 +79,41 @@ class HoverButton(QToolButton):
         self.locked = locked
 
 
+class RotateButton(QToolButton):
+    rotation = 0
+
+    tint = "#FFFFFF"
+    mask_color = "black"
+    raw_icon = None
+
+    def setRotation(self, degrees: float):
+        self.rotation = degrees
+
+    def setRawIcon(self, icon: QIcon) -> None:
+        self.raw_icon = icon
+
+    def showEvent(self, a0: QShowEvent) -> None:
+        super().showEvent(a0)
+        self._updateIcon()
+
+    def setMaskColor(self, color: str):
+        self.mask_color = color
+
+    def setTint(self, tint: str):
+        self.tint = tint
+
+    def _updateIcon(self):
+        """
+        Updates the icon of the RotateButton to the tinted color, using the stored mask color.
+        """
+
+        pixmap = self.raw_icon.pixmap(self.size(), QIcon.Normal, QIcon.On)
+        mask = pixmap.createMaskFromColor(QColor(self.mask_color), Qt.MaskOutColor)
+        pixmap.fill(QColor(self.tint))
+        pixmap.setMask(mask)
+        self.setIcon(QIcon(pixmap))
+
+
 class DragHandle(QToolButton):
     start_pos = None
     last_drag_global_pos = None
