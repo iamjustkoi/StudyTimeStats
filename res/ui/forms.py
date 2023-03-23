@@ -121,6 +121,8 @@ class DragHandle(QToolButton):
     is_dragging = False
     list_item = None
     icon_color = '#FFFFFF'
+    last_target_idx = -1
+    padding = 4
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -140,7 +142,7 @@ class DragHandle(QToolButton):
         offset = self.start_pos.y() - event.pos().y() if self.start_pos else 0
 
         if abs(offset) > 5:
-            # moved beyond range (enough to consider a drag check/updates)
+            # Moved beyond range (enough to consider a drag check/updates)
             self.drag(offset)
 
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
@@ -148,24 +150,52 @@ class DragHandle(QToolButton):
         self.start_pos = None
         self.setCursor(Qt.OpenHandCursor)
 
-    def drag(self, offset: int, padding=4):
+    def drag(self, offset: int):
         if not self.is_dragging:
             self.is_dragging = True
             self.setCursor(Qt.ClosedHandCursor)
 
-        if self.list_widget and self.list_item and abs(offset) > ((self.parentWidget().height() / 2) + padding):
+        # Offset greater than half of the currently dragged cell item's height (plus padding)
+        if self.list_widget and self.list_item and abs(offset) > ((self.parentWidget().height() / 2) + self.padding):
             drag_idx = self.list_widget.row(self.list_item)
-            target_idx = drag_idx + (1 if offset < 0 else -1)
+            target_idx = drag_idx + (-1 if offset > 0 else 1)
+
+            move_dir = target_idx - drag_idx
 
             if target_idx != self.list_widget.count() - 1:
-                # target index isn't the last cell item (empty cell)
+                print(f'    idx={self.last_target_idx}::{target_idx}')
+
+                # Target index isn't the last cell item (empty cell)
                 target_item = self.list_widget.item(target_idx)
 
                 if target_item:
-                    self.list_item.cell_item.index = target_idx
-                    target_item.cell_item.index = drag_idx
+                    did_switch_dir = False
+                    if self.last_drag_global_pos:
+                        current_drag_global_pos = self.parentWidget().cursor().pos()
+                        global_dir_y = current_drag_global_pos.y() - self.last_drag_global_pos.y()
 
-                self.list_widget.sortItems()
-                # Broadcast change
-                self.list_widget.currentRowChanged.emit(self.list_item.cell_item.index)
+                        print(f'{global_dir_y=},{move_dir=}')
 
+                        # Moving in the opposite direction from the last drag event
+                        did_switch_dir = (global_dir_y < 0 < -move_dir) or (global_dir_y > 0 > -move_dir)
+
+                        print(f'{did_switch_dir=}')
+
+                    # noinspection PyUnresolvedReferences
+                    target_cell = target_item.cell_item
+
+                    # Not the same target, or the same target and moving in the opposite direction
+                    if target_cell.index != self.last_target_idx or did_switch_dir:
+                        # Swap indices
+                        self.list_item.cell_item.index = target_idx
+                        target_cell.index = drag_idx
+
+                        # Re-sort post index swap
+                        self.list_widget.sortItems()
+
+                        # Broadcast change
+                        self.list_widget.currentRowChanged.emit(self.list_item.cell_item.index)
+
+                        # Cache values
+                        self.last_target_idx = drag_idx
+                        self.last_drag_global_pos = self.parentWidget().cursor().pos()
