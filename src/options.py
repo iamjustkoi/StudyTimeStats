@@ -678,13 +678,13 @@ class CellItem(QWidget):
         if collapse is None:
             if is_collapsed:
                 self.widget.expandFrame.show()
-                self.widget.expandoButton.setRotation(90)
+                self.widget.expandoButton.setRotation(0)
             else:
                 self.widget.expandFrame.hide()
-                self.widget.expandoButton.setRotation(0)
+                self.widget.expandoButton.setRotation(90)
         else:
             self.widget.codeTextEdit.show() if not collapse else self.widget.codeTextEdit.hide()
-            self.widget.expandoButton.setRotation(0) if not collapse else self.widget.expandoButton.setRotation(90)
+            self.widget.expandoButton.setRotation(90) if not collapse else self.widget.expandoButton.setRotation(0)
 
         self._redraw()
 

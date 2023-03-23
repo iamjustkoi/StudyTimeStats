@@ -1,11 +1,11 @@
+import re
 from aqt import Qt
 from aqt.qt import (
     QToolButton,
     QColor,
     QShowEvent,
     QIcon,
-    QPoint,
-    QCursor,
+    QTransform,
 )
 
 from aqt.qt import (
@@ -81,13 +81,13 @@ class HoverButton(QToolButton):
 
 class RotateButton(QToolButton):
     rotation = 0
-
     tint = "#FFFFFF"
     mask_color = "black"
     raw_icon = None
 
     def setRotation(self, degrees: float):
         self.rotation = degrees
+        self._updateIcon()
 
     def setRawIcon(self, icon: QIcon) -> None:
         self.raw_icon = icon
@@ -106,12 +106,14 @@ class RotateButton(QToolButton):
         """
         Updates the icon of the RotateButton to the tinted color, using the stored mask color.
         """
-
-        pixmap = self.raw_icon.pixmap(self.size(), QIcon.Normal, QIcon.On)
+        pixmap = self.raw_icon.pixmap(self.size(), QIcon.Normal, QIcon.On)\
+            .transformed(QTransform().rotate(self.rotation), Qt.SmoothTransformation)
         mask = pixmap.createMaskFromColor(QColor(self.mask_color), Qt.MaskOutColor)
         pixmap.fill(QColor(self.tint))
         pixmap.setMask(mask)
         self.setIcon(QIcon(pixmap))
+        self.adjustSize()
+        self.setMinimumSize(self.sizeHint())
 
 
 class DragHandle(QToolButton):
