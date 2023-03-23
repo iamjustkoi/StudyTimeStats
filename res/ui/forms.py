@@ -4,6 +4,8 @@ from aqt.qt import (
     QColor,
     QShowEvent,
     QIcon,
+    QPoint,
+    QCursor,
 )
 
 from aqt.qt import (
@@ -79,6 +81,7 @@ class HoverButton(QToolButton):
 
 class DragHandle(QToolButton):
     start_pos = None
+    last_drag_global_pos = None
     list_widget: QListWidget = None
     is_dragging = False
     list_item = None

@@ -450,6 +450,8 @@ class CellItem(QWidget):
         def add_cell():
             _add_cell_to_list(self.list_widget, CellItem(self.list_widget, False))
 
+        print(f'(1) {self.widget.mainFrame.height()=}')
+
         if is_empty:
             self.widget.addButton.clicked.connect(lambda *_: add_cell())
 
@@ -461,26 +463,43 @@ class CellItem(QWidget):
 
             self.widget.addButton.setVisible(True)
             self.widget.mainFrame.setVisible(False)
+            self.widget.expandFrame.setVisible(False)
             self.setMinimumHeight(self.widget.addButton.height())
         else:
+            print(f'(3) {self.widget.mainFrame.height()=}')
+
             self.build_hover_buttons()
             self.build_color_pickers()
             self.build_direction_buttons()
             self.build_range_inputs()
+
+            print(f'(4) {self.widget.mainFrame.height()=}')
+
             self.build_code_button()
+            print(f'(5) {self.widget.mainFrame.height()=}')
             self.build_drag_handles()
+
+            self.build_expando()
 
             self.data = {k: v for k, v in Config.DEFAULT_CELL_DATA.items()} if not data else data
             self.load_data(self.data)
 
             self.widget.addButton.setVisible(False)
             self.widget.mainFrame.setVisible(True)
-            self.setMinimumHeight(self.widget.mainFrame.height())
+            self.widget.expandFrame.setVisible(True)
+
+            self._redraw()
+            print(f'(6) {self.widget.mainFrame.height()=}')
+
+            # self.widget.mainFrame.setMinimumHeight(self.widget.expandFrame.height() + self.widget.titleLabel.height())
+            # self.setMinimumHeight(self.widget.tit.height())
 
             self.build_signals()
 
         self.list_item.setSizeHint(self.sizeHint())
         self.list_item.setFlags(Qt.ItemFlag.NoItemFlags)
+
+        print(f'(6) {self.widget.mainFrame.height()=}')
 
     def load_data(self, data):
         self.widget.titleLineEdit.setText(data[Config.TITLE])
@@ -531,6 +550,10 @@ class CellItem(QWidget):
         self.widget.codeButton.setTint(Color.BUTTON_ICON[theme_manager.get_night_mode()])
         self.widget.codeButton.setHoverTint(Color.HOVER[theme_manager.get_night_mode()])
         self.widget.codeButton.setStyleSheet(FLAT_ICON_STYLE)
+
+        self.widget.expandoButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{CHEVRON_ICON_PATH}'))
+        self.widget.expandoButton.setTint(Color.BUTTON_ICON[theme_manager.get_night_mode()])
+        self.widget.expandoButton.setStyleSheet(FLAT_ICON_STYLE)
 
     def build_color_pickers(self):
         def _append_color_change_signal(button: QToolButton):
@@ -599,6 +622,10 @@ class CellItem(QWidget):
         self.widget.codeButton.clicked.connect(lambda _: self.toggle_code_editor())
         self.toggle_code_editor(True)
 
+    def build_expando(self):
+        self.widget.expandoButton.clicked.connect(lambda _: self.toggle_expando())
+        self.toggle_expando(True)
+
     def build_drag_handles(self):
         self.widget.dragHandle.icon_color = Color.BUTTON_ICON[theme_manager.get_night_mode()]
         self.widget.dragHandle.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{VERT_HANDLES_PATH}'))
@@ -642,6 +669,22 @@ class CellItem(QWidget):
         else:
             self.widget.codeTextEdit.show() if not hide else self.widget.codeTextEdit.hide()
             self.widget.codeButton.lockHoverTint(not hide)
+
+        self._redraw()
+
+    def toggle_expando(self, collapse: bool = None):
+        is_collapsed = self.widget.expandFrame.isHidden()
+
+        if collapse is None:
+            if is_collapsed:
+                self.widget.expandFrame.show()
+                self.widget.expandoButton.setRotation(90)
+            else:
+                self.widget.expandFrame.hide()
+                self.widget.expandoButton.setRotation(0)
+        else:
+            self.widget.codeTextEdit.show() if not collapse else self.widget.codeTextEdit.hide()
+            self.widget.expandoButton.setRotation(0) if not collapse else self.widget.expandoButton.setRotation(90)
 
         self._redraw()
 
