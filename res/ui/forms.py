@@ -46,6 +46,9 @@ class HoverButton(QToolButton):
             pixmap.setMask(mask)
             self.setIcon(QIcon(pixmap))
 
+        self.adjustSize()
+        self.setMinimumSize(self.sizeHint())
+
     def setMaskColor(self, color: str):
         self.mask_color = color
 
@@ -136,6 +139,8 @@ class DragHandle(QToolButton):
         pixmap.fill(QColor(self.icon_color))
         pixmap.setMask(mask)
         super().setIcon(QIcon(pixmap))
+        self.adjustSize()
+        self.setMinimumSize(self.sizeHint())
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         self.start_pos = event.pos()
