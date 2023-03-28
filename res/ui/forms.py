@@ -95,8 +95,8 @@ class RotateButton(QToolButton):
     def setRawIcon(self, icon: QIcon) -> None:
         self.raw_icon = icon
 
-    def showEvent(self, a0: QShowEvent) -> None:
-        super().showEvent(a0)
+    def showEvent(self, evt: QShowEvent) -> None:
+        super().showEvent(evt)
         self._updateIcon()
 
     def setMaskColor(self, color: str):
