@@ -438,9 +438,6 @@ class CellItem(QWidget):
 
         self.list_item = CellItem.CellListItem(self.list_widget, cell_item=self)
 
-        # print(f'{aqt.mw.pm=}')
-        # print(f'{aqt.mw.pm.night_mode()=}')
-        # print(f'{aqt.mw.pm.theme()=}')
         print(f'{theme_manager.get_night_mode()=}')
         print(
             f'Color.BUTTON_ICON[{int(theme_manager.get_night_mode())}]='
@@ -449,8 +446,6 @@ class CellItem(QWidget):
 
         def add_cell():
             _add_cell_to_list(self.list_widget, CellItem(self.list_widget, False))
-
-        print(f'(1) {self.widget.mainFrame.height()=}')
 
         if is_empty:
             self.widget.addButton.clicked.connect(lambda *_: add_cell())
@@ -742,13 +737,19 @@ class CellItem(QWidget):
     def open_delete_confirm_button(self, list_widget: QListWidget):
         confirm_button = QToolButton(self)
         confirm_button.setText('Delete?')
+
         # noinspection PyUnresolvedReferences
         confirm_button.clicked.connect(lambda _: _remove_cell_from_list(list_widget, self))
+
         confirm_button.leaveEvent = lambda _: confirm_button.deleteLater()
+        remove_button_local_pos = self.widget.expandFrame.pos() + self.widget.removeButton.pos()
+        padding = self.widget.expandFrame.layout().spacing()
+
         confirm_button.move(
             QPoint(
-                self.widget.removeButton.x() - confirm_button.width() + self.widget.removeButton.width(),
-                self.widget.removeButton.y()
+                remove_button_local_pos.x() - confirm_button.width() + self.widget.removeButton.width() + padding,
+                remove_button_local_pos.y()
             )
         )
+
         confirm_button.show()
