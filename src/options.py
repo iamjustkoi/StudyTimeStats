@@ -464,19 +464,15 @@ class CellItem(QWidget):
             self.widget.addButton.setVisible(True)
             self.widget.mainFrame.setVisible(False)
             self.widget.expandFrame.setVisible(False)
-            self.setMinimumHeight(self.widget.addButton.height())
-        else:
-            print(f'(3) {self.widget.mainFrame.height()=}')
+            self.widget.addButton.setFixedHeight(self.widget.addButton.minimumHeight())
 
+        else:
             self.build_hover_buttons()
             self.build_color_pickers()
             self.build_direction_buttons()
             self.build_range_inputs()
 
-            print(f'(4) {self.widget.mainFrame.height()=}')
-
             self.build_code_button()
-            print(f'(5) {self.widget.mainFrame.height()=}')
             self.build_drag_handles()
 
             self.build_expando()
@@ -489,17 +485,10 @@ class CellItem(QWidget):
             self.widget.expandFrame.setVisible(True)
 
             self._redraw()
-            print(f'(6) {self.widget.mainFrame.height()=}')
-
-            # self.widget.mainFrame.setMinimumHeight(self.widget.expandFrame.height() + self.widget.titleLabel.height())
-            # self.setMinimumHeight(self.widget.tit.height())
-
             self.build_signals()
 
         self.list_item.setSizeHint(self.sizeHint())
         self.list_item.setFlags(Qt.ItemFlag.NoItemFlags)
-
-        print(f'(6) {self.widget.mainFrame.height()=}')
 
     def load_data(self, data):
         self.widget.titleLineEdit.setText(data[Config.TITLE])
