@@ -114,7 +114,9 @@ class RotateButton(QToolButton):
         mask = pixmap.createMaskFromColor(QColor(self.mask_color), Qt.MaskOutColor)
         pixmap.fill(QColor(self.tint))
         pixmap.setMask(mask)
+
         self.setIcon(QIcon(pixmap))
+
         self.adjustSize()
         self.setMinimumSize(self.sizeHint())
 
@@ -139,6 +141,7 @@ class DragHandle(QToolButton):
         pixmap.fill(QColor(self.icon_color))
         pixmap.setMask(mask)
         super().setIcon(QIcon(pixmap))
+
         self.adjustSize()
         self.setMinimumSize(self.sizeHint())
 
