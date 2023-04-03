@@ -9,6 +9,7 @@ from pathlib import Path
 
 import aqt.theme
 from aqt.qt import (
+    QAction,
     QColor,
     QColorDialog,
     QDialog,
@@ -16,6 +17,7 @@ from aqt.qt import (
     QHBoxLayout,
     QIcon,
     QLabel,
+    QLineEdit,
     QListWidget,
     QListWidgetItem,
     QMenu,
@@ -471,11 +473,10 @@ class CellItem(QWidget):
             self.build_color_pickers()
             self.build_direction_buttons()
             self.build_range_inputs()
-
             self.build_code_button()
             self.build_drag_handles()
-
             self.build_expando()
+            self.build_line_edits()
 
             self.data = {k: v for k, v in Config.DEFAULT_CELL_DATA.items()} if not data else data
             self.load_data(self.data)
@@ -483,33 +484,6 @@ class CellItem(QWidget):
             self.widget.addButton.setVisible(False)
             self.widget.mainFrame.setVisible(True)
             self.widget.expandFrame.setVisible(True)
-
-            entries = ['test1', 'test2', 'test3']
-
-            from aqt.qt import (
-                QAction,
-                QListView,
-                QStandardItemModel,
-                QStandardItem,
-                QCompleter,
-                QLineEdit,
-                QScrollBar,
-            )
-
-            icon_path = f'{Path(__file__).parent.resolve()}\\{ADD_ICON_PATH}'
-
-            # Connect the action to the open_macro_dialog function
-
-            # Add the action to the QLineEdits
-            action = QAction(QIcon(icon_path), 'Add Entry', self.widget.titleLineEdit)
-            action.triggered.connect(lambda _: self.open_macro_dialog(self.widget.titleLineEdit))
-            self.widget.titleLineEdit.addAction(action, QLineEdit.ActionPosition.TrailingPosition)
-
-            action = QAction(QIcon(icon_path), 'Add Entry', self.widget.outputLineEdit)
-            action.triggered.connect(lambda _: self.open_macro_dialog(self.widget.outputLineEdit))
-            self.widget.outputLineEdit.addAction(action, QLineEdit.ActionPosition.TrailingPosition)
-
-            print(f'{self.widget.titleLabel.styleSheet()=}')
 
             self._redraw()
             self.build_signals()
@@ -625,6 +599,18 @@ class CellItem(QWidget):
 
         self.widget.directionVerticalButton.clicked.connect(lambda _: self.toggle_direction_buttons())
         self.widget.directionHorizontalButton.clicked.connect(lambda _: self.toggle_direction_buttons())
+
+    def build_line_edits(self):
+        icon_path = f'{Path(__file__).parent.resolve()}\\{ADD_ICON_PATH}'
+
+        # Add the actions to the QLineEdits
+        action = QAction(QIcon(icon_path), 'Add Entry', self.widget.titleLineEdit)
+        action.triggered.connect(lambda _: self.open_macro_dialog(self.widget.titleLineEdit))
+        self.widget.titleLineEdit.addAction(action, QLineEdit.ActionPosition.TrailingPosition)
+
+        action = QAction(QIcon(icon_path), 'Add Entry', self.widget.outputLineEdit)
+        action.triggered.connect(lambda _: self.open_macro_dialog(self.widget.outputLineEdit))
+        self.widget.outputLineEdit.addAction(action, QLineEdit.ActionPosition.TrailingPosition)
 
     def build_range_inputs(self):
         self.widget.rangeDropdown.currentIndexChanged.connect(self.on_range_update)
