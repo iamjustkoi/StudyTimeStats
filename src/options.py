@@ -417,6 +417,7 @@ class CellItem(QWidget):
     data: dict = {}
     direction = 'vertical'
     index = 0
+    mask_color = 'black'
 
     class CellListItem(QListWidgetItem):
         cell_item: CellItem
@@ -600,15 +601,24 @@ class CellItem(QWidget):
         self.widget.directionVerticalButton.clicked.connect(lambda _: self.toggle_direction_buttons())
         self.widget.directionHorizontalButton.clicked.connect(lambda _: self.toggle_direction_buttons())
 
-    def build_line_edits(self):
+    def build_line_edits(self, mask_color='black'):
         icon_path = f'{Path(__file__).parent.resolve()}\\{ADD_ICON_PATH}'
 
+        tint_color = Color.BUTTON_ICON[theme_manager.get_night_mode()]
+
+        pixmap = QIcon(icon_path).pixmap(self.size(), QIcon.Normal, QIcon.On)
+        mask = pixmap.createMaskFromColor(QColor(mask_color), Qt.MaskOutColor)
+        pixmap.fill(QColor(tint_color))
+        pixmap.setMask(mask)
+
+        icon = QIcon(pixmap)
+
         # Add the actions to the QLineEdits
-        action = QAction(QIcon(icon_path), 'Add Entry', self.widget.titleLineEdit)
+        action = QAction(icon, 'Add Entry', self.widget.titleLineEdit)
         action.triggered.connect(lambda _: self.open_macro_dialog(self.widget.titleLineEdit))
         self.widget.titleLineEdit.addAction(action, QLineEdit.ActionPosition.TrailingPosition)
 
-        action = QAction(QIcon(icon_path), 'Add Entry', self.widget.outputLineEdit)
+        action = QAction(icon, 'Add Entry', self.widget.outputLineEdit)
         action.triggered.connect(lambda _: self.open_macro_dialog(self.widget.outputLineEdit))
         self.widget.outputLineEdit.addAction(action, QLineEdit.ActionPosition.TrailingPosition)
 
