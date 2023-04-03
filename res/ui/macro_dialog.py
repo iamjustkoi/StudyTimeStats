@@ -41,7 +41,7 @@ class Ui_MacroDialog(object):
         self.previewGroupBox.setMinimumSize(QtCore.QSize(0, 42))
         self.previewGroupBox.setObjectName("previewGroupBox")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.previewGroupBox)
-        self.verticalLayout_3.setContentsMargins(6, 0, 6, 6)
+        self.verticalLayout_3.setContentsMargins(6, 4, 6, 6)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.previewLabel = QtWidgets.QLabel(self.previewGroupBox)
         self.previewLabel.setObjectName("previewLabel")
