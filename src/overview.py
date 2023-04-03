@@ -668,7 +668,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             else:
                 _update_string_text(
                     fr'{Macro.CMD_EVAL}{raw_match}\}}',
-                    f'{round(result, precision):n}',
+                    f'{round(result, precision):n}' if isinstance(result, float) else str(result),
                 )
 
     def _update_string_time(macro: str, revlog: list = None):
