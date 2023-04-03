@@ -841,6 +841,12 @@ class MacroDialog(QDialog):
         self.ui.listView.selectionModel().currentChanged.connect(self.update_preview)
         self.ui.listView.doubleClicked.connect(self.accept)
 
+        # Update list view's item selection
+        self.ui.listView.selectionModel().select(
+            self.ui.listView.currentIndex(),
+            aqt.qt.QItemSelectionModel.SelectCurrent,
+        )
+
     def update_preview(self, index, *__args):
         macro_cmd: str = self.model.data(index, Qt.UserRole)
         macro_cmd += '}' if macro_cmd.find('{') >= 0 else ''
