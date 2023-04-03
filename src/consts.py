@@ -76,40 +76,40 @@ class Macro:
     CMD_FULL_DAY = '%from_full_day'
     CMD_DAY = '%from_day'
     CMD_DAYS = '%days'
-    CMD_DATE_STRF = r'%from_date:strf\{".*\"}'
+    CMD_DATE_FORMATTED = r'%from_date:strf\{".*\"}'
 
     CMD_MONTH = '%from_month'
     CMD_FULL_MONTH = '%from_full_month'
 
     # Time
-    CMD_TOTAL_HRS = '%total_hrs'
+    CMD_TOTAL_HOURS = '%total_hrs'
 
-    CMD_RANGE_HRS = '%range_hrs'
-    CMD_DAY_HRS = '%day_hrs'
-    CMD_WEEK_HRS = '%week_hrs'
-    CMD_TWO_WEEKS_HRS = '%two_week_hrs'
-    CMD_MONTH_HRS = '%month_hrs'
-    CMD_YEAR_HRS = '%year_hrs'
+    CMD_RANGE_HOURS = '%range_hrs'
+    CMD_DAY_HOURS = '%day_hrs'
+    CMD_WEEK_HOURS = '%week_hrs'
+    CMD_TWO_WEEKS_HOURS = '%two_week_hrs'
+    CMD_MONTH_HOURS = '%month_hrs'
+    CMD_YEAR_HOURS = '%year_hrs'
 
-    CMD_ETA_HRS = '%eta_hrs'
+    CMD_ETA_HOURS = '%eta_hrs'
 
-    CMD_HIGHEST_DAY_HRS = '%highest_day_hrs'
-    CMD_HIGHEST_WEEK_HRS = '%highest_week_hrs'
-    CMD_HIGHEST_MONTH_HRS = '%highest_month_hrs'
-    CMD_HIGHEST_YEAR_HRS = '%highest_year_hrs'
+    CMD_HIGHEST_DAY_HOURS = '%highest_day_hrs'
+    CMD_HIGHEST_WEEK_HOURS = '%highest_week_hrs'
+    CMD_HIGHEST_MONTH_HOURS = '%highest_month_hrs'
+    CMD_HIGHEST_YEAR_HOURS = '%highest_year_hrs'
 
     # Avg
-    CMD_CARD_AVG_HRS = '%card_avg_hrs'
-    CMD_DAY_AVG_HRS = '%day_avg_hrs'
+    CMD_CARD_AVERAGE_HOURS = '%card_avg_hrs'
+    CMD_DAY_AVERAGE_HOURS = '%day_avg_hrs'
 
     # Previous Time
-    CMD_PREV_RANGE_HRS = '%prev_range_hrs'
-    CMD_PREV_DAY_HRS = '%prev_day_hrs'
-    CMD_PREV_WEEK_HRS = '%prev_week_hrs'
-    CMD_PREV_TWO_WEEKS_HRS = '%prev_two_week_hrs'
-    CMD_PREV_MONTH_HRS = '%prev_month_hrs'
-    CMD_PREV_YEAR_HRS = '%prev_year_hrs'
-    CMD_FROM_DATE_HRS = '%from_custom_hrs'
+    CMD_PREVIOUS_RANGE_HOURS = '%prev_range_hrs'
+    CMD_PREVIOUS_DAY_HOURS = '%prev_day_hrs'
+    CMD_PREVIOUS_WEEK_HOURS = '%prev_week_hrs'
+    CMD_PREVIOUS_TWO_WEEKS_HOURS = '%prev_two_week_hrs'
+    CMD_PREVIOUS_MONTH_HOURS = '%prev_month_hrs'
+    CMD_PREVIOUS_YEAR_HOURS = '%prev_year_hrs'
+    CMD_FROM_DATE_HOURS = '%from_custom_hrs'
 
     # Reviews
     CMD_TOTAL_REVIEWS = '%total_rev'
@@ -120,12 +120,12 @@ class Macro:
     CMD_MONTH_REVIEWS = '%month_rev'
     CMD_YEAR_REVIEWS = '%year_rev'
 
-    CMD_PREV_RANGE_REVIEWS = '%prev_range_rev'
-    CMD_PREV_DAY_REVIEWS = '%prev_day_rev'
-    CMD_PREV_WEEK_REVIEWS = '%prev_week_rev'
-    CMD_PREV_TWO_WEEKS_REVIEWS = '%prev_two_week_rev'
-    CMD_PREV_MONTH_REVIEWS = '%prev_month_rev'
-    CMD_PREV_YEAR_REVIEWS = '%prev_year_rev'
+    CMD_PREVIOUS_RANGE_REVIEWS = '%prev_range_rev'
+    CMD_PREVIOUS_DAY_REVIEWS = '%prev_day_rev'
+    CMD_PREVIOUS_WEEK_REVIEWS = '%prev_week_rev'
+    CMD_PREVIOUS_TWO_WEEKS_REVIEWS = '%prev_two_week_rev'
+    CMD_PREVIOUS_MONTH_REVIEWS = '%prev_month_rev'
+    CMD_PREVIOUS_YEAR_REVIEWS = '%prev_year_rev'
     CMD_FROM_DATE_REVIEWS = '%from_custom_rev'
 
     CMD_HIGHEST_DAY_REVIEWS = '%highest_day_rev'
@@ -143,33 +143,33 @@ class Macro:
         CMD_FULL_DAY: '''range filter's full start day''',
         CMD_DAY: '''range filter's starting day using a compact format''',
         CMD_DAYS: '''total days the range filter checks against''',
-        CMD_DATE_STRF: '''formatted date string of the range filter's start date''',
+        CMD_DATE_FORMATTED: '''formatted date string of the range filter's start date''',
         CMD_MONTH: '''range filter's month name using a compact format''',
         CMD_FULL_MONTH: '''range filter's full month name''',
 
-        CMD_TOTAL_HRS: '''total study time''',
-        CMD_RANGE_HRS: '''total study time in range''',
-        CMD_DAY_HRS: '''total study time for the past day''',
-        CMD_WEEK_HRS: '''total study time for the past week''',
-        CMD_TWO_WEEKS_HRS: '''total study time for the past two weeks''',
-        CMD_MONTH_HRS: '''total study time for the past month''',
-        CMD_YEAR_HRS: '''total study time for the past year''',
-        CMD_ETA_HRS: '''estimated study time for the current card queue''',
-        CMD_HIGHEST_DAY_HRS: '''highest total study time for all days in the current range''',
-        CMD_HIGHEST_WEEK_HRS: '''highest total study time for all weeks in the current range''',
-        CMD_HIGHEST_MONTH_HRS: '''highest total study time for all months in the current range''',
-        CMD_HIGHEST_YEAR_HRS: '''highest total study time for all years in the current range''',
+        CMD_TOTAL_HOURS: '''total study time''',
+        CMD_RANGE_HOURS: '''total study time in range''',
+        CMD_DAY_HOURS: '''total study time for the past day''',
+        CMD_WEEK_HOURS: '''total study time for the past week''',
+        CMD_TWO_WEEKS_HOURS: '''total study time for the past two weeks''',
+        CMD_MONTH_HOURS: '''total study time for the past month''',
+        CMD_YEAR_HOURS: '''total study time for the past year''',
+        CMD_ETA_HOURS: '''estimated study time for the current card queue''',
+        CMD_HIGHEST_DAY_HOURS: '''highest total study time for all days in the current range''',
+        CMD_HIGHEST_WEEK_HOURS: '''highest total study time for all weeks in the current range''',
+        CMD_HIGHEST_MONTH_HOURS: '''highest total study time for all months in the current range''',
+        CMD_HIGHEST_YEAR_HOURS: '''highest total study time for all years in the current range''',
 
-        CMD_CARD_AVG_HRS: '''average study time per card in range''',
-        CMD_DAY_AVG_HRS: '''average study time per day in range''',
+        CMD_CARD_AVERAGE_HOURS: '''average study time per card in range''',
+        CMD_DAY_AVERAGE_HOURS: '''average study time per day in range''',
 
-        CMD_PREV_RANGE_HRS: '''total study time for the previous range''',
-        CMD_PREV_DAY_HRS: '''total study time for the previous day''',
-        CMD_PREV_WEEK_HRS: '''total study time for the previous week''',
-        CMD_PREV_TWO_WEEKS_HRS: '''total study time for the previous two weeks''',
-        CMD_PREV_MONTH_HRS: '''total study time for the previous month''',
-        CMD_PREV_YEAR_HRS: '''total study time for the previous year''',
-        CMD_FROM_DATE_HRS: '''total study time for a custom date range''',
+        CMD_PREVIOUS_RANGE_HOURS: '''total study time for the previous range''',
+        CMD_PREVIOUS_DAY_HOURS: '''total study time for the previous day''',
+        CMD_PREVIOUS_WEEK_HOURS: '''total study time for the previous week''',
+        CMD_PREVIOUS_TWO_WEEKS_HOURS: '''total study time for the previous two weeks''',
+        CMD_PREVIOUS_MONTH_HOURS: '''total study time for the previous month''',
+        CMD_PREVIOUS_YEAR_HOURS: '''total study time for the previous year''',
+        CMD_FROM_DATE_HOURS: '''total study time for a custom date range''',
 
         CMD_TOTAL_REVIEWS: '''total reviews''',
         CMD_RANGE_REVIEWS: '''total reviews in range''',
@@ -178,12 +178,12 @@ class Macro:
         CMD_TWO_WEEKS_REVIEWS: '''''',
         CMD_MONTH_REVIEWS: '''''',
         CMD_YEAR_REVIEWS: '''''',
-        CMD_PREV_RANGE_REVIEWS: '''''',
-        CMD_PREV_DAY_REVIEWS: '''''',
-        CMD_PREV_WEEK_REVIEWS: '''''',
-        CMD_PREV_TWO_WEEKS_REVIEWS: '''''',
-        CMD_PREV_MONTH_REVIEWS: '''''',
-        CMD_PREV_YEAR_REVIEWS: '''''',
+        CMD_PREVIOUS_RANGE_REVIEWS: '''''',
+        CMD_PREVIOUS_DAY_REVIEWS: '''''',
+        CMD_PREVIOUS_WEEK_REVIEWS: '''''',
+        CMD_PREVIOUS_TWO_WEEKS_REVIEWS: '''''',
+        CMD_PREVIOUS_MONTH_REVIEWS: '''''',
+        CMD_PREVIOUS_YEAR_REVIEWS: '''''',
         CMD_FROM_DATE_REVIEWS: '''''',
         CMD_HIGHEST_DAY_REVIEWS: '''''',
         CMD_HIGHEST_WEEK_REVIEWS: '''''',
@@ -197,8 +197,8 @@ class Macro:
 class String:
     TOTAL = 'Total'
     PAST_RANGE = 'Past %range'
-    TOTAL_HRS = '%total_hrs'
-    PAST_HRS = '%range_hrs'
+    TOTAL_HOURS = '%total_hrs'
+    PAST_HOURS = '%range_hrs'
     HRS = 'hrs'
     MIN = 'min'
     OPTIONS_ACTION = 'Study &Time Stats Options...'
@@ -244,9 +244,9 @@ class Config:
     CUSTOM_DAYS = 'Custom_Days'
     CUSTOM_TOTAL_TEXT = 'Custom_Total_Text'
     CUSTOM_RANGE_TEXT = 'Custom_Range_Text'
-    CUSTOM_TOTAL_HRS = 'Custom_Total_Hrs'
-    CUSTOM_RANGE_HRS = 'Custom_Range_Hrs'
-    CUSTOM_HRS_TEXT = 'Custom_Hrs_Text'
+    CUSTOM_TOTAL_HOURS = 'Custom_Total_Hrs'
+    CUSTOM_RANGE_HOURS = 'Custom_Range_Hrs'
+    CUSTOM_HOURS_TEXT = 'Custom_Hrs_Text'
     CUSTOM_MIN_TEXT = 'Custom_Min_Text'
     BROWSER_ENABLED = 'Browser_Enabled'
     OVERVIEW_ENABLED = 'Overview_Enabled'
@@ -270,7 +270,7 @@ class Config:
     HTML = 'html'
     DEFAULT_CELL_DATA = {
         TITLE: String.PAST_RANGE,
-        OUTPUT: String.PAST_HRS,
+        OUTPUT: String.PAST_HOURS,
         TITLE_COLOR: Color.TITLE_DEFAULT[theme_manager.get_night_mode()],
         OUTPUT_COLOR: Color.OUTPUT_DEFAULT[theme_manager.get_night_mode()],
         DIRECTION: Direction.VERTICAL,

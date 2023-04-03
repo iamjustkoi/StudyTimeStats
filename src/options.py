@@ -871,12 +871,6 @@ class MacroDialog(QDialog):
 
         print(f'{self.macros=}')
 
-    def update_list(self):
-        for macro in self.macros:
-            item = QStandardItem(macro.name)
-            item.setData(macro.cmd, Qt.UserRole)
-            self.model.appendRow(item)
-
     def update_preview(self, index):
         macro_name = self.model.data(index)
         for macro in self.macros:
