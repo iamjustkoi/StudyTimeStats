@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MacroDialog(object):
     def setupUi(self, MacroDialog):
         MacroDialog.setObjectName("MacroDialog")
-        MacroDialog.resize(400, 300)
+        MacroDialog.resize(528, 362)
         self.verticalLayout = QtWidgets.QVBoxLayout(MacroDialog)
         self.verticalLayout.setObjectName("verticalLayout")
         self.macroGroupBox = QtWidgets.QGroupBox(MacroDialog)
@@ -38,6 +38,7 @@ class Ui_MacroDialog(object):
         self.verticalLayout_2.addWidget(self.listView)
         self.verticalLayout.addWidget(self.macroGroupBox)
         self.previewGroupBox = QtWidgets.QGroupBox(MacroDialog)
+        self.previewGroupBox.setMinimumSize(QtCore.QSize(0, 42))
         self.previewGroupBox.setObjectName("previewGroupBox")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.previewGroupBox)
         self.verticalLayout_3.setContentsMargins(6, 0, 6, 6)
