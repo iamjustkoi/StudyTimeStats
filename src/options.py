@@ -76,6 +76,7 @@ Addon options QDialog class for accessing and changing the addon's config values
         :param conf_manager: TimeStatsConfigManager used to reading and writing user input.
         """
         super().__init__(flags=aqt.mw.windowFlags())
+
         self.manager = conf_manager
         self.config = conf_manager.config
         self.ui = Ui_OptionsDialog()
@@ -839,9 +840,21 @@ class MacroDialog(QDialog):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         self.setWindowModality(Qt.WindowModal)
         self.ui = Ui_MacroDialog()
         self.ui.setupUi(MacroDialog=self)
+
+        self.addon_config = None
+        self.cell_config = None
+
+        cell_item = self.parent()
+        if isinstance(cell_item, CellItem):
+            self.cell_config = cell_item.get_data()
+            options_dialog = cell_item.parent().window()
+
+            if isinstance(options_dialog, TimeStatsOptionsDialog):
+                self.addon_config = options_dialog.config
 
         self.ui.buttonBox.button(aqt.qt.QDialogButtonBox.Ok).setText(String.INSERT)
 
