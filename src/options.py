@@ -20,6 +20,8 @@ from aqt.qt import (
     QListWidgetItem,
     QMenu,
     QPoint,
+    QStandardItem,
+    QStandardItemModel,
     QToolButton,
     QWidget,
     Qt,
@@ -29,6 +31,7 @@ from aqt.qt import (
 from .config import ANKI_VERSION, TimeStatsConfigManager
 from .consts import *
 from ..res.ui.cell_item import Ui_CellWidget
+from ..res.ui.macro_dialog import Ui_MacroDialog
 from ..res.ui.options_dialog import Ui_OptionsDialog
 
 
@@ -479,6 +482,78 @@ class CellItem(QWidget):
             self.widget.mainFrame.setVisible(True)
             self.widget.expandFrame.setVisible(True)
 
+            entries = ['test1', 'test2', 'test3']
+
+            from aqt.qt import (
+                QAction,
+                QListView,
+                QStandardItemModel,
+                QStandardItem,
+                QCompleter,
+                QLineEdit,
+                QScrollBar,
+            )
+            # clear_button: QAction = self.widget.titleLineEdit.findChild(QAction, "_q_qlineeditclearaction")
+            # clear_button.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{ADD_ICON_PATH}'))
+            icon_path = f'{Path(__file__).parent.resolve()}\\{ADD_ICON_PATH}'
+            action = QAction(QIcon(icon_path), 'Add Entry', self.widget.titleLineEdit)
+
+            # # Define a function to show the list view
+            # def show_list_view():
+            #     # # Create the list view
+            #     # list_view = QListView(self.widget.titleLineEdit)
+            #     # list_view.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint | Qt.WindowDoesNotAcceptFocus)
+            #     # list_view.setFocus()
+            #     #
+            #     # # Create the model for the list view
+            #     # model = QStandardItemModel()
+            #     # for entry in entries:
+            #     #     item = QStandardItem(entry)
+            #     #     model.appendRow(item)
+            #     #
+            #     # # Set the model for the list view
+            #     # list_view.setModel(model)
+            #     #
+            #     # # Set the completer for the title line edit
+            #     # completer = QCompleter(model, self.widget.titleLineEdit)
+            #     # self.widget.titleLineEdit.setCompleter(completer)
+            #     #
+            #     # # Define a function to close the list view
+            #     # def close_list_view(*args):
+            #     #     print(f'pre-hide')
+            #     #     list_view.hide()
+            #     #     print(f'post-hide')
+            #     #     # completer.setPopup(None)
+            #     #     list_view.close()
+            #     #
+            #     # # Connect the item clicked signal to the close_list_view function
+            #     # list_view.clicked.connect(close_list_view)
+            #     #
+            #     # list_view.focusOutEvent = close_list_view
+            #     #
+            #     # # Set the size of the list view based on the contents
+            #     # list_view.setMaximumHeight(200)
+            #     # list_view.setMinimumWidth(self.widget.titleLineEdit.width())
+            #     # list_view.setMaximumWidth(self.widget.titleLineEdit.width())
+            #     #
+            #     # # Add a scrollbar to the list view when necessary
+            #     # scrollbar = QScrollBar(Qt.Vertical, list_view)
+            #     # list_view.setVerticalScrollBar(scrollbar)
+            #     # scrollbar.setMaximum(list_view.sizeHintForRow(0) * len(entries))
+            #     #
+            #     # # Show the list view at the position of the action
+            #     # list_view.move(self.parentWidget().cursor().pos())
+            #     # list_view.show()
+            #     pass
+
+            # Connect the action to the show_list_view function
+            action.triggered.connect(self.open_macro_dialog)
+
+            # Add the action to the title QLineEdit
+            self.widget.titleLineEdit.addAction(action, QLineEdit.ActionPosition.TrailingPosition)
+
+            print(f'{self.widget.titleLabel.styleSheet()=}')
+
             self._redraw()
             self.build_signals()
 
@@ -753,3 +828,57 @@ class CellItem(QWidget):
         )
 
         confirm_button.show()
+
+    def open_macro_dialog(self):
+        macro_dialog = MacroDialog(parent=self)
+        macro_dialog.show()
+
+
+class MacroDialog(QDialog):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setWindowModality(Qt.WindowModal)
+        self.ui = Ui_MacroDialog()
+        self.ui.setupUi(MacroDialog=self)
+
+        self.ui.buttonBox.button(aqt.qt.QDialogButtonBox.Ok).setText(String.INSERT)
+
+        class MacroItem:
+            def __init__(self, name: str, cmd: str):
+                self.name = name
+                self.cmd = cmd
+
+        self.model = QStandardItemModel()
+        self.macros: list[MacroItem] = []
+
+        for attr_name in dir(Macro):
+            attr = getattr(Macro, attr_name)
+            if isinstance(attr, str) and attr_name.startswith('CMD'):
+                # Remove the CMD_ prefix, replace underscores with spaces, and title case the string
+                formatted_name = attr_name.replace('CMD_', '').replace('_', ' ').title()
+
+                item = QStandardItem(formatted_name)
+                item.setData(attr, Qt.UserRole)
+
+                self.model.appendRow(item)
+                self.macros.append(MacroItem(formatted_name, attr))
+
+        self.ui.listView.setModel(self.model)
+        self.ui.listView.clicked.connect(self.update_preview)
+
+        self.update_list()
+
+        print(f'{self.macros=}')
+
+    def update_list(self):
+        for macro in self.macros:
+            item = QStandardItem(macro.name)
+            item.setData(macro.cmd, Qt.UserRole)
+            self.model.appendRow(item)
+
+    def update_preview(self, index):
+        macro_name = self.model.data(index)
+        for macro in self.macros:
+            if macro.name == macro_name:
+                self.ui.previewLabel.setText(macro.cmd)
