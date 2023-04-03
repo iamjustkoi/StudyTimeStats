@@ -149,12 +149,15 @@ class Macro:
 
         CMD_TOTAL_HOURS: '''total study time''',
         CMD_RANGE_HOURS: '''total study time in range''',
+
         CMD_DAY_HOURS: '''total study time for the past day''',
         CMD_WEEK_HOURS: '''total study time for the past week''',
         CMD_TWO_WEEKS_HOURS: '''total study time for the past two weeks''',
         CMD_MONTH_HOURS: '''total study time for the past month''',
         CMD_YEAR_HOURS: '''total study time for the past year''',
+
         CMD_ETA_HOURS: '''estimated study time for the current card queue''',
+
         CMD_HIGHEST_DAY_HOURS: '''highest total study time for all days in the current range''',
         CMD_HIGHEST_WEEK_HOURS: '''highest total study time for all weeks in the current range''',
         CMD_HIGHEST_MONTH_HOURS: '''highest total study time for all months in the current range''',
@@ -169,22 +172,27 @@ class Macro:
         CMD_PREVIOUS_TWO_WEEKS_HOURS: '''total study time for the previous two weeks''',
         CMD_PREVIOUS_MONTH_HOURS: '''total study time for the previous month''',
         CMD_PREVIOUS_YEAR_HOURS: '''total study time for the previous year''',
+
         CMD_FROM_DATE_HOURS: '''total study time for a custom date range''',
 
         CMD_TOTAL_REVIEWS: '''total reviews''',
         CMD_RANGE_REVIEWS: '''total reviews in range''',
+
         CMD_DAY_REVIEWS: '''''',
         CMD_WEEK_REVIEWS: '''''',
         CMD_TWO_WEEKS_REVIEWS: '''''',
         CMD_MONTH_REVIEWS: '''''',
         CMD_YEAR_REVIEWS: '''''',
+
         CMD_PREVIOUS_RANGE_REVIEWS: '''''',
         CMD_PREVIOUS_DAY_REVIEWS: '''''',
         CMD_PREVIOUS_WEEK_REVIEWS: '''''',
         CMD_PREVIOUS_TWO_WEEKS_REVIEWS: '''''',
         CMD_PREVIOUS_MONTH_REVIEWS: '''''',
         CMD_PREVIOUS_YEAR_REVIEWS: '''''',
+
         CMD_FROM_DATE_REVIEWS: '''''',
+
         CMD_HIGHEST_DAY_REVIEWS: '''''',
         CMD_HIGHEST_WEEK_REVIEWS: '''''',
         CMD_HIGHEST_MONTH_REVIEWS: '''''',
