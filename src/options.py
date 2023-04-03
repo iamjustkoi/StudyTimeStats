@@ -495,64 +495,19 @@ class CellItem(QWidget):
                 QLineEdit,
                 QScrollBar,
             )
-            # clear_button: QAction = self.widget.titleLineEdit.findChild(QAction, "_q_qlineeditclearaction")
-            # clear_button.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{ADD_ICON_PATH}'))
+
             icon_path = f'{Path(__file__).parent.resolve()}\\{ADD_ICON_PATH}'
+
+            # Connect the action to the open_macro_dialog function
+
+            # Add the action to the QLineEdits
             action = QAction(QIcon(icon_path), 'Add Entry', self.widget.titleLineEdit)
-
-            # # Define a function to show the list view
-            # def show_list_view():
-            #     # # Create the list view
-            #     # list_view = QListView(self.widget.titleLineEdit)
-            #     # list_view.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint | Qt.WindowDoesNotAcceptFocus)
-            #     # list_view.setFocus()
-            #     #
-            #     # # Create the model for the list view
-            #     # model = QStandardItemModel()
-            #     # for entry in entries:
-            #     #     item = QStandardItem(entry)
-            #     #     model.appendRow(item)
-            #     #
-            #     # # Set the model for the list view
-            #     # list_view.setModel(model)
-            #     #
-            #     # # Set the completer for the title line edit
-            #     # completer = QCompleter(model, self.widget.titleLineEdit)
-            #     # self.widget.titleLineEdit.setCompleter(completer)
-            #     #
-            #     # # Define a function to close the list view
-            #     # def close_list_view(*args):
-            #     #     print(f'pre-hide')
-            #     #     list_view.hide()
-            #     #     print(f'post-hide')
-            #     #     # completer.setPopup(None)
-            #     #     list_view.close()
-            #     #
-            #     # # Connect the item clicked signal to the close_list_view function
-            #     # list_view.clicked.connect(close_list_view)
-            #     #
-            #     # list_view.focusOutEvent = close_list_view
-            #     #
-            #     # # Set the size of the list view based on the contents
-            #     # list_view.setMaximumHeight(200)
-            #     # list_view.setMinimumWidth(self.widget.titleLineEdit.width())
-            #     # list_view.setMaximumWidth(self.widget.titleLineEdit.width())
-            #     #
-            #     # # Add a scrollbar to the list view when necessary
-            #     # scrollbar = QScrollBar(Qt.Vertical, list_view)
-            #     # list_view.setVerticalScrollBar(scrollbar)
-            #     # scrollbar.setMaximum(list_view.sizeHintForRow(0) * len(entries))
-            #     #
-            #     # # Show the list view at the position of the action
-            #     # list_view.move(self.parentWidget().cursor().pos())
-            #     # list_view.show()
-            #     pass
-
-            # Connect the action to the show_list_view function
-            action.triggered.connect(self.open_macro_dialog)
-
-            # Add the action to the title QLineEdit
+            action.triggered.connect(lambda _: self.open_macro_dialog(self.widget.titleLineEdit))
             self.widget.titleLineEdit.addAction(action, QLineEdit.ActionPosition.TrailingPosition)
+
+            action = QAction(QIcon(icon_path), 'Add Entry', self.widget.outputLineEdit)
+            action.triggered.connect(lambda _: self.open_macro_dialog(self.widget.outputLineEdit))
+            self.widget.outputLineEdit.addAction(action, QLineEdit.ActionPosition.TrailingPosition)
 
             print(f'{self.widget.titleLabel.styleSheet()=}')
 
@@ -831,27 +786,29 @@ class CellItem(QWidget):
 
         confirm_button.show()
 
-    def open_macro_dialog(self):
-        macro_dialog = MacroDialog(parent=self)
+    def open_macro_dialog(self, line_edit: aqt.qt.QLineEdit):
+        macro_dialog = MacroDialog(line_edit=line_edit, parent=self)
         macro_dialog.show()
 
 
 class MacroDialog(QDialog):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, line_edit: aqt.qt.QLineEdit, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.setWindowModality(Qt.WindowModal)
         self.ui = Ui_MacroDialog()
         self.ui.setupUi(MacroDialog=self)
 
+        self.line_edit = line_edit
         self.addon_config = None
         self.cell_config = None
 
         cell_item = self.parent()
         if isinstance(cell_item, CellItem):
-            self.cell_config = cell_item.get_data()
-            options_dialog = cell_item.parent().window()
+            self.cell_item = cell_item
+            self.cell_config = self.cell_item.get_data()
+            options_dialog = self.cell_item.parent().window()
 
             if isinstance(options_dialog, TimeStatsOptionsDialog):
                 self.addon_config = options_dialog.config
@@ -886,6 +843,7 @@ class MacroDialog(QDialog):
 
         self.ui.listView.setModel(self.model)
         self.ui.listView.clicked.connect(self.update_preview)
+        self.ui.listView.doubleClicked.connect(self.accept)
 
     def update_preview(self, index):
         macro_cmd: str = self.model.data(index, Qt.UserRole)
@@ -904,3 +862,21 @@ class MacroDialog(QDialog):
                 parsed_cmd = parsed_string(macro_cmd, self.addon_config, self.cell_config)
 
                 self.ui.previewLabel.setText(parsed_cmd)
+
+    def accept(self) -> None:
+        # Get selected item in QListView
+        selected_index = self.ui.listView.currentIndex()
+
+        # Get macro data from selected item
+        macro_cmd: str = self.ui.listView.model().data(selected_index, Qt.UserRole)
+
+        # Get current cursor position
+        cursor_pos = self.line_edit.cursorPosition()
+
+        # Insert text at current cursor position
+        self.line_edit.insert(macro_cmd)
+
+        # Set cursor position to end of inserted text
+        self.line_edit.setCursorPosition(cursor_pos + len(macro_cmd))
+
+        self.close()
