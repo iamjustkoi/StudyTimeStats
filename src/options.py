@@ -33,6 +33,7 @@ from .consts import *
 from ..res.ui.cell_item import Ui_CellWidget
 from ..res.ui.macro_dialog import Ui_MacroDialog
 from ..res.ui.options_dialog import Ui_OptionsDialog
+from ..src.overview import parsed_string
 
 
 def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem):
@@ -845,34 +846,48 @@ class MacroDialog(QDialog):
         self.ui.buttonBox.button(aqt.qt.QDialogButtonBox.Ok).setText(String.INSERT)
 
         class MacroItem:
-            def __init__(self, name: str, cmd: str):
+            def __init__(self, name: str, cmd: str, definition: str):
                 self.name = name
                 self.cmd = cmd
+                self.definition = definition
 
         self.model = QStandardItemModel()
         self.macros: list[MacroItem] = []
 
         for attr_name in dir(Macro):
             attr = getattr(Macro, attr_name)
+
             if isinstance(attr, str) and attr_name.startswith('CMD'):
+                # Set macro definition from Macro definitions
+                macro_def = Macro.DEFINITIONS[attr]
+
                 # Remove the CMD_ prefix, replace underscores with spaces, and title case the string
                 formatted_name = attr_name.replace('CMD_', '').replace('_', ' ').title()
+                item_label = f'{formatted_name} - {macro_def}'
 
-                item = QStandardItem(formatted_name)
+                item = QStandardItem(item_label)
                 item.setData(attr, Qt.UserRole)
 
                 self.model.appendRow(item)
-                self.macros.append(MacroItem(formatted_name, attr))
+                self.macros.append(MacroItem(formatted_name, attr, Macro.DEFINITIONS[attr]))
 
         self.ui.listView.setModel(self.model)
         self.ui.listView.clicked.connect(self.update_preview)
 
-        self.update_list()
-
-        print(f'{self.macros=}')
-
     def update_preview(self, index):
-        macro_name = self.model.data(index)
+        macro_cmd: str = self.model.data(index, Qt.UserRole)
+
         for macro in self.macros:
-            if macro.name == macro_name:
-                self.ui.previewLabel.setText(macro.cmd)
+            if macro.cmd == macro_cmd:
+                # parse macro string
+                # set preview label text to parsed string
+
+                if macro_cmd == Macro.CMD_EVAL:
+                    macro_cmd += 'None'
+
+                if macro_cmd.find('{') >= 0:
+                    macro_cmd += '}'
+
+                parsed_cmd = parsed_string(macro_cmd, self.addon_config, self.cell_config)
+
+                self.ui.previewLabel.setText(parsed_cmd)
