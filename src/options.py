@@ -838,18 +838,22 @@ class MacroDialog(QDialog):
                 self.macros.append(MacroItem(formatted_name, attr, Macro.DEFINITIONS[attr]))
 
         self.ui.listView.setModel(self.model)
-        self.ui.listView.clicked.connect(self.update_preview)
+        self.ui.listView.selectionModel().currentChanged.connect(self.update_preview)
         self.ui.listView.doubleClicked.connect(self.accept)
 
-    def update_preview(self, index):
+    def update_preview(self, index, *__args):
         macro_cmd: str = self.model.data(index, Qt.UserRole)
         macro_cmd += '}' if macro_cmd.find('{') >= 0 else ''
 
+        parsed_cmd = None
         for macro in self.macros:
             if macro.cmd == macro_cmd:
                 parsed_cmd = parsed_string(macro_cmd, self.addon_config, self.cell_config)
-
                 self.ui.previewLabel.setText(parsed_cmd)
+                break
+
+        if not parsed_cmd:
+            self.ui.previewLabel.setText(macro_cmd)
 
     def accept(self) -> None:
         # Get selected item in QListView
@@ -867,4 +871,5 @@ class MacroDialog(QDialog):
         # Set cursor position to end of inserted text
         self.line_edit.setCursorPosition(cursor_pos + len(macro_cmd))
 
+        # Close macro dialog
         self.close()
