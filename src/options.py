@@ -828,7 +828,8 @@ class MacroDialog(QDialog):
 
                 # Remove the CMD_ prefix, replace underscores with spaces, and title case the string
                 formatted_name = attr_name.replace('CMD_', '').replace('_', ' ').title()
-                item_label = f'{formatted_name} - {macro_def}'
+                formatted_cmd = attr + ('}' if attr.find('{') >= 0 else '')
+                item_label = f'{formatted_name} - ({formatted_cmd}) {macro_def}'
 
                 item = QStandardItem(item_label)
                 item.setData(attr, Qt.UserRole)
@@ -842,18 +843,10 @@ class MacroDialog(QDialog):
 
     def update_preview(self, index):
         macro_cmd: str = self.model.data(index, Qt.UserRole)
+        macro_cmd += '}' if macro_cmd.find('{') >= 0 else ''
 
         for macro in self.macros:
             if macro.cmd == macro_cmd:
-                # parse macro string
-                # set preview label text to parsed string
-
-                if macro_cmd == Macro.CMD_EVAL:
-                    macro_cmd += 'None'
-
-                if macro_cmd.find('{') >= 0:
-                    macro_cmd += '}'
-
                 parsed_cmd = parsed_string(macro_cmd, self.addon_config, self.cell_config)
 
                 self.ui.previewLabel.setText(parsed_cmd)
