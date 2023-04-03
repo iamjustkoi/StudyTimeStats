@@ -603,11 +603,10 @@ class CellItem(QWidget):
 
     def build_line_edits(self, mask_color='black'):
         icon_path = f'{Path(__file__).parent.resolve()}\\{ADD_ICON_PATH}'
-
         tint_color = Color.BUTTON_ICON[theme_manager.get_night_mode()]
-
         pixmap = QIcon(icon_path).pixmap(self.size(), QIcon.Normal, QIcon.On)
         mask = pixmap.createMaskFromColor(QColor(mask_color), Qt.MaskOutColor)
+
         pixmap.fill(QColor(tint_color))
         pixmap.setMask(mask)
 
