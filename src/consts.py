@@ -136,69 +136,119 @@ class Macro:
     # Misc
     CMD_EVAL = '%eval{'
 
+    # Definitions for all macros
     DEFINITIONS = {
-        CMD_RANGE: '''currently selected range''',
-        CMD_DATE: '''current range's start date using the system's locale''',
-        CMD_YEAR: '''current range's year''',
-        CMD_FULL_DAY: '''range filter's full start day''',
-        CMD_DAY: '''range filter's starting day using a compact format''',
-        CMD_DAYS: '''total days the range filter checks against''',
-        CMD_DATE_FORMATTED: '''formatted date string of the range filter's start date''',
-        CMD_MONTH: '''range filter's month name using a compact format''',
-        CMD_FULL_MONTH: '''range filter's full month name''',
+        CMD_RANGE:
+            '''label for the currently selected range''',
+        CMD_DATE:
+            '''current range's start date using the system's locale''',
+        CMD_YEAR:
+            '''current range's year''',
+        CMD_FULL_DAY:
+            '''range filter's full start day''',
+        CMD_DAY:
+            '''range filter's starting day using a compact format''',
+        CMD_DAYS:
+            '''total days the range filter checks against''',
+        CMD_DATE_FORMATTED:
+            '''formatted date string using the current range's from-date (e.g. %from_date:strf{"%x"} -> 2022-01-01)''',
+        CMD_MONTH:
+            '''range filter's month name using a compact format''',
+        CMD_FULL_MONTH:
+            '''range filter's full month name''',
 
-        CMD_TOTAL_HOURS: '''total study time''',
-        CMD_RANGE_HOURS: '''total study time in range''',
+        CMD_TOTAL_HOURS:
+            '''total study time''',
+        CMD_RANGE_HOURS:
+            '''total study time for the current range''',
 
-        CMD_DAY_HOURS: '''total study time for the past day''',
-        CMD_WEEK_HOURS: '''total study time for the past week''',
-        CMD_TWO_WEEKS_HOURS: '''total study time for the past two weeks''',
-        CMD_MONTH_HOURS: '''total study time for the past month''',
-        CMD_YEAR_HOURS: '''total study time for the past year''',
+        CMD_DAY_HOURS:
+            '''total study time for the past day''',
+        CMD_WEEK_HOURS:
+            '''total study time for the past week''',
+        CMD_TWO_WEEKS_HOURS:
+            '''total study time for the past two weeks''',
+        CMD_MONTH_HOURS:
+            '''total study time for the past month''',
+        CMD_YEAR_HOURS:
+            '''total study time for the past year''',
 
-        CMD_ETA_HOURS: '''estimated study time for the current card queue''',
+        CMD_ETA_HOURS:
+            '''estimated study time for the current card queue''',
 
-        CMD_HIGHEST_DAY_HOURS: '''highest total study time for all days in the current range''',
-        CMD_HIGHEST_WEEK_HOURS: '''highest total study time for all weeks in the current range''',
-        CMD_HIGHEST_MONTH_HOURS: '''highest total study time for all months in the current range''',
-        CMD_HIGHEST_YEAR_HOURS: '''highest total study time for all years in the current range''',
+        CMD_HIGHEST_DAY_HOURS:
+            '''highest total study time for all days in the current range''',
+        CMD_HIGHEST_WEEK_HOURS:
+            '''highest total study time for all weeks in the current range''',
+        CMD_HIGHEST_MONTH_HOURS:
+            '''highest total study time for all months in the current range''',
+        CMD_HIGHEST_YEAR_HOURS:
+            '''highest total study time for all years in the current range''',
 
-        CMD_CARD_AVERAGE_HOURS: '''average study time per card in range''',
-        CMD_DAY_AVERAGE_HOURS: '''average study time per day in range''',
+        CMD_CARD_AVERAGE_HOURS:
+            '''average study time per card for the current range''',
+        CMD_DAY_AVERAGE_HOURS:
+            '''average study time per day for the current range''',
 
-        CMD_PREVIOUS_RANGE_HOURS: '''total study time for the previous range''',
-        CMD_PREVIOUS_DAY_HOURS: '''total study time for the previous day''',
-        CMD_PREVIOUS_WEEK_HOURS: '''total study time for the previous week''',
-        CMD_PREVIOUS_TWO_WEEKS_HOURS: '''total study time for the previous two weeks''',
-        CMD_PREVIOUS_MONTH_HOURS: '''total study time for the previous month''',
-        CMD_PREVIOUS_YEAR_HOURS: '''total study time for the previous year''',
+        CMD_PREVIOUS_RANGE_HOURS:
+            '''total study time for the previous range''',
+        CMD_PREVIOUS_DAY_HOURS:
+            '''total study time for the previous day''',
+        CMD_PREVIOUS_WEEK_HOURS:
+            '''total study time for the previous week''',
+        CMD_PREVIOUS_TWO_WEEKS_HOURS:
+            '''total study time for the previous two weeks''',
+        CMD_PREVIOUS_MONTH_HOURS:
+            '''total study time for the previous month''',
+        CMD_PREVIOUS_YEAR_HOURS:
+            '''total study time for the previous year''',
 
-        CMD_FROM_DATE_HOURS: '''total study time for a custom date range''',
+        CMD_FROM_DATE_HOURS:
+            '''total study time for a custom date range (%from_custom_hrs:<from>:<to> (YYYY-MM-DD))''',
 
-        CMD_TOTAL_REVIEWS: '''total reviews''',
-        CMD_RANGE_REVIEWS: '''total reviews in range''',
+        CMD_TOTAL_REVIEWS:
+            '''total reviews''',
+        CMD_RANGE_REVIEWS:
+            '''total reviews for the current range''',
 
-        CMD_DAY_REVIEWS: '''''',
-        CMD_WEEK_REVIEWS: '''''',
-        CMD_TWO_WEEKS_REVIEWS: '''''',
-        CMD_MONTH_REVIEWS: '''''',
-        CMD_YEAR_REVIEWS: '''''',
+        CMD_DAY_REVIEWS:
+            '''total reviews for the past day''',
+        CMD_WEEK_REVIEWS:
+            '''total reviews for the past week''',
+        CMD_TWO_WEEKS_REVIEWS:
+            '''total reviews for the past two weeks''',
+        CMD_MONTH_REVIEWS:
+            '''total reviews for the past month''',
+        CMD_YEAR_REVIEWS:
+            '''total reviews for the past year''',
 
-        CMD_PREVIOUS_RANGE_REVIEWS: '''''',
-        CMD_PREVIOUS_DAY_REVIEWS: '''''',
-        CMD_PREVIOUS_WEEK_REVIEWS: '''''',
-        CMD_PREVIOUS_TWO_WEEKS_REVIEWS: '''''',
-        CMD_PREVIOUS_MONTH_REVIEWS: '''''',
-        CMD_PREVIOUS_YEAR_REVIEWS: '''''',
+        CMD_PREVIOUS_RANGE_REVIEWS:
+            '''total reviews for the previous range''',
+        CMD_PREVIOUS_DAY_REVIEWS:
+            '''total reviews for the previous day''',
+        CMD_PREVIOUS_WEEK_REVIEWS:
+            '''total reviews for the previous week''',
+        CMD_PREVIOUS_TWO_WEEKS_REVIEWS:
+            '''total reviews for the previous two weeks''',
+        CMD_PREVIOUS_MONTH_REVIEWS:
+            '''total reviews for the previous month''',
+        CMD_PREVIOUS_YEAR_REVIEWS:
+            '''total reviews for the previous year''',
 
-        CMD_FROM_DATE_REVIEWS: '''''',
+        CMD_FROM_DATE_REVIEWS:
+            '''total reviews for a custom date range (%from_custom_hrs:<from>:<to> (YYYY-MM-DD))''',
 
-        CMD_HIGHEST_DAY_REVIEWS: '''''',
-        CMD_HIGHEST_WEEK_REVIEWS: '''''',
-        CMD_HIGHEST_MONTH_REVIEWS: '''''',
-        CMD_HIGHEST_YEAR_REVIEWS: '''''',
+        CMD_HIGHEST_DAY_REVIEWS:
+            '''highest total reviews for all days in the current range''',
+        CMD_HIGHEST_WEEK_REVIEWS:
+            '''highest total reviews for all weeks in the current range''',
+        CMD_HIGHEST_MONTH_REVIEWS:
+            '''highest total reviews for all months in the current range''',
+        CMD_HIGHEST_YEAR_REVIEWS:
+            '''highest total reviews for all years in the current range''',
 
-        CMD_EVAL: '''''',
+        CMD_EVAL:
+            '''customized output that accepts any macros, math, or python as input (warning: unsafe implementation)''',
     }
 
 
