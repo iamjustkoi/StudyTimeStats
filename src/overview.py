@@ -814,6 +814,9 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
     text_macros()
     eval_macros()
 
+    # Combine leftover symbols
+    updated_string = updated_string.replace('%%', '%')
+
     print(f'Commands completed. Elapsed time: {((time() - initial_time) * 1000):2f}ms')
     print()
 
