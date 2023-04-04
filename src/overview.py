@@ -41,16 +41,29 @@ def _unit_key_for_time(hours: float):
     return Config.HRS_UNIT if hours > 1 else Config.MIN_UNIT
 
 
-def _formatted_time(hours: float, precision=2):
+def _formatted_time(hours: float, precision=2, use_decimal=True):
     """
     Returns a locale-formatted length of time.
 
     :param hours: referenced time
     :param precision: total digits to show after a decimal
+    :param use_decimal: whether to use the hh:mm format instead of a decimal for the output value
+
     :return: hours if given a value larger than 1, otherwise minutes
     """
-    val = round(hours, precision) if hours > 1 else round(hours * 60, precision)
-    return f'{val:n}'
+
+    if use_decimal:
+        val = round(hours, precision) if hours > 1 else round(hours * 60, precision)
+        return f'{val:n}'
+    else:
+        # Contributed by x51mon
+        hour_only = int(hours)
+        min_and_sec = (hours - hour_only) * 60
+        min_only = int(min_and_sec)
+        sec_only = (min_and_sec - min_only) * 60
+
+        return str(hour_only) + ':' + "{:02.0f}".format(min_only) if hours > 1 \
+            else str(min_only) + ':' + "{:02.0f}".format(sec_only)
 
 
 def _offset_hour():
@@ -336,7 +349,10 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             eta_hrs = avg_hrs_per_card * total_count
 
             unit_key = _unit_key_for_time(eta_hrs)
-            _update_string_text(cmd, f'{_formatted_time(eta_hrs)} {cell_data[unit_key]}')
+            _update_string_text(
+                cmd,
+                f'{_formatted_time(eta_hrs, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+            )
 
         cmd = fr'{Macro.CMD_FROM_DATE_HOURS}:(\d\d\d\d-\d\d-\d\d)(?!:)'
         for match in re.findall(fr'(?<!%){cmd}', updated_string):
@@ -357,21 +373,30 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             days_in_logs = (to_date - from_date).days
             avg_hrs = _total_hrs_in_revlog(logs) / (days_in_logs if days_in_logs > 0 else 1)
             unit_key = _unit_key_for_time(avg_hrs)
-            _update_string_text(cmd, f'{_formatted_time(avg_hrs)} {cell_data[unit_key]}')
+            _update_string_text(
+                cmd,
+                f'{_formatted_time(avg_hrs, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+            )
 
         cmd = Macro.CMD_CARD_AVERAGE_HOURS
         if re.findall(fr'(?<!%){cmd}', updated_string):
             logs = filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_time_ms())
             avg_hrs = _total_hrs_in_revlog(logs) / len(logs)
             unit_key = _unit_key_for_time(avg_hrs)
-            _update_string_text(cmd, f'{_formatted_time(avg_hrs)} {cell_data[unit_key]}')
+            _update_string_text(
+                cmd,
+                f'{_formatted_time(avg_hrs, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+            )
 
         cmd = Macro.CMD_HIGHEST_DAY_HOURS
         if re.search(fr'(?<!%){cmd}', updated_string):
             max_log = _max_log_from_modifier()
             hours = max_log[1] / 60 / 60 / 1000
             unit_key = _unit_key_for_time(hours)
-            _update_string_text(cmd, f'{_formatted_time(hours)} {cell_data[unit_key]}')
+            _update_string_text(
+                cmd,
+                f'{_formatted_time(hours, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+            )
 
         cmd = Macro.CMD_HIGHEST_WEEK_HOURS
         if re.search(fr'(?<!%){cmd}', updated_string):
@@ -382,21 +407,30 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             max_log = _max_log_from_modifier([f'weekday {weekday_for_modifier}'])
             hours = max_log[1] / 60 / 60 / 1000
             unit_key = _unit_key_for_time(hours)
-            _update_string_text(cmd, f'{_formatted_time(hours)} {cell_data[unit_key]}')
+            _update_string_text(
+                cmd,
+                f'{_formatted_time(hours, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+            )
 
         cmd = Macro.CMD_HIGHEST_MONTH_HOURS
         if re.search(fr'(?<!%){cmd}', updated_string):
             max_log = _max_log_from_modifier(['start of month'])
             hours = max_log[1] / 60 / 60 / 1000
             unit_key = _unit_key_for_time(hours)
-            _update_string_text(cmd, f'{_formatted_time(hours)} {cell_data[unit_key]}')
+            _update_string_text(
+                cmd,
+                f'{_formatted_time(hours, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+            )
 
         cmd = Macro.CMD_HIGHEST_YEAR_HOURS
         if re.search(fr'(?<!%){cmd}', updated_string):
             max_log = _max_log_from_modifier(['start of year'])
             hours = max_log[1] / 60 / 60 / 1000
             unit_key = _unit_key_for_time(hours)
-            _update_string_text(cmd, f'{_formatted_time(hours)} {cell_data[unit_key]}')
+            _update_string_text(
+                cmd,
+                f'{_formatted_time(hours, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+            )
 
     def review_macros():
         # Reviews
@@ -663,7 +697,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                 unit_key = _unit_key_for_time(result)
                 _update_string_text(
                     fr'{Macro.CMD_EVAL}{raw_match}\}}',
-                    f'{_formatted_time(result)} {cell_data[unit_key]}',
+                    f'{_formatted_time(result, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
                 )
             else:
                 _update_string_text(
@@ -682,7 +716,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         unit_key = _unit_key_for_time(total_hrs)
         updated_string = re.sub(
             fr'(?<!%){macro}',
-            f'{_formatted_time(total_hrs)} {cell_data[unit_key]}',
+            f'{_formatted_time(total_hrs, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
             updated_string,
         )
 

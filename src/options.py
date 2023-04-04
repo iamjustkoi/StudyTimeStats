@@ -136,7 +136,7 @@ Addon options QDialog class for accessing and changing the addon's config values
         self.ui.tabs_widget.setCurrentIndex(0)
         self._load()
 
-        # Attached post-load_data to prevent pre-change broadcasts
+        # Attached post-load to prevent pre-change broadcasts
         change_signals = {
             self.ui.browser_checkbox.stateChanged,
             self.ui.overview_checkbox.stateChanged,
@@ -149,8 +149,10 @@ Addon options QDialog class for accessing and changing the addon's config values
             self.ui.deck_disable_button.clicked,
             self.ui.confirm_button_box.clicked,
             self.ui.useRolloverCheckbox.stateChanged,
+            self.ui.useDecimalCheckbox.stateChanged,
             self.ui.cellListWidget.currentRowChanged,
         }
+
         self._attach_change_signals(change_signals)
 
         self.adjustSize()
@@ -187,10 +189,14 @@ Loads all config values to the options dialog.
 
         self.ui.useRolloverCheckbox.setChecked(self.config[Config.USE_ROLLOVER])
 
+        self.ui.useDecimalCheckbox.setChecked(self.config[Config.USE_DECIMAL])
+
         # Load Cell Data
         self.ui.cellListWidget.clear()
+
         # Add blank
         _add_cell_to_list(self.ui.cellListWidget, CellItem(self.ui.cellListWidget, is_empty=True))
+
         # Loop through data
         for data in self.config[Config.CELLS_DATA]:
             _add_cell_to_list(self.ui.cellListWidget, CellItem(self.ui.cellListWidget, data=data))
@@ -213,6 +219,8 @@ window to update all the ui.
         self.config[Config.INCLUDE_DELETED] = self.ui.include_deleted_checkbox.isChecked()
 
         self.config[Config.USE_ROLLOVER] = self.ui.useRolloverCheckbox.isChecked()
+
+        self.config[Config.USE_DECIMAL] = self.ui.useDecimalCheckbox.isChecked()
 
         self.config[Config.EXCLUDED_DIDS] = self._get_excluded_dids()
 

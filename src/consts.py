@@ -311,6 +311,7 @@ class Config:
     CONGRATS_ENABLED = 'Congrats_Enabled'
     INCLUDE_DELETED = 'Include_Deleted_Reviews'
     USE_ROLLOVER = 'Use_Rollover_Hour'
+    USE_DECIMAL = 'Use_Decimal_Format'
     EXCLUDED_DIDS = "Excluded_Deck_IDs"
     CELLS_DATA = "cellsData"
 
@@ -348,6 +349,7 @@ class Config:
         CONGRATS_ENABLED: True,
         INCLUDE_DELETED: True,
         USE_ROLLOVER: False,
+        USE_DECIMAL: False,
         EXCLUDED_DIDS: [1],
         CELLS_DATA: []
     }
