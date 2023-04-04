@@ -386,7 +386,7 @@ Sets the enabled state of the current DeckItem and updates its label to represen
         self.label.setEnabled(enable)
         self.enabled = enable
 
-    def mousePressEvent(self, mouse_event: aqt.QMouseEvent) -> None:
+    def mouseReleaseEvent(self, mouse_event: aqt.QMouseEvent) -> None:
         super(DeckItem, self).mousePressEvent(mouse_event)
         if mouse_event.button() == aqt.qt.Qt.RightButton:
             self.on_context_menu(mouse_event.pos())
