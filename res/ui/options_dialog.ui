@@ -27,7 +27,7 @@
    <item>
     <widget class="QTabWidget" name="tabs_widget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="appearance_tab">
       <property name="enabled">
@@ -202,6 +202,19 @@ This window can also be opened in the Add-ons menu using the Config button.</str
          </property>
          <property name="text">
           <string>Use the next-day hour when calculating ranged times</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox">
+         <property name="toolTip">
+          <string>Shows an &quot;hour.min&quot; format, versus an &quot;hh:mm&quot; format, for all time output values.</string>
+         </property>
+         <property name="text">
+          <string>Use decimal format time outputs</string>
          </property>
          <property name="checked">
           <bool>true</bool>
