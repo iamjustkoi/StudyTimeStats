@@ -595,7 +595,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         cmd = Macro.CMD_DATE_FORMATTED
         for match in re.findall(fr'(?<!%){cmd}', updated_string):
             match: str
-            date_format = match[match.find("\"") + 1:match.rfind("\"")]
+            date_format = match[(match.find("\"") + 1):(match.rfind("\""))]
             _update_string_text(match, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime(date_format))
 
         cmd = Macro.CMD_YEAR
