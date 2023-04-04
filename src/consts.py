@@ -3,7 +3,7 @@
 
 from aqt.theme import theme_manager
 
-CURRENT_VERSION = '2.0.0-b2'
+CURRENT_VERSION = '2.0.0-b3'
 
 ANKI_LEGACY_VER = 35
 ANKI_DEFAULT_ROLLOVER = 4
