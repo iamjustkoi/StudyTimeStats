@@ -526,6 +526,7 @@ class CellItem(QWidget):
         return self.data
 
     def _redraw(self):
+        self.widget.expandFrame.adjustSize()
         self.widget.mainFrame.adjustSize()
         self.list_item.setSizeHint(self.sizeHint())
 
@@ -681,6 +682,7 @@ class CellItem(QWidget):
             self.widget.codeTextEdit.show() if not hide else self.widget.codeTextEdit.hide()
             self.widget.codeButton.lockHoverTint(not hide)
 
+        # self.widget.expandFrame.adjustSize()
         self._redraw()
 
     def toggle_expando(self, collapse: bool = None):
@@ -694,7 +696,7 @@ class CellItem(QWidget):
                 self.widget.expandFrame.hide()
                 self.widget.expandoButton.setRotation(90)
         else:
-            self.widget.codeTextEdit.show() if not collapse else self.widget.codeTextEdit.hide()
+            self.widget.expandFrame.show() if not collapse else self.widget.expandFrame.hide()
             self.widget.expandoButton.setRotation(90) if not collapse else self.widget.expandoButton.setRotation(0)
 
         self._redraw()
@@ -755,6 +757,9 @@ class CellItem(QWidget):
             self.widget.calendarCheckbox.show()
             self.widget.calendarCheckbox.setText(f'{String.USE_CALENDAR} {Range.LABEL[range_idx]}')
 
+        # HACK: idk, adjusts size correctly unlike all other attempts
+        self.toggle_expando()
+        self.toggle_expando()
         self._redraw()
 
     def set_button_color(self, button: QToolButton, color: str):
