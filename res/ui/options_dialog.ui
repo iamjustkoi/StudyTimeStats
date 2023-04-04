@@ -209,7 +209,7 @@ This window can also be opened in the Add-ons menu using the Config button.</str
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox">
+        <widget class="QCheckBox" name="useDecimalCheckbox">
          <property name="toolTip">
           <string>Shows an &quot;hour.min&quot; format, versus an &quot;hh:mm&quot; format, for all time output values.</string>
          </property>
