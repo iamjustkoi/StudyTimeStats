@@ -817,6 +817,9 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
     # Combine leftover symbols
     updated_string = updated_string.replace('%%', '%')
 
+    # Swap duplicate spaces characters with non-breaking space characters
+    updated_string = updated_string.replace('  ', '&nbsp;&nbsp;')
+
     print(f'Commands completed. Elapsed time: {((time() - initial_time) * 1000):2f}ms')
     print()
 
