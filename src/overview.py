@@ -41,7 +41,7 @@ def _unit_key_for_time(hours: float):
     return Config.HRS_UNIT if hours > 1 else Config.MIN_UNIT
 
 
-def _formatted_time(hours: float, precision=2, use_decimal=True):
+def _formatted_time(hours: float, precision: int = None, use_decimal=True):
     """
     Returns a locale-formatted length of time.
 
@@ -51,6 +51,9 @@ def _formatted_time(hours: float, precision=2, use_decimal=True):
 
     :return: hours if given a value larger than 1, otherwise minutes
     """
+
+    if precision is None:
+        precision = 2
 
     if use_decimal:
         val = round(hours, precision) if hours > 1 else round(hours * 60, precision)
@@ -190,6 +193,17 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
     _cached_range_time_ms: tuple[int, int] = 0, 0
 
     initial_time = time()
+
+    def _precision(cmd):
+        """
+        Searches for the command in the string's text and outputs a precision value, if one is found.
+        :param cmd: Command text to search for.
+        :return:
+        """
+
+        print(f'searching prec for cmd: "{cmd}"')
+        precision_match = re.search(fr'{cmd}:p\{{(\d*)\}}', updated_string)
+        return int(precision_match.group(1)) if precision_match else None
 
     def time_macros():
         # Time
@@ -351,11 +365,12 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             unit_key = _unit_key_for_time(eta_hrs)
             _update_string_text(
                 cmd,
-                f'{_formatted_time(eta_hrs, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+                f'{_formatted_time(eta_hrs, _precision(cmd), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
             )
 
-        cmd = fr'{Macro.CMD_FROM_DATE_HOURS}:(\d\d\d\d-\d\d-\d\d)(?!:)'
-        for match in re.findall(fr'(?<!%){cmd}', updated_string):
+        cmd = fr'{Macro.CMD_FROM_DATE_HOURS}:(\d\d\d\d-\d\d-\d\d)'
+        for match in re.findall(fr'(?<!%){cmd}(?!:\d)', updated_string):
+            print(f'Running {cmd}. {match=}')
             match: str
             _process_range(match, replace_cb=_update_string_time, cmd=Macro.CMD_FROM_DATE_HOURS)
 
@@ -375,7 +390,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             unit_key = _unit_key_for_time(avg_hrs)
             _update_string_text(
                 cmd,
-                f'{_formatted_time(avg_hrs, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+                f'{_formatted_time(avg_hrs, _precision(cmd), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
             )
 
         cmd = Macro.CMD_CARD_AVERAGE_HOURS
@@ -385,7 +400,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             unit_key = _unit_key_for_time(avg_hrs)
             _update_string_text(
                 cmd,
-                f'{_formatted_time(avg_hrs, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+                f'{_formatted_time(avg_hrs, _precision(cmd), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
             )
 
         cmd = Macro.CMD_HIGHEST_DAY_HOURS
@@ -395,7 +410,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             unit_key = _unit_key_for_time(hours)
             _update_string_text(
                 cmd,
-                f'{_formatted_time(hours, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+                f'{_formatted_time(hours, _precision(cmd), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
             )
 
         cmd = Macro.CMD_HIGHEST_WEEK_HOURS
@@ -409,7 +424,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             unit_key = _unit_key_for_time(hours)
             _update_string_text(
                 cmd,
-                f'{_formatted_time(hours, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+                f'{_formatted_time(hours, _precision(cmd), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
             )
 
         cmd = Macro.CMD_HIGHEST_MONTH_HOURS
@@ -419,7 +434,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             unit_key = _unit_key_for_time(hours)
             _update_string_text(
                 cmd,
-                f'{_formatted_time(hours, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+                f'{_formatted_time(hours, _precision(cmd), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
             )
 
         cmd = Macro.CMD_HIGHEST_YEAR_HOURS
@@ -427,9 +442,10 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             max_log = _max_log_from_modifier(['start of year'])
             hours = max_log[1] / 60 / 60 / 1000
             unit_key = _unit_key_for_time(hours)
+
             _update_string_text(
                 cmd,
-                f'{_formatted_time(hours, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+                f'{_formatted_time(hours, _precision(cmd), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
             )
 
     def review_macros():
@@ -705,18 +721,18 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                     f'{round(result, precision):n}' if isinstance(result, float) else str(result),
                 )
 
-    def _update_string_time(macro: str, revlog: list = None):
+    def _update_string_time(repl: str, revlog: list = None):
         nonlocal updated_string
 
         if revlog is None:
-            updated_string = re.sub(fr'(?<!%){macro}', f'ERR', updated_string)
+            updated_string = re.sub(fr'(?<!%){repl}(:p\{{\d*\}})?', f'ERR', updated_string)
             return
 
         total_hrs = _total_hrs_in_revlog(revlog)
         unit_key = _unit_key_for_time(total_hrs)
         updated_string = re.sub(
-            fr'(?<!%){macro}',
-            f'{_formatted_time(total_hrs, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+            fr'(?<!%){repl}(:p\{{\d*\}})?',
+            f'{_formatted_time(total_hrs, _precision(repl), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
             updated_string,
         )
 
@@ -732,7 +748,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
 
     def _update_string_text(macro: str, text: str):
         nonlocal updated_string
-        updated_string = re.sub(fr'(?<!%){macro}', text, updated_string)
+        updated_string = re.sub(fr'(?<!%){macro}(:p\{{\d*\}})?', text, updated_string)
 
     def _process_range(from_date_str: str, to_date_str: str = None, replace_cb=None, cmd=Macro.CMD_FROM_DATE_HOURS):
         try:
@@ -756,7 +772,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                 to_ms = int(date_with_rollover(to_date_raw).timestamp() * 1000)
                 if replace_cb:
                     replace_cb(
-                        fr'{cmd}:{from_date_str}(?!:)',
+                        fr'{cmd}:{from_date_str}(?!:\d)',
                         filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
                     )
 
