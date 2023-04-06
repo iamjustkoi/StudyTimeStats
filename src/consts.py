@@ -349,7 +349,7 @@ class Config:
         CONGRATS_ENABLED: True,
         INCLUDE_DELETED: True,
         USE_ROLLOVER: False,
-        USE_DECIMAL: False,
+        USE_DECIMAL: True,
         EXCLUDED_DIDS: [1],
         CELLS_DATA: []
     }
