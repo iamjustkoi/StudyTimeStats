@@ -145,7 +145,7 @@ class Ui_OptionsDialog(object):
         self.scroll_area.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.scroll_area.setObjectName("scroll_area")
         self.about_scroll = QtWidgets.QWidget()
-        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 449, 851))
+        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 449, 516))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -238,7 +238,7 @@ class Ui_OptionsDialog(object):
         self.verticalLayout_4.addWidget(self.confirm_button_box)
 
         self.retranslateUi(OptionsDialog)
-        self.tabs_widget.setCurrentIndex(1)
+        self.tabs_widget.setCurrentIndex(2)
         self.confirm_button_box.accepted.connect(OptionsDialog.accept) # type: ignore
         self.confirm_button_box.rejected.connect(OptionsDialog.reject) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(OptionsDialog)
@@ -285,48 +285,18 @@ class Ui_OptionsDialog(object):
         self.kofi_button.setText(_translate("OptionsDialog", "  Buy me a coffee "))
         self.patreon_button.setText(_translate("OptionsDialog", "  Become a patron "))
         self.about_label_body.setText(_translate("OptionsDialog", "Every bit helps with maintaining and developing the add-on and is greatly appreciated!\n"
+"\n"
 "### Text Macros\n"
-"The add-on can also filter text in the custom labels input to show information based on what\'s set in the config (e.g. \"Past %range\" to \"Past Week\"). These can be used multiple times and will update whenever Anki\'s main window reloads.\n"
-"\n"
-"### Available Macros:\n"
-"\n"
-"##### General\n"
-"+ `%range` - the currently selected range format (Week, 2 Weeks, Month, Year)\n"
-"+ `%from_date` - range filter\'s start date using the system\'s locale (2022-06-30)\n"
-"+ `%from_day` - range filter\'s starting day using a compact format (Sun)\n"
-"+ `%from_full_day` - range filter\'s full start day (Sunday)\n"
-"+ `%from_month` - range filter\'s month name using a compact format (Sep)\n"
-"+ `%from_full_month` - range filter\'s full month name (September)\n"
-"+ `%days` - total days the range filter checks against (17)\n"
-"<br></br>\n"
-"##### Advanced\n"
-"These macros will each index the received review logs and output its individual value-unit combination (e.g. \"%total_hrs\" -> \"3.14 hrs\").\n"
-"+ `%total_hrs` - total study time\n"
-"+ `%range_hrs` - ranged study time\n"
-"+ `%prev_range_hrs` - total study time of the last calendar range\n"
-"<br></br>\n"
-"\n"
-"Total time for a specific range (current week, current month, etc):\n"
-"+ `%week_hrs`, `%two_week_hrs`, `%month_hrs`, `%year_hrs`\n"
-"<br></br>\n"
-"\n"
-"Total time for a specific, previous range (previous week, previous month, etc):\n"
-"+ `%prev_day_hrs`, `%prev_week_hrs`, `%prev_two_week_hrs`, `%prev_month_hrs`, `%prev_year_hrs`\n"
-"<br></br>\n"
-"\n"
-"Custom date:\n"
-"+ `%from_custom_hrs:<YYYY-MM-DD>` - total study time from a unique, input date (e.g. \"%from_custom_hrs:2022-03-14\" -> \"22.5 hrs\" (from 2022, March 14th))\n"
-"<br></br>\n"
+"The add-on can also filter text in the custom labels input to show information based on what\'s set in the config (e.g. \"Past %range\" to \"Past Week\"). These can be used multiple times and will update whenever Anki\'s main window reloads. You can find more details via the \"Macro\" dialog that pops up after clicking the + icon inside any of the text inputs.\n"
 "\n"
 "##### Misc\n"
-"+ `%%` - returns a single % symbol and doesn\'t apply the text macro (%, %range, etc)\n"
-"\n"
+"`%%` - returns a single % symbol and doesn\'t apply a text macro (e.g. %% -> %, %%range -> %range)\n"
 "<br></br>\n"
-"Thanks for downloading and hope you enjoy!  \n"
-"-koi  \n"
-"<br></br>  \n"
-"MIT License    \n"
-"©2022 JustKoi (iamjustkoi)  "))
+"Thanks for downloading and hope you enjoy!\n"
+"-koi \n"
+"<br></br>\n"
+"MIT License \n"
+"©2022-2023 JustKoi (iamjustkoi)"))
         self.tabs_widget.setTabText(self.tabs_widget.indexOf(self.about_tab), _translate("OptionsDialog", "About"))
 
 
