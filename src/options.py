@@ -38,13 +38,22 @@ from ..res.ui.options_dialog import Ui_OptionsDialog
 from ..src.overview import parsed_string
 
 
+def _refresh_cell_list(list_widget: QListWidget):
+    # update sorting indices
+    for i in range(list_widget.count()):
+        cell_widget = list_widget.item(i)
+        if isinstance(cell_widget, CellItem.CellListItem):
+            cell_widget.cell_item.index = i
+
+
 def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem):
     list_widget.addItem(cell_item.list_item)
     list_widget.setItemWidget(cell_item.list_item, cell_item)
     list_widget.sortItems()
     list_widget.currentRowChanged.emit(list_widget.currentRow())
-    # update empty
-    list_widget.item(list_widget.count() - 1).cell_item.index = list_widget.count() - 1
+
+    # list_widget.item(list_widget.count() - 1).cell_item.index = list_widget.count() - 1
+    _refresh_cell_list(list_widget)
 
 
 def _remove_cell_from_list(list_widget: QListWidget, cell_item: CellItem):
@@ -54,8 +63,9 @@ def _remove_cell_from_list(list_widget: QListWidget, cell_item: CellItem):
             list_widget.takeItem(i)
             break
 
-    # update empty
-    list_widget.item(list_widget.count() - 1).cell_item.index = list_widget.count() - 1
+    # list_widget.item(list_widget.count() - 1).cell_item.index = list_widget.count() - 1
+
+    _refresh_cell_list(list_widget)
 
     list_widget.sortItems()
     list_widget.currentRowChanged.emit(list_widget.currentRow())
