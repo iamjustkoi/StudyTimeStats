@@ -28,14 +28,7 @@ Past %range" to "Past Week"). These can be used multiple times and will update w
 can find more details via the "Macro" dialog that pops up after clicking the + icon inside any of the text inputs.
 
 ##### Misc
-
 `%%` - returns a single % symbol and doesn't apply a text macro (e.g. %% -> %, %%range -> %range)
-<br></br>
-Thanks for downloading and hope you enjoy!
--koi
-<br></br>
-MIT License
-©2022-2023 JustKoi (iamjustkoi)
 
 #### Bugs/Issues:
 Please post any issues or feedback you might have on [GitHub](https://github.com/iamjustkoi/StudyTimeStats/issues).
