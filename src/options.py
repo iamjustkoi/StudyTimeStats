@@ -701,8 +701,6 @@ class CellItem(QWidget):
         self._redraw()
 
     def toggle_expando(self, collapse: bool = None):
-        print(f'toggle_expando({collapse})')
-
         if collapse is None:
             if self.widget.expandFrame.isHidden():
                 self.widget.expandFrame.show()
