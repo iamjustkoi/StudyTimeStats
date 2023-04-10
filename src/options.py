@@ -837,18 +837,19 @@ class MacroDialog(QDialog):
 
             if isinstance(attr, str) and attr_name.startswith('CMD'):
                 # Set macro definition from Macro definitions
-                macro_def = Macro.DEFINITIONS[attr]
+                macro_def = Macro.DEFINITIONS.get(attr, None)
 
-                # Remove the CMD_ prefix, replace underscores with spaces, and title case the string
-                formatted_name = attr_name.replace('CMD_', '').replace('_', ' ').title()
-                formatted_cmd = attr + ('}' if attr.find('{') >= 0 else '')
-                item_label = f'{formatted_name} - ({formatted_cmd}) {macro_def}'
+                if macro_def is not None:
+                    # Remove the CMD_ prefix, replace underscores with spaces, and title case the string
+                    formatted_name = attr_name.replace('CMD_', '').replace('_', ' ').title()
+                    formatted_cmd = attr + ('}' if attr.find('{') >= 0 else '')
+                    item_label = f'{formatted_name} - ({formatted_cmd}) {macro_def}'
 
-                item = QStandardItem(item_label)
-                item.setData(attr, Qt.UserRole)
+                    item = QStandardItem(item_label)
+                    item.setData(attr, Qt.UserRole)
 
-                self.model.appendRow(item)
-                self.macros.append(MacroItem(formatted_name, attr, Macro.DEFINITIONS[attr]))
+                    self.model.appendRow(item)
+                    self.macros.append(MacroItem(formatted_name, attr, Macro.DEFINITIONS[attr]))
 
         self.ui.listView.setModel(self.model)
         self.ui.listView.selectionModel().currentChanged.connect(self.update_preview)
