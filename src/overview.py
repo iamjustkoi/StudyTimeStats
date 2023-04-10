@@ -207,7 +207,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         """
 
         print(f'searching prec for cmd: "{cmd}"')
-        precision_match = re.search(fr'{cmd}:p\{{(\d*)\}}', updated_string)
+        precision_match = re.search(fr'{cmd}{Macro.CMD_PRECISION}\{{(\d*)\}}', updated_string)
         return int(precision_match.group(1)) if precision_match else None
 
     def time_macros():
@@ -734,13 +734,13 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         nonlocal updated_string
 
         if revlog is None:
-            updated_string = re.sub(fr'(?<!%){repl}(:p\{{\d*\}})?', f'ERR', updated_string)
+            updated_string = re.sub(fr'(?<!%){repl}({Macro.CMD_PRECISION}\{{(\d*)\}})?', f'ERR', updated_string)
             return
 
         total_hrs = _total_hrs_in_revlog(revlog)
         unit_key = _unit_key_for_time(total_hrs)
         updated_string = re.sub(
-            fr'(?<!%){repl}(:p\{{\d*\}})?',
+            fr'(?<!%){repl}({Macro.CMD_PRECISION}\{{(\d*)\}})?',
             f'{_formatted_time(total_hrs, _precision(repl), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
             updated_string,
         )
@@ -757,7 +757,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
 
     def _update_string_text(macro: str, text: str):
         nonlocal updated_string
-        updated_string = re.sub(fr'(?<!%){macro}(:p\{{\d*\}})?', text, updated_string)
+        updated_string = re.sub(fr'(?<!%){macro}({Macro.CMD_PRECISION}\{{(\d*)\}})?', text, updated_string)
 
     def _process_range(from_date_str: str, to_date_str: str = None, replace_cb=None, cmd=Macro.CMD_FROM_DATE_HOURS):
         try:

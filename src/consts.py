@@ -135,6 +135,7 @@ class Macro:
 
     # Misc
     CMD_EVAL = '%eval{'
+    CMD_PRECISION = r':p'
 
     # Definitions for all macros
     DEFINITIONS = {
@@ -249,6 +250,9 @@ class Macro:
 
         CMD_EVAL:
             '''customized output that accepts any macros, math, or python as input (warning: unsafe implementation)''',
+
+        CMD_PRECISION:
+            '''precision of the output decimal number for time-based macros (%range_hrs:p{<0-4>})''',
     }
 
 
