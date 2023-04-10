@@ -981,12 +981,13 @@ def _excluded_did_limit(excluded_dids: list = None):
         filtered_did_cmd = f'AND cards.did NOT IN {_args_from_ids(excluded_dids) if excluded_dids else ""}'
 
     else:
-        # Grab the current parent/children deck ids (inclusive) if viewing a deck, else grab all deck ids (inclusive)
+        # If currently in a deck's overview: grab the current deck's parent/children deck ids (inclusive)
         if mw.state == 'overview':
             included_dids = [
                 i for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))
                 if i not in excluded_dids
             ]
+        # Else: grab all deck ids (inclusive)
         else:
             included_dids = [
                 name_id.id for name_id in mw.col.decks.all_names_and_ids()
