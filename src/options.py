@@ -22,6 +22,7 @@ from aqt.qt import (
     QListWidgetItem,
     QMenu,
     QPoint,
+    QResizeEvent,
     QStandardItem,
     QStandardItemModel,
     QToolButton,
@@ -163,6 +164,13 @@ Addon options QDialog class for accessing and changing the addon's config values
         self._attach_change_signals(change_signals)
 
         self.adjustSize()
+
+        win_size: list = self.config.get('win_size', None)
+        self.resize(win_size[0], win_size[1]) if win_size else None
+
+    def resizeEvent(self, evt: QResizeEvent):
+        self.manager.write_config_val('win_size', [self.width(), self.height()])
+        super().resizeEvent(evt)
 
     def apply(self):
         """
