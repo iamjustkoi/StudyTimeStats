@@ -721,7 +721,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             try:
                 result = eval(expression)
             except ValueError:
-                result = "ERR"
+                result = String.ERR
                 is_using_hours = False
 
             if is_using_hours:
