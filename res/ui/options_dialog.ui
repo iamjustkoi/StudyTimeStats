@@ -27,7 +27,7 @@
    <item>
     <widget class="QTabWidget" name="tabs_widget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="appearance_tab">
       <property name="enabled">
@@ -338,7 +338,7 @@ This window can also be opened in the Add-ons menu using the Config button.</str
               </sizepolicy>
              </property>
              <property name="text">
-              <string>## Study Time Stats
+              <string>## &lt;p align=&quot;center&quot;&gt;Study Time Stats&lt;img src=&quot;{img_path}&quot;&gt;&lt;/p&gt;
 Adds a total and ranged study time statistic to Anki's main window.  
 
 Version: {version}  

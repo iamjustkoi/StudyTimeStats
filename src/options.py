@@ -136,8 +136,11 @@ Addon options QDialog class for accessing and changing the addon's config values
         self.ui.cellListWidget.setStyleSheet('#cellListWidget { background: transparent; border: none; }')
         self.ui.cellListWidget.verticalScrollBar().setSingleStep(12)
 
-        # Update about header text with the current version number
-        updated_about_header = self.ui.about_label_header.text().format(version=CURRENT_VERSION)
+        # Update about header text with the current version number and stats image
+        updated_about_header = self.ui.about_label_header.text().format(
+            version=CURRENT_VERSION,
+            img_path=f'{Path(__file__).parent.resolve()}\\{ADDON_ICON_PATH}'
+        )
         self.ui.about_label_header.setText(updated_about_header)
 
         # Apply button

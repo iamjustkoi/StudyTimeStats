@@ -237,7 +237,7 @@ class Ui_OptionsDialog(object):
         self.verticalLayout_4.addWidget(self.confirm_button_box)
 
         self.retranslateUi(OptionsDialog)
-        self.tabs_widget.setCurrentIndex(0)
+        self.tabs_widget.setCurrentIndex(2)
         self.confirm_button_box.accepted.connect(OptionsDialog.accept) # type: ignore
         self.confirm_button_box.rejected.connect(OptionsDialog.reject) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(OptionsDialog)
@@ -270,7 +270,7 @@ class Ui_OptionsDialog(object):
         self.deck_disable_button.setToolTip(_translate("OptionsDialog", "Disable stats for the selected deck(s)."))
         self.deck_disable_button.setText(_translate("OptionsDialog", "Disable"))
         self.tabs_widget.setTabText(self.tabs_widget.indexOf(self.decks_tab), _translate("OptionsDialog", "Advanced"))
-        self.about_label_header.setText(_translate("OptionsDialog", "## Study Time Stats\n"
+        self.about_label_header.setText(_translate("OptionsDialog", "## <p align=\"center\">Study Time Stats<img src=\"{img_path}\"></p>\n"
 "Adds a total and ranged study time statistic to Anki\'s main window.  \n"
 "\n"
 "Version: {version}  \n"
