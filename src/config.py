@@ -31,10 +31,9 @@ class TimeStatsConfigManager:
 
     def __init__(self, mw: AnkiQt):
         """
-Generic config manager for accessing and writing addon config values.
+        Generic config manager for accessing and writing addon config values.
 
-    :param mw: Anki window to retrieve addon and other data from
-    :param max_filter_range: maximum days the addon can filter through
+        :param mw: Anki window to retrieve addon and other data from
         """
         super().__init__()
         self.mw = mw
