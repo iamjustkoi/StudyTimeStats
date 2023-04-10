@@ -177,7 +177,7 @@ def cell_data_html():
         updated_output = cell_data[Config.OUTPUT].replace('  ', '&nbsp;&nbsp;')
 
         cell_html = cell_html.format(
-            CellClass=f'{HORIZ_CLASS}' if cell_data[Config.DIRECTION] == Direction.HORIZONTAL else '',
+            CellClass=HORIZ_CELL_CLASS if cell_data[Config.DIRECTION] == Direction.HORIZONTAL else VERT_CELL_CLASS,
             TitleColor=cell_data[Config.TITLE_COLOR],
             Title=updated_title,
             OutputColor=cell_data[Config.OUTPUT_COLOR],
