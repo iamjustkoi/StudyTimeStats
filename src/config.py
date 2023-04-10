@@ -69,3 +69,10 @@ class TimeStatsConfigManager:
 Writes the config manager's current values to the addon meta file.
         """
         self.mw.addonManager.writeAddonMeta(self._addon, self._meta)
+
+    def write_config_val(self, key: str, val):
+        config = self._init_config()
+        config[key] = val
+        meta = self.mw.addonManager.addonMeta(self._addon)
+        meta['config'] = config
+        self.mw.addonManager.writeAddonMeta(self._addon, meta)
