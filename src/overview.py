@@ -171,12 +171,17 @@ def cell_data_html():
     for cell_data in addon_config[Config.CELLS_DATA]:
         cell_html: str = cell_data[Config.HTML].replace('{{', '{').replace('}}', '}')
         cell_html = f'<div class="{COL_CLASS}">\n{cell_html}\n</div>'
+
+        # Swap duplicate spaces characters with non-breaking space characters
+        updated_title = cell_data[Config.TITLE].replace('  ', '&nbsp;&nbsp;')
+        updated_output = cell_data[Config.OUTPUT].replace('  ', '&nbsp;&nbsp;')
+
         cell_html = cell_html.format(
             CellClass=f'{HORIZ_CLASS}' if cell_data[Config.DIRECTION] == Direction.HORIZONTAL else '',
             TitleColor=cell_data[Config.TITLE_COLOR],
-            Title=cell_data[Config.TITLE],
+            Title=updated_title,
             OutputColor=cell_data[Config.OUTPUT_COLOR],
-            Output=cell_data[Config.OUTPUT],
+            Output=updated_output,
         )
 
         cells_html += parsed_string(cell_html, addon_config, cell_data)
@@ -866,9 +871,6 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
 
     # Combine leftover symbols
     updated_string = updated_string.replace('%%', '%')
-
-    # Swap duplicate spaces characters with non-breaking space characters
-    updated_string = updated_string.replace('  ', '&nbsp;&nbsp;')
 
     print(f'Commands completed. Elapsed time: {((time() - initial_time) * 1000):2f}ms')
     print()
