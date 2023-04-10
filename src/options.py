@@ -52,7 +52,6 @@ def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem):
     list_widget.sortItems()
     list_widget.currentRowChanged.emit(list_widget.currentRow())
 
-    # list_widget.item(list_widget.count() - 1).cell_item.index = list_widget.count() - 1
     _refresh_cell_list(list_widget)
 
 
@@ -62,8 +61,6 @@ def _remove_cell_from_list(list_widget: QListWidget, cell_item: CellItem):
         if item and isinstance(item, CellItem.CellListItem) and item.cell_item == cell_item:
             list_widget.takeItem(i)
             break
-
-    # list_widget.item(list_widget.count() - 1).cell_item.index = list_widget.count() - 1
 
     _refresh_cell_list(list_widget)
 
