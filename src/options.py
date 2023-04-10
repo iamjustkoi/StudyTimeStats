@@ -8,6 +8,7 @@ from datetime import date
 from pathlib import Path
 
 import aqt.theme
+import markdown
 from aqt.qt import (
     QAction,
     QColor,
@@ -123,6 +124,10 @@ Addon options QDialog class for accessing and changing the addon's config values
         ankiweb_button.customContextMenuRequested.connect(
             lambda point: self.on_line_context_menu(point, ankiweb_button)
         )
+
+        # Convert markdown to HTML and update
+        self.ui.about_label_header.setText(markdown.markdown(self.ui.about_label_header.text()))
+        self.ui.about_label_body.setText(markdown.markdown(self.ui.about_label_body.text()))
 
         # Restore Defaults Button
         self.ui.confirm_button_box.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.on_restore_defaults)
