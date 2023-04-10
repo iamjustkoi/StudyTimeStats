@@ -356,7 +356,10 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             avg_hrs_per_card = (_total_hrs_in_revlog(logs) / len(logs)) if len(logs) > 0 else 0
 
             total_count = 0
-            due_tree = mw.col.sched.deck_due_tree()
+
+            current_did = mw.col.decks.current().get('id') if mw.state == 'overview' else None
+            due_tree = mw.col.sched.deck_due_tree(current_did)
+
             for child in due_tree.children:
                 if child.deck_id not in addon_config[Config.EXCLUDED_DIDS]:
                     deck_conf = _conf_for_did(child.deck_id)
@@ -367,8 +370,8 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                         total_count += (delays * child.new_count) + child.learn_count + child.review_count
 
             eta_hrs = avg_hrs_per_card * total_count
-
             unit_key = _unit_key_for_time(eta_hrs)
+
             _update_string_text(
                 cmd,
                 f'{_formatted_time(eta_hrs, _precision(cmd), addon_config[Config.USE_DECIMAL])} '
