@@ -270,6 +270,7 @@ class String:
     ENABLE_ACTION = '&Enable'
     DISABLE_ACTION = '&Disable'
     INSERT = 'Insert'
+    ERR = 'ERR'
 
 
 class Range:
