@@ -353,30 +353,27 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         if re.search(fr'(?<!%){cmd}', updated_string):
             logs = filtered_revlog(addon_config[Config.EXCLUDED_DIDS])
 
-            if len(logs) <= 0:
-                _update_string_text(cmd, String.ERR)
-            else:
-                avg_hrs_per_card = _total_hrs_in_revlog(logs) / len(logs)
+            avg_hrs_per_card = (_total_hrs_in_revlog(logs) / len(logs)) if len(logs) > 0 else 0
 
-                total_count = 0
-                due_tree = mw.col.sched.deck_due_tree()
-                for child in due_tree.children:
-                    if child.deck_id not in addon_config[Config.EXCLUDED_DIDS]:
-                        deck_conf = _conf_for_did(child.deck_id)
+            total_count = 0
+            due_tree = mw.col.sched.deck_due_tree()
+            for child in due_tree.children:
+                if child.deck_id not in addon_config[Config.EXCLUDED_DIDS]:
+                    deck_conf = _conf_for_did(child.deck_id)
 
-                        # Check for filtered/dynamic deck
-                        if deck_conf and deck_conf.get('new', None):
-                            delays = len(deck_conf['new'].get('delays', [0]))
-                            total_count += (delays * child.new_count) + child.learn_count + child.review_count
+                    # Check for filtered/dynamic deck
+                    if deck_conf and deck_conf.get('new', None):
+                        delays = len(deck_conf['new'].get('delays', [0]))
+                        total_count += (delays * child.new_count) + child.learn_count + child.review_count
 
-                eta_hrs = avg_hrs_per_card * total_count
+            eta_hrs = avg_hrs_per_card * total_count
 
-                unit_key = _unit_key_for_time(eta_hrs)
-                _update_string_text(
-                    cmd,
-                    f'{_formatted_time(eta_hrs, _precision(cmd), addon_config[Config.USE_DECIMAL])} '
-                    f'{cell_data[unit_key]}',
-                )
+            unit_key = _unit_key_for_time(eta_hrs)
+            _update_string_text(
+                cmd,
+                f'{_formatted_time(eta_hrs, _precision(cmd), addon_config[Config.USE_DECIMAL])} '
+                f'{cell_data[unit_key]}',
+            )
 
         cmd = fr'{Macro.CMD_FROM_DATE_HOURS}:(\d\d\d\d-\d\d-\d\d)'
         for match in re.findall(fr'(?<!%){cmd}(?!:\d)', updated_string):
@@ -407,16 +404,13 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         if re.findall(fr'(?<!%){cmd}', updated_string):
             logs = filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_time_ms())
 
-            if len(logs) <= 0:
-                _update_string_text(cmd, String.ERR)
-            else:
-                avg_hrs = _total_hrs_in_revlog(logs) / len(logs)
-                unit_key = _unit_key_for_time(avg_hrs)
-                _update_string_text(
-                    cmd,
-                    f'{_formatted_time(avg_hrs, _precision(cmd), addon_config[Config.USE_DECIMAL])} '
-                    f'{cell_data[unit_key]}',
-                )
+            avg_hrs = (_total_hrs_in_revlog(logs) / len(logs)) if len(logs) > 0 else 0
+            unit_key = _unit_key_for_time(avg_hrs)
+            _update_string_text(
+                cmd,
+                f'{_formatted_time(avg_hrs, _precision(cmd), addon_config[Config.USE_DECIMAL])} '
+                f'{cell_data[unit_key]}',
+            )
 
         cmd = Macro.CMD_HIGHEST_DAY_HOURS
         if re.search(fr'(?<!%){cmd}', updated_string):
@@ -870,7 +864,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         max_log = mw.col.db.first(sql_query)
         if not max_log:
             print(f'max_log returned an emtpy array for selected modifier(s): {modifiers}')
-            max_log = [0, 0]
+            max_log = [0, 0, 0]
 
         return max_log
 
