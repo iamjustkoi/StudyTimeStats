@@ -40,17 +40,29 @@ class TimeStatsConfigManager:
         self._addon = self.mw.addonManager.addonFromModule(__name__)
         self._meta = self.mw.addonManager.addonMeta(self._addon)
 
-        self.config = self._meta.get('config', Config.DEFAULT_CONFIG)
-        self.config = _reformat_conf(self.config)
+        self.config = self._init_config()
+
+        # self.config = self._meta.get('config', Config.DEFAULT_CONFIG)
+        # self.config = _reformat_conf(self.config)
+        # for field in Config.DEFAULT_CONFIG:
+        #     if field not in self.config:
+        #         # load temp defaults
+        #         self.config[field] = Config.DEFAULT_CONFIG[field]
+
         self.decks = self.mw.col.decks if self.mw.col is not None else None
-        # self.max_range = max_filter_range
 
-        for field in Config.DEFAULT_CONFIG:
-            if field not in self.config:
-                # load temp defaults
-                self.config[field] = Config.DEFAULT_CONFIG[field]
-
+        # Add a constant key to meta
         self._meta['config'] = self.config
+
+    def _init_config(self):
+        config = self._meta.get('config', Config.DEFAULT_CONFIG)
+        config = _reformat_conf(config)
+        for field in Config.DEFAULT_CONFIG:
+            if field not in config:
+                # load temp defaults
+                config[field] = Config.DEFAULT_CONFIG[field]
+
+        return config
 
     def write_config(self):
         """
