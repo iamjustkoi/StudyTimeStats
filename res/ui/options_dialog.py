@@ -28,6 +28,11 @@ class Ui_OptionsDialog(object):
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.appearance_tab)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.frame = QtWidgets.QFrame(self.appearance_tab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
+        self.frame.setSizePolicy(sizePolicy)
         self.frame.setObjectName("frame")
         self.verticalLayout_8 = QtWidgets.QVBoxLayout(self.frame)
         self.verticalLayout_8.setObjectName("verticalLayout_8")
@@ -230,11 +235,25 @@ class Ui_OptionsDialog(object):
         self.verticalLayout_2.addWidget(self.scroll_area)
         self.tabs_widget.addTab(self.about_tab, "")
         self.verticalLayout_4.addWidget(self.tabs_widget)
-        self.confirm_button_box = QtWidgets.QDialogButtonBox(OptionsDialog)
+        self.frame_2 = QtWidgets.QFrame(OptionsDialog)
+        self.frame_2.setObjectName("frame_2")
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.frame_2)
+        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.confirm_button_box = QtWidgets.QDialogButtonBox(self.frame_2)
         self.confirm_button_box.setOrientation(QtCore.Qt.Horizontal)
         self.confirm_button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Apply|QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok|QtWidgets.QDialogButtonBox.RestoreDefaults)
         self.confirm_button_box.setObjectName("confirm_button_box")
-        self.verticalLayout_4.addWidget(self.confirm_button_box)
+        self.horizontalLayout_2.addWidget(self.confirm_button_box)
+        self.supportButton = HoverButton(self.frame_2)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.supportButton.sizePolicy().hasHeightForWidth())
+        self.supportButton.setSizePolicy(sizePolicy)
+        self.supportButton.setObjectName("supportButton")
+        self.horizontalLayout_2.addWidget(self.supportButton)
+        self.verticalLayout_4.addWidget(self.frame_2)
 
         self.retranslateUi(OptionsDialog)
         self.tabs_widget.setCurrentIndex(2)
@@ -297,6 +316,8 @@ class Ui_OptionsDialog(object):
 "MIT License \n"
 "©2022-2023 JustKoi (iamjustkoi)"))
         self.tabs_widget.setTabText(self.tabs_widget.indexOf(self.about_tab), _translate("OptionsDialog", "About"))
+        self.supportButton.setText(_translate("OptionsDialog", "<3"))
+from .forms import HoverButton
 
 
 if __name__ == "__main__":

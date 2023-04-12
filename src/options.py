@@ -10,6 +10,7 @@ from pathlib import Path
 import aqt.theme
 import markdown
 from aqt.qt import (
+    QAbstractAnimation,
     QAction,
     QColor,
     QColorDialog,
@@ -23,6 +24,7 @@ from aqt.qt import (
     QListWidgetItem,
     QMenu,
     QPoint,
+    QPropertyAnimation,
     QResizeEvent,
     QStandardItem,
     QStandardItemModel,
@@ -80,6 +82,7 @@ FLAT_ICON_STYLE = \
 
 
 class TimeStatsOptionsDialog(QDialog):
+    anim: QPropertyAnimation
 
     def __init__(self, conf_manager: TimeStatsConfigManager):
         """
@@ -171,14 +174,43 @@ Addon options QDialog class for accessing and changing the addon's config values
 
         self._attach_change_signals(change_signals)
 
-        self.adjustSize()
+        # Build support button
+        self.ui.supportButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{HEART_ICON_PATH}'))
+        self.ui.supportButton.setTint(Color.BUTTON_ICON[theme_manager.get_night_mode()])
+        self.ui.supportButton.setHoverTint(Color.HOVER[theme_manager.get_night_mode()])
+        self.ui.supportButton.setStyleSheet('border: unset;')
+        self.ui.supportButton.clicked.connect(self.on_support_button_clicked)
+
+        # Short highlight animation
+        self.anim = QPropertyAnimation(self.ui.supportButtonHolder, b"opacity")
+        self.anim.setDirection(QAbstractAnimation.Direction.Forward)
+        self.anim.setStartValue(127)
+        self.anim.setEndValue(0)
+        self.anim.setDuration(800)
+        highlight_color = ['rgba(0, 0, 0, {alpha})', 'rgba(255, 255, 255, {alpha})']
+        support_holder_style_template = f'''
+            QFrame {{{{
+                background-color: {highlight_color[theme_manager.get_night_mode()]};
+                border-radius: 6px;
+            }}}};
+        '''
+
+        # Updates the support button holder alpha
+        def set_support_alpha(alpha: int):
+            style = support_holder_style_template.format(alpha=alpha)
+            self.ui.supportButtonHolder.setStyleSheet(style)
+
+        self.anim.valueChanged.connect(set_support_alpha)
+        set_support_alpha(0)
 
         win_size: list = self.config.get('win_size', None)
         self.resize(win_size[0], win_size[1]) if win_size else None
 
+        self.updateGeometry()
+
     def resizeEvent(self, evt: QResizeEvent):
-        self.manager.write_config_val('win_size', [self.width(), self.height()])
         super().resizeEvent(evt)
+        self.manager.write_config_val('win_size', [self.width(), self.height()])
 
     def apply(self):
         """
@@ -347,6 +379,17 @@ Restores all config value to their default settings.
             # load_data temp defaults
             self.config[field] = Config.DEFAULT_CONFIG[field]
         self._load()
+
+    def on_support_button_clicked(self):
+        # Switch to about tab
+        self.ui.tabs_widget.setCurrentWidget(self.ui.about_tab)
+
+        # Scroll to support button holder position
+        scroll_pos = self.ui.supportButtonHolder.pos().y()
+        self.ui.scroll_area.verticalScrollBar().setValue(scroll_pos)
+
+        # Animate support button holder background color
+        self.anim.start()
 
 
 class DeckItem(QWidget):
