@@ -10,6 +10,7 @@ ANKI_DEFAULT_ROLLOVER = 4
 UNIQUE_DATE = '2006-10-05'
 
 ADDON_ICON_PATH = '../res/img/stats_icon.svg'
+HEART_ICON_PATH = '../res/img/heart_icon.svg'
 KOFI_ICON_PATH = '../res/img/kofilogo_blue.PNG'
 PATREON_ICON_PATH = '../res/img/patreon.png'
 ANKI_LIKE_ICON_PATH = '../res/img/anki_like.png'
