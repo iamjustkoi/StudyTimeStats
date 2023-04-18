@@ -337,11 +337,11 @@ class Config:
     HTML = 'html'
     DEFAULT_CELL_DATA = {
         TITLE: String.PAST_RANGE,
-        OUTPUT: String.PAST_HOURS,
+        OUTPUT: Macro.CMD_RANGE,
         TITLE_COLOR: Color.TITLE_DEFAULT[theme_manager.get_night_mode()],
         OUTPUT_COLOR: Color.OUTPUT_DEFAULT[theme_manager.get_night_mode()],
         DIRECTION: Direction.VERTICAL,
-        RANGE: Range.TOTAL,
+        RANGE: Range.WEEK,
         USE_CALENDAR: True,
         WEEK_START: Weekday.SUNDAY,
         DAYS: 7,
@@ -359,5 +359,34 @@ class Config:
         USE_ROLLOVER: False,
         USE_DECIMAL: True,
         EXCLUDED_DIDS: [1],
-        CELLS_DATA: []
+        CELLS_DATA: [
+            {
+                TITLE: String.TOTAL,
+                OUTPUT: Macro.CMD_TOTAL_HOURS,
+                TITLE_COLOR: Color.TITLE_DEFAULT[theme_manager.get_night_mode()],
+                OUTPUT_COLOR: Color.OUTPUT_DEFAULT[theme_manager.get_night_mode()],
+                DIRECTION: Direction.VERTICAL,
+                RANGE: Range.TOTAL,
+                USE_CALENDAR: True,
+                WEEK_START: Weekday.SUNDAY,
+                DAYS: 7,
+                HRS_UNIT: String.HRS,
+                MIN_UNIT: String.MIN,
+                HTML: CELL_HTML_SHELL,
+            },
+            {
+                TITLE: String.PAST_RANGE,
+                OUTPUT: Macro.CMD_RANGE_HOURS,
+                TITLE_COLOR: Color.TITLE_DEFAULT[theme_manager.get_night_mode()],
+                OUTPUT_COLOR: Color.OUTPUT_DEFAULT[theme_manager.get_night_mode()],
+                DIRECTION: Direction.VERTICAL,
+                RANGE: Range.WEEK,
+                USE_CALENDAR: True,
+                WEEK_START: Weekday.SUNDAY,
+                DAYS: 7,
+                HRS_UNIT: String.HRS,
+                MIN_UNIT: String.MIN,
+                HTML: CELL_HTML_SHELL,
+            }
+        ]
     }
