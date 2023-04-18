@@ -941,7 +941,7 @@ class CellItem(QWidget):
 
         confirm_button.move(
             QPoint(
-                remove_button_local_pos.x() - confirm_button.width() + self.widget.removeButton.width() + padding,
+                (remove_button_local_pos.x() - confirm_button.width()) + self.widget.removeButton.width() + padding,
                 remove_button_local_pos.y()
             )
         )

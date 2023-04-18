@@ -324,8 +324,8 @@ This window can also be opened in the Add-ons menu using the Config button.</str
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>473</width>
-            <height>527</height>
+            <width>479</width>
+            <height>510</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -493,7 +493,7 @@ If you like the add-on and want to consider supporting my stuff:</string>
                  <enum>Qt::CustomContextMenu</enum>
                 </property>
                 <property name="text">
-                 <string>  Support me on patron </string>
+                 <string>  Support me on patreon </string>
                 </property>
                 <property name="icon">
                  <iconset>

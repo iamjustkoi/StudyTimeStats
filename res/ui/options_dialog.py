@@ -149,7 +149,7 @@ class Ui_OptionsDialog(object):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setObjectName("scroll_area")
         self.about_scroll = QtWidgets.QWidget()
-        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 473, 527))
+        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 479, 510))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -301,7 +301,7 @@ class Ui_OptionsDialog(object):
 "If you like the add-on and want to consider supporting my stuff:"))
         self.like_button.setText(_translate("OptionsDialog", "Review on AnkiWeb "))
         self.kofi_button.setText(_translate("OptionsDialog", "  Buy me a coffee "))
-        self.patreon_button.setText(_translate("OptionsDialog", "  Support me on patron "))
+        self.patreon_button.setText(_translate("OptionsDialog", "  Support me on patreon "))
         self.about_label_body.setText(_translate("OptionsDialog", "Every bit helps with maintaining and developing the add-on and is greatly appreciated!\n"
 "\n"
 "### Text Macros\n"
