@@ -13,16 +13,19 @@ ANKI_VERSION = int(buildinfo.version.replace('2.1.', ''))
 
 def _reformat_conf(config: dict):
     """
-    Handles addon config update pipelines.
+    Handles the addon's config updates/patching pipeline.
+
     :param config: The current config for the addon.
-    :return: An updated addon config with some redone formatting.
+    :return: An updated addon config with updated formatting/patched changes.
     """
     addon_ver = config.get(Config.VERSION, '0.0.0')
     formatted_addon_ver = re.sub('-.*', '', addon_ver)
     ver_numbers: list[int] = [int(n) for n in formatted_addon_ver.split('.')]
 
     # v1.3.5
+    # Replaces "%from_custom_date" with the updated, custom-date-range hours macro.
     if ver_numbers[0] <= 1 and ver_numbers[1] <= 3 and ver_numbers[2] <= 5:
+
         def replace_macro(outer_conf: dict):
             for field in outer_conf:
                 data = outer_conf[field]
@@ -34,9 +37,11 @@ def _reformat_conf(config: dict):
         replace_macro(config)
 
     # v2.0.0
+    # Initializes cells to the legacy types (total/range), given they're currently unhidden.
     if ver_numbers[0] < 2 and not config.get(Config.CELLS_DATA, None):
         cells = []
         default_data = Config.DEFAULT_CELL_DATA.copy()
+
         if not config.get('Hide_Total_Stat', False):
             cells.append(
                 {
@@ -112,11 +117,15 @@ class TimeStatsConfigManager:
 
     def write_config(self):
         """
-Writes the config manager's current values to the addon meta file.
+        Writes the config manager's current values to the addon meta file.
         """
         self.mw.addonManager.writeAddonMeta(self._addon, self._meta)
 
     def write_config_val(self, key: str, val):
+        """
+        Creates a shallow copy of the current config and writes a single value to the addon meta file
+        using the shallow copy as a template.
+        """
         config = self._init_config(deep=False)
         config[key] = val
         meta = self.mw.addonManager.addonMeta(self._addon)
