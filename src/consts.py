@@ -323,6 +323,7 @@ class Config:
     USE_DECIMAL = 'Use_Decimal_Format'
     EXCLUDED_DIDS = "Excluded_Deck_IDs"
     CELLS_DATA = "cellsData"
+    WIN_SIZE = 'winSize'
 
     TITLE = 'title'
     OUTPUT = 'output'

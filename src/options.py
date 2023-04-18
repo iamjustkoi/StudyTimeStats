@@ -212,14 +212,14 @@ Addon options QDialog class for accessing and changing the addon's config values
         # Set starting value
         set_support_alpha(0)
 
-        win_size: list = self.config.get('win_size', None)
+        win_size: list = self.config.get(Config.WIN_SIZE, None)
         self.resize(win_size[0], win_size[1]) if win_size else None
 
         self.updateGeometry()
 
     def resizeEvent(self, evt: QResizeEvent):
         super().resizeEvent(evt)
-        self.manager.write_config_val('win_size', [self.width(), self.height()])
+        self.manager.write_config_val(Config.WIN_SIZE, [self.width(), self.height()])
 
     def apply(self):
         """
