@@ -265,8 +265,6 @@ class Macro:
 class String:
     TOTAL = 'Total'
     PAST_RANGE = 'Past %range'
-    TOTAL_HOURS = '%total_hrs'
-    PAST_HOURS = '%range_hrs'
     HRS = 'hrs'
     MIN = 'min'
     OPTIONS_ACTION = 'Study &Time Stats Options...'
@@ -304,7 +302,6 @@ class Color:
     BUTTON_ICON = ['#808080', '#8a8a8a']
     TITLE_DEFAULT = ['#000000', '#FFFFFF']
     OUTPUT_DEFAULT = ['#76bfb4', '#76bfb4']
-    # BUTTON_ACTIVE = ['rgba(0, 0, 0, 5%)', 'rgba(255, 255, 255, 10%)']
     BUTTON_ACTIVE = ['#cacaca', '#5b5b5b']
 
 
