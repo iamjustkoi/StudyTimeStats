@@ -41,8 +41,21 @@ from ..res.ui.macro_dialog import Ui_MacroDialog
 from ..res.ui.options_dialog import Ui_OptionsDialog
 from ..src.overview import parsed_string
 
+FLAT_ICON_STYLE = \
+    '''
+    background: transparent;
+    border: none;
+    width: 20px;
+    height: 20px;
+    '''
+
 
 def _refresh_cell_list(list_widget: QListWidget):
+    """
+    Updates the sorting indices of the cells in the given QListWidget.
+
+    :param list_widget: The QListWidget containing the cells to be updated.
+    """
     # update sorting indices
     for i in range(list_widget.count()):
         cell_widget = list_widget.item(i)
@@ -51,6 +64,12 @@ def _refresh_cell_list(list_widget: QListWidget):
 
 
 def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem):
+    """
+    Adds a cell item to a QListWidget and refreshes the list.
+
+    :param list_widget: The QListWidget to add the cell item to.
+    :param cell_item: The cell item to add to the list.
+    """
     list_widget.addItem(cell_item.list_item)
     list_widget.setItemWidget(cell_item.list_item, cell_item)
     list_widget.sortItems()
@@ -60,6 +79,12 @@ def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem):
 
 
 def _remove_cell_from_list(list_widget: QListWidget, cell_item: CellItem):
+    """
+    Removes a cell item from the QListWidget.
+
+    :param list_widget: The QListWidget to remove the cell item from.
+    :param cell_item: The cell item to remove.
+    """
     for i in range(list_widget.count()):
         item = list_widget.item(i)
         if item and isinstance(item, CellItem.CellListItem) and item.cell_item == cell_item:
@@ -72,21 +97,13 @@ def _remove_cell_from_list(list_widget: QListWidget, cell_item: CellItem):
     list_widget.currentRowChanged.emit(list_widget.currentRow())
 
 
-FLAT_ICON_STYLE = \
-    '''
-    background: transparent;
-    border: none;
-    width: 20px;
-    height: 20px;
-    '''
-
-
 class TimeStatsOptionsDialog(QDialog):
     anim: QPropertyAnimation
 
     def __init__(self, conf_manager: TimeStatsConfigManager):
         """
-Addon options QDialog class for accessing and changing the addon's config values.
+        Addon options QDialog class for accessing and changing the addon's config values.
+
         :param conf_manager: TimeStatsConfigManager used to reading and writing user input.
         """
         super().__init__(flags=aqt.mw.windowFlags())
@@ -219,6 +236,7 @@ Addon options QDialog class for accessing and changing the addon's config values
 
     def resizeEvent(self, evt: QResizeEvent):
         super().resizeEvent(evt)
+        # Update the window's size value in the config
         self.manager.write_config_val(Config.WIN_SIZE, [self.width(), self.height()])
 
     def apply(self):
@@ -241,7 +259,7 @@ Addon options QDialog class for accessing and changing the addon's config values
 
     def _load(self):
         """
-Loads all config values to the options dialog.
+        Loads all config values to the options dialog.
         """
         self.ui.toolbar_checkbox.setChecked(self.config[Config.TOOLBAR_ENABLED])
 
@@ -270,8 +288,8 @@ Loads all config values to the options dialog.
 
     def _save(self):
         """
-Retrieves values from options dialog window, updates/writes the values to the current config, then resets the main
-window to update all the ui.
+        Retrieves values from options dialog window, updates/writes the values to the current config,
+        then resets the main window to update all the ui.
         """
         # Store options
         self.config[Config.TOOLBAR_ENABLED] = self.ui.toolbar_checkbox.isChecked()
@@ -300,7 +318,7 @@ window to update all the ui.
 
     def _load_excluded_decks(self):
         """
-Loads deck names to list and sets label to enabled if not in current config's excluded decks.
+        Loads deck names to list and sets label to enabled if not in current config's excluded decks.
         """
         self.excluded_deck_names = [self.manager.decks.name(i) for i in self.config.get(Config.EXCLUDED_DIDS)]
         decks_list = self.ui.excluded_decks_list
@@ -326,7 +344,8 @@ Loads deck names to list and sets label to enabled if not in current config's ex
 
     def _get_excluded_dids(self):
         """
-Retrieves currently excluded deck id's.
+        Retrieves currently excluded deck id's.
+
         :return: a list containing all excluded deck id's as integers.
         """
         dids = []
@@ -339,7 +358,7 @@ Retrieves currently excluded deck id's.
 
     def accept(self) -> None:
         """
-Saves all user config values and closes the window.
+        Saves all user config values and closes the window.
         """
         self._save()
         self.close()
@@ -348,16 +367,14 @@ Saves all user config values and closes the window.
         for item in self.ui.excluded_decks_list.selectedItems():
             deck_item = DeckItem.from_list_widget(self, item)
             deck_item.set_included(should_enable)
-            # self.on_selection_change()
 
     def on_item_double_clicked(self, item: QListWidgetItem):
         self.set_selected_enabled(not DeckItem.from_list_widget(self, item).is_included())
-        # self.set_selected_enabled()
-        pass
 
     def on_line_context_menu(self, point, button):
         """
-Handles context menu actions for the input button.
+        Handles context menu actions for the input button.
+
         :param point: input coordinate to display the menu
         :param button: button being clicked/triggered
         """
@@ -367,7 +384,8 @@ Handles context menu actions for the input button.
 
     def on_copy_link(self, button):
         """
-Copies a link to the clipboard based on the input button.
+        Copies a link to the clipboard based on the input button.
+
         :param button: button to use for determining which link to copy
         """
         cb = self.manager.mw.app.clipboard()
@@ -382,7 +400,7 @@ Copies a link to the clipboard based on the input button.
 
     def on_restore_defaults(self):
         """
-Restores all config value to their default settings.
+        Restores all config value to their default settings.
         """
         for field in Config.DEFAULT_CONFIG:
             # load_data temp defaults
@@ -399,10 +417,6 @@ Restores all config value to their default settings.
         scroll_pos = self.ui.supportButtonHolder.pos().y()
         self.ui.scroll_area.verticalScrollBar().setValue(scroll_pos)
 
-        print(f'a {self.anim.state()=}')
-        print(f'a {self.anim.currentValue()=}')
-        print(f'a {self.anim.startValue()=}')
-
         # Animate support button holder background color
         if not self.anim.startValue() or self.anim.currentValue() != self.anim.startValue():
             self.anim.setDirection(QAbstractAnimation.Direction.Backward)
@@ -411,8 +425,6 @@ Restores all config value to their default settings.
             self.anim.start()
 
         def playForward():
-            print(f'b {self.anim.state()=}')
-
             if self.anim.currentValue() != self.anim.endValue():
                 self.anim.setDirection(QAbstractAnimation.Direction.Forward)
                 self.anim.setDuration(600)
@@ -427,7 +439,8 @@ class DeckItem(QWidget):
 
     def __init__(self, text: str, dialog: TimeStatsOptionsDialog):
         """
-DeckItem used for DeckListItems to give more options to interaction between the list and the enabled decks.
+        DeckItem used for DeckListItems to give more options to interaction between the list and the enabled decks.
+
         :param text: string value to use for the label of the list item
         :param dialog: reference to the base class to use for context menu actions
         """
@@ -448,7 +461,8 @@ DeckItem used for DeckListItems to give more options to interaction between the 
 
     def __lt__(self: DeckItem, other: DeckItem):
         """
-Uses the DeckItems enabled/disabled values, otherwise label text, to sort the items in descending order.
+        Uses the DeckItems enabled/disabled values, otherwise label text, to sort the items in descending order.
+
         :param other: comparable DeckItem
         :return: True if the current DeckItem is less than the other DeckItem
         """
@@ -470,14 +484,16 @@ Uses the DeckItems enabled/disabled values, otherwise label text, to sort the it
 
     def is_included(self):
         """
-Returns enabled state of the current DeckItem.
+        Returns enabled state of the current DeckItem.
+
         :return: True if the DeckItem is enabled, otherwise false
         """
         return self.enabled
 
     def set_included(self, enable: bool):
         """
-Sets the enabled state of the current DeckItem and updates its label to represent that.
+        Sets the enabled state of the current DeckItem and updates its label to represent that.
+
         :param enable: value the DeckItem should be set to
         """
         self.label.setEnabled(enable)
@@ -490,7 +506,8 @@ Sets the enabled state of the current DeckItem and updates its label to represen
 
     def on_context_menu(self, point):
         """
-Opens a context menu for modifying deck list info.
+        Opens a context menu for modifying deck list info.
+
         :param point: input coordinate to display the menu
         """
         self.context_menu = QMenu(self)
@@ -506,7 +523,8 @@ Opens a context menu for modifying deck list info.
 class DeckListItem(QListWidgetItem):
     def __lt__(self: DeckListItem, other: DeckListItem):
         """
-Uses the base DeckItem to sort its value less than the other DeckItem.
+        Uses the base DeckItem to sort its value less than the other DeckItem.
+
         :param other: comparable DeckListItem
         :return: True if this item is less than ther other DeckItem
         """
@@ -528,7 +546,14 @@ class CellItem(QWidget):
         cell_item: CellItem
 
         def __init__(self, *args, cell_item: CellItem):
+            """
+            QListWidgetItem of a parent, CellItem widget. Used for easy access to widget/widget item properties.
+
+            :param args: Default QT arguments.
+            :param cell_item: The QListWidgetItem's referenced/parent cell item.
+            """
             super().__init__(*args)
+            # Store parent cell item
             self.cell_item = cell_item
 
         def __lt__(self, other: CellItem.CellListItem):
@@ -541,6 +566,13 @@ class CellItem(QWidget):
             return False
 
     def __init__(self, list_widget: QListWidget, is_empty: bool = False, data: dict = None):
+        """
+        QWidget used in the cells QListWidget.
+
+        :param list_widget: A QListWidget holding cell items.
+        :param is_empty: Whether the cell show use an add button/unfilled template.
+        :param data: Data dict used to fill in information for the widget's input objects.
+        """
         super().__init__()
 
         self.index = list_widget.count() - 1
@@ -551,16 +583,13 @@ class CellItem(QWidget):
 
         self.list_item = CellItem.CellListItem(self.list_widget, cell_item=self)
 
-        print(f'{theme_manager.get_night_mode()=}')
-        print(
-            f'Color.BUTTON_ICON[{int(theme_manager.get_night_mode())}]='
-            f'{Color.BUTTON_ICON[theme_manager.get_night_mode()]}'
-        )
-
         def add_cell():
+            # External cell adder used so lambda doesn't use old/static variables (quick-fix)
             _add_cell_to_list(self.list_widget, CellItem(self.list_widget, False))
 
         if is_empty:
+            # Hide rest of cell, initialize and show the add button
+
             self.widget.addButton.clicked.connect(lambda *_: add_cell())
 
             self.widget.addButton.setRawIcon(
@@ -575,6 +604,7 @@ class CellItem(QWidget):
             self.widget.addButton.setFixedHeight(self.widget.addButton.minimumHeight())
 
         else:
+            # Hide the add button, initialize and load all cell inputs/data
             self.build_hover_buttons()
             self.build_color_pickers()
             self.build_direction_buttons()
@@ -594,6 +624,7 @@ class CellItem(QWidget):
             self._redraw()
             self.build_signals()
 
+        # Update size hint for the list
         self.list_item.setSizeHint(self.sizeHint())
         self.list_item.setFlags(Qt.ItemFlag.NoItemFlags)
 
@@ -674,7 +705,6 @@ class CellItem(QWidget):
 
     def build_direction_buttons(self):
         mask_color = '#000000'
-
         style = f'''
             QPushButton:disabled {{
                 background: {Color.BUTTON_ACTIVE[theme_manager.get_night_mode()]};
@@ -688,6 +718,7 @@ class CellItem(QWidget):
             ''' if aqt.QT_VERSION_STR[0] == '5' else '\n    }'
         )
 
+        # Setup radio button-like functionality for the vertical button
         vert_lines = QIcon(f'{Path(__file__).parent.resolve()}\\{VERT_LINES_PATH}')
         vert_pixmap = vert_lines.pixmap(self.widget.directionVerticalButton.size(), QIcon.Normal, QIcon.On)
         mask = vert_pixmap.createMaskFromColor(QColor(mask_color), Qt.MaskOutColor)
@@ -696,6 +727,7 @@ class CellItem(QWidget):
         self.widget.directionVerticalButton.setIcon(QIcon(vert_pixmap))
         self.widget.directionVerticalButton.setStyleSheet(style)
 
+        # Setup radio button-like functionality for the horizontal button
         horiz_lines = QIcon(f'{Path(__file__).parent.resolve()}\\{HORIZ_LINES_PATH}')
         horiz_pixmap = horiz_lines.pixmap(self.widget.directionHorizontalButton.size(), QIcon.Normal, QIcon.On)
         mask = horiz_pixmap.createMaskFromColor(QColor(mask_color), Qt.MaskOutColor)
@@ -704,12 +736,15 @@ class CellItem(QWidget):
         self.widget.directionHorizontalButton.setIcon(QIcon(horiz_pixmap))
         self.widget.directionHorizontalButton.setStyleSheet(style)
 
+        # Connect signals
         self.widget.directionVerticalButton.clicked.connect(lambda _: self.toggle_direction_buttons())
         self.widget.directionHorizontalButton.clicked.connect(lambda _: self.toggle_direction_buttons())
 
     def build_line_edits(self, mask_color='black'):
+        # Build macro-add action's icon and colors
         icon_path = f'{Path(__file__).parent.resolve()}\\{ADD_ICON_PATH}'
         tint_color = Color.BUTTON_ICON[theme_manager.get_night_mode()]
+
         pixmap = QIcon(icon_path).pixmap(self.size(), QIcon.Normal, QIcon.On)
         mask = pixmap.createMaskFromColor(QColor(mask_color), Qt.MaskOutColor)
 
@@ -774,6 +809,11 @@ class CellItem(QWidget):
 
     # noinspection PyUnresolvedReferences
     def toggle_code_editor(self, hide: bool = None):
+        """
+        Toggles the code editor widget.
+
+        :param hide: A boolean value indicating whether to hide the code editor widget.
+        """
         if hide is None:
             is_hidden = self.widget.codeTextEdit.isHidden()
             if is_hidden:
@@ -791,6 +831,11 @@ class CellItem(QWidget):
         self._redraw()
 
     def toggle_expando(self, collapse: bool = None):
+        """
+        Toggles the expandable frame of the widget.
+
+        :param collapse: A boolean value indicating whether to hide or show the expandable frame.
+        """
         if collapse is None:
             if self.widget.expandFrame.isHidden():
                 self.widget.expandFrame.show()
@@ -805,6 +850,15 @@ class CellItem(QWidget):
         self._redraw()
 
     def toggle_direction_buttons(self, direction: str = None):
+        """
+        Toggles the direction buttons of a widget between horizontal and vertical.
+
+        If no direction is specified, both buttons will be toggled. If a direction is specified,
+        only the corresponding button will be toggled.
+
+        :param direction: A string representing the direction to toggle the button to. Can be either
+                          'horizontal' or 'vertical'. Defaults to None.
+        """
         if direction is None:
             self.widget.directionHorizontalButton.setEnabled(not self.widget.directionHorizontalButton.isEnabled())
             self.widget.directionVerticalButton.setEnabled(not self.widget.directionVerticalButton.isEnabled())
@@ -833,6 +887,11 @@ class CellItem(QWidget):
         self._redraw()
 
     def on_range_update(self, index: int):
+        """
+        Updates and toggles the visibility of all range-related elements based on the passed index value.
+
+        :param index: An integer representing the range index.
+        """
         range_idx = index - 1
         self.data[Config.RANGE] = range_idx
 
@@ -920,6 +979,9 @@ class MacroDialog(QDialog):
 
         class MacroItem:
             def __init__(self, name: str, cmd: str, definition: str):
+                """
+                Template class used for easy storage/listing.
+                """
                 self.name = name
                 self.cmd = cmd
                 self.definition = definition
@@ -927,11 +989,12 @@ class MacroDialog(QDialog):
         self.model = QStandardItemModel()
         self.macros: list[MacroItem] = []
 
+        # Loop through the attribute names of all "CMD"-string attributes in the Macro class
         for attr_name in dir(Macro):
             attr = getattr(Macro, attr_name)
 
             if isinstance(attr, str) and attr_name.startswith('CMD'):
-                # Set macro definition from Macro definitions
+                # Set definition to string in the definitions dictionary
                 macro_def = Macro.DEFINITIONS.get(attr, None)
 
                 if macro_def is not None:
@@ -943,11 +1006,19 @@ class MacroDialog(QDialog):
                     item = QStandardItem(item_label)
                     item.setData(attr, Qt.UserRole)
 
+                    # Add row to item list model
                     self.model.appendRow(item)
+
+                    # Append macro to stored list
                     self.macros.append(MacroItem(formatted_name, attr, Macro.DEFINITIONS[attr]))
 
+        # Set to the newly created model
         self.ui.listView.setModel(self.model)
+
+        # Run updates to the preview label on item selected
         self.ui.listView.selectionModel().currentChanged.connect(self.update_preview)
+
+        # Use selected macro on item double-clicked
         self.ui.listView.doubleClicked.connect(self.accept)
 
         # Update list view's item selection
@@ -957,6 +1028,13 @@ class MacroDialog(QDialog):
         )
 
     def update_preview(self, index, *__args):
+        """
+        Update the preview label with the parsed command string, if a matching macro is found.
+        If no matching macro is found, display the original command string.
+
+        :param index: The index of the selected item in the model.
+        :param __args: Any additional arguments.
+        """
         macro_cmd: str = self.model.data(index, Qt.UserRole)
         macro_cmd += '}' if macro_cmd.find('{') >= 0 else ''
 
