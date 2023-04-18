@@ -211,6 +211,7 @@ class TimeStatsOptionsDialog(QDialog):
             }}}};
         '''
 
+        # FIXME: Random flashing at the end of the animation every now and then
         # Updates the support button holder alpha
         def set_support_alpha(alpha: int):
             if self.anim.direction() == QAbstractAnimation.Direction.Forward:
