@@ -324,6 +324,7 @@ class Config:
     EXCLUDED_DIDS = "Excluded_Deck_IDs"
     CELLS_DATA = "cellsData"
     WIN_SIZE = 'winSize'
+    VERSION = 'version'
 
     TITLE = 'title'
     OUTPUT = 'output'
