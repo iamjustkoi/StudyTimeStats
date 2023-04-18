@@ -279,6 +279,7 @@ class String:
     DISABLE_ACTION = '&Disable'
     INSERT = 'Insert'
     ERR = 'ERR'
+    DELETE_CELL = 'Delete cell?'
 
 
 class Range:

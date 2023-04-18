@@ -871,7 +871,7 @@ class CellItem(QWidget):
 
     def open_delete_confirm_button(self, list_widget: QListWidget):
         confirm_button = QToolButton(self)
-        confirm_button.setText('Delete?')
+        confirm_button.setText(String.DELETE_CELL)
 
         # noinspection PyUnresolvedReferences
         confirm_button.clicked.connect(lambda _: _remove_cell_from_list(list_widget, self))
