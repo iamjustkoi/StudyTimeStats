@@ -54,9 +54,10 @@ class TimeStatsConfigManager:
         # Add a constant key to meta
         self._meta['config'] = self.config
 
-    def _init_config(self):
-        config = self._meta.get('config', Config.DEFAULT_CONFIG)
-        config = _reformat_conf(config)
+    def _init_config(self, deep=True):
+        meta = self._meta if deep else self.mw.addonManager.addonMeta(self._addon)
+        config = meta.get('config', Config.DEFAULT_CONFIG)
+        config = _reformat_conf(config) if deep else config
         for field in Config.DEFAULT_CONFIG:
             if field not in config:
                 # load temp defaults
@@ -71,7 +72,7 @@ Writes the config manager's current values to the addon meta file.
         self.mw.addonManager.writeAddonMeta(self._addon, self._meta)
 
     def write_config_val(self, key: str, val):
-        config = self._init_config()
+        config = self._init_config(deep=False)
         config[key] = val
         meta = self.mw.addonManager.addonMeta(self._addon)
         meta['config'] = config
