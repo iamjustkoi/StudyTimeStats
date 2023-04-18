@@ -56,7 +56,7 @@ class TimeStatsConfigManager:
 
     def _init_config(self, deep=True):
         meta = self._meta if deep else self.mw.addonManager.addonMeta(self._addon)
-        config = meta.get('config', Config.DEFAULT_CONFIG)
+        config = meta.get('config', Config.DEFAULT_CONFIG.copy())
         config = _reformat_conf(config) if deep else config
         for field in Config.DEFAULT_CONFIG:
             if field not in config:
