@@ -763,6 +763,14 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         updated_string = re.sub(fr'(?<!%){macro}({Macro.CMD_PRECISION}\{{(\d*)\}})?', text, updated_string)
 
     def _process_range(from_date_str: str, to_date_str: str = None, replace_cb=None, cmd=Macro.CMD_FROM_DATE_HOURS):
+        """
+        Processes a date range and calls the replace_cb callable using a filtered revlog based on the input date range.
+
+        :param from_date_str: A string representing the starting date in ISO format.
+        :param to_date_str: A string representing the ending date in ISO format. If None, today's date is used.
+        :param replace_cb: A callback function to replace the matched pattern using the filtered revlog.
+        :param cmd: A string representing the command to be used in the matched pattern (e.g. <cmd>:<from>:<to>).
+        """
         try:
             # minus a day for inclusive checking
             from_date_raw = datetime.fromisoformat(from_date_str)
