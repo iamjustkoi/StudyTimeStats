@@ -6,7 +6,7 @@ import re
 from anki import buildinfo
 from aqt import AnkiQt
 
-from .consts import Config, Macro
+from .consts import CELL_HTML_SHELL, CURRENT_VERSION, Config, Direction, Macro, Range, String
 
 ANKI_VERSION = int(buildinfo.version.replace('2.1.', ''))
 
