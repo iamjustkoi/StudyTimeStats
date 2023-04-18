@@ -1,4 +1,3 @@
-import re
 from aqt import Qt
 from aqt.qt import (
     QToolButton,
