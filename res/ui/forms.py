@@ -181,12 +181,8 @@ class DragHandle(QToolButton):
                         current_drag_global_pos = self.parentWidget().cursor().pos()
                         global_dir_y = current_drag_global_pos.y() - self.last_drag_global_pos.y()
 
-                        print(f'{global_dir_y=},{move_dir=}')
-
                         # Moving in the opposite direction from the last drag event
                         did_switch_dir = (global_dir_y < 0 < -move_dir) or (global_dir_y > 0 > -move_dir)
-
-                        print(f'{did_switch_dir=}')
 
                     # noinspection PyUnresolvedReferences
                     target_cell = target_item.cell_item
