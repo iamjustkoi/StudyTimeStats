@@ -1,18 +1,15 @@
 # MIT License: Copyright (c) 2022-2023 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
 # Full license text available in the "LICENSE" file, packaged with the add-on.
 
-from datetime import date
-
 from aqt import mw
 from aqt.qt import QAction
 
 from .config import TimeStatsConfigManager
-from .options import TimeStatsOptionsDialog
 from .consts import (
     Config,
     String,
-    UNIQUE_DATE,
 )
+from .options import TimeStatsOptionsDialog
 
 
 def build_toolbar_actions():
@@ -20,13 +17,13 @@ def build_toolbar_actions():
     mw.addonManager.setConfigAction(__name__, on_options_called)
 
 
-def refresh_tools_menu_action(changes=None, obj=None):
+def refresh_tools_menu_action(__changes=None, __obj=None):
     """
     Updates the toolbar actions menu with the options shortcut. Expects an Operation Change hook call,
     but can also be used as a general update push, too.
 
-    :param changes: unused OpChanges object
-    :param obj: unused options object
+    :param __changes: unused OpChanges object
+    :param __obj: unused options object
     """
     if TimeStatsConfigManager(mw).config[Config.TOOLBAR_ENABLED]:
         options_action = QAction(String.OPTIONS_ACTION, mw)
