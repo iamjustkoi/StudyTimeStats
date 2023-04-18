@@ -184,9 +184,8 @@ Addon options QDialog class for accessing and changing the addon's config values
         # Short highlight animation
         self.anim = QPropertyAnimation(self.ui.supportButtonHolder, b"opacity")
         self.anim.setDirection(QAbstractAnimation.Direction.Forward)
-        self.anim.setStartValue(127)
+        self.anim_delay = 30
         self.anim.setEndValue(0)
-        self.anim.setDuration(800)
         highlight_color = ['rgba(0, 0, 0, {alpha})', 'rgba(255, 255, 255, {alpha})']
         support_holder_style_template = f'''
             QFrame {{{{
@@ -197,10 +196,20 @@ Addon options QDialog class for accessing and changing the addon's config values
 
         # Updates the support button holder alpha
         def set_support_alpha(alpha: int):
-            style = support_holder_style_template.format(alpha=alpha)
-            self.ui.supportButtonHolder.setStyleSheet(style)
+            if self.anim.direction() == QAbstractAnimation.Direction.Forward:
+                should_update = self.anim.currentValue() != self.anim.endValue()
+            else:
+                should_update = self.anim.currentValue() != self.anim.startValue()
 
+            if should_update:
+                style = support_holder_style_template.format(alpha=max(alpha - self.anim_delay, self.anim.endValue()))
+                # print(f'style({alpha - self.anim_delay})\n{style}')
+                self.ui.supportButtonHolder.setStyleSheet(style)
+
+        # Connect value changed listener
         self.anim.valueChanged.connect(set_support_alpha)
+
+        # Set starting value
         set_support_alpha(0)
 
         win_size: list = self.config.get('win_size', None)
@@ -381,6 +390,8 @@ Restores all config value to their default settings.
         self._load()
 
     def on_support_button_clicked(self):
+        start_value = 127
+
         # Switch to about tab
         self.ui.tabs_widget.setCurrentWidget(self.ui.about_tab)
 
@@ -388,8 +399,28 @@ Restores all config value to their default settings.
         scroll_pos = self.ui.supportButtonHolder.pos().y()
         self.ui.scroll_area.verticalScrollBar().setValue(scroll_pos)
 
+        print(f'a {self.anim.state()=}')
+        print(f'a {self.anim.currentValue()=}')
+        print(f'a {self.anim.startValue()=}')
+
         # Animate support button holder background color
-        self.anim.start()
+        if not self.anim.startValue() or self.anim.currentValue() != self.anim.startValue():
+            self.anim.setDirection(QAbstractAnimation.Direction.Backward)
+            self.anim.setStartValue(start_value + self.anim_delay)
+            self.anim.setDuration(100)
+            self.anim.start()
+
+        def playForward():
+            print(f'b {self.anim.state()=}')
+
+            if self.anim.currentValue() != self.anim.endValue():
+                self.anim.setDirection(QAbstractAnimation.Direction.Forward)
+                self.anim.setDuration(600)
+                self.anim.setStartValue(start_value)
+                self.anim.start()
+
+        if self.anim.receivers(self.anim.finished) <= 0:
+            self.anim.finished.connect(playForward)
 
 
 class DeckItem(QWidget):
