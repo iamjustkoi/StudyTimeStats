@@ -341,7 +341,7 @@ class Config:
     HTML = 'html'
     DEFAULT_CELL_DATA = {
         TITLE: String.PAST_RANGE,
-        OUTPUT: Macro.CMD_RANGE,
+        OUTPUT: Macro.CMD_RANGE_HOURS,
         TITLE_COLOR: Color.TITLE_DEFAULT[theme_manager.get_night_mode()],
         OUTPUT_COLOR: Color.OUTPUT_DEFAULT[theme_manager.get_night_mode()],
         DIRECTION: Direction.VERTICAL,
