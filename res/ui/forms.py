@@ -173,8 +173,6 @@ class DragHandle(QToolButton):
             move_dir = target_idx - drag_idx
 
             if target_idx != self.list_widget.count() - 1:
-                print(f'    idx={self.last_target_idx}::{target_idx}')
-
                 # Target index isn't the last cell item (empty cell)
                 target_item = self.list_widget.item(target_idx)
 
