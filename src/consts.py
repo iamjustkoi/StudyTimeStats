@@ -362,7 +362,7 @@ class Config:
         CELLS_DATA: [
             {
                 TITLE: String.TOTAL,
-                OUTPUT: Macro.CMD_TOTAL_HOURS,
+                OUTPUT: Macro.CMD_RANGE_HOURS,
                 TITLE_COLOR: Color.TITLE_DEFAULT[theme_manager.get_night_mode()],
                 OUTPUT_COLOR: Color.OUTPUT_DEFAULT[theme_manager.get_night_mode()],
                 DIRECTION: Direction.VERTICAL,
