@@ -23,8 +23,6 @@ def _reformat_conf(config: dict):
 
     # v1.3.5
     if ver_numbers[0] <= 1 and ver_numbers[1] <= 3 and ver_numbers[2] <= 5:
-        print(f'run_replace')
-
         def replace_macro(outer_conf: dict):
             for field in outer_conf:
                 data = outer_conf[field]
@@ -37,7 +35,6 @@ def _reformat_conf(config: dict):
 
     # v2.0.0
     if ver_numbers[0] < 2 and not config.get(Config.CELLS_DATA, None):
-        print(f'run_cave_exit')
         cells = []
         default_data = Config.DEFAULT_CELL_DATA.copy()
         if not config.get('Hide_Total_Stat', False):
