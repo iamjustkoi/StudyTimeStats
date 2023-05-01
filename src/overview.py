@@ -210,8 +210,6 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         :param cmd: Command text to search for.
         :return:
         """
-
-        print(f'searching prec for cmd: "{cmd}"')
         precision_match = re.search(fr'{cmd}{Macro.CMD_PRECISION}\{{(\d*)\}}', updated_string)
         return int(precision_match.group(1)) if precision_match else None
 
@@ -698,7 +696,8 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
 
         :param precision: The precision of the resulting value.
         """
-        for match in (matches := re.findall(fr'(?<!%){Macro.CMD_EVAL}([^}}]*)}}', updated_string)):
+        matches = re.findall(fr'(?<!%){Macro.CMD_EVAL}([^}}]*)}}', updated_string)
+        for match in matches:
             expression = match
             raw_match = match.replace('+', r'\+').replace('*', r'\*').replace('-', r'\-')
             is_using_hours = False
