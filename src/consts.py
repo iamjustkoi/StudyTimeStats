@@ -360,7 +360,7 @@ class Config:
         OVERVIEW_ENABLED: True,
         CONGRATS_ENABLED: True,
         INCLUDE_DELETED: True,
-        USE_ROLLOVER: False,
+        USE_ROLLOVER: True,
         USE_DECIMAL: True,
         EXCLUDED_DIDS: [1],
         CELLS_DATA: [
