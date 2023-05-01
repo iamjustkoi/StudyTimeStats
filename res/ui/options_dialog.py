@@ -149,7 +149,7 @@ class Ui_OptionsDialog(object):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setObjectName("scroll_area")
         self.about_scroll = QtWidgets.QWidget()
-        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 479, 510))
+        self.about_scroll.setGeometry(QtCore.QRect(0, 0, 456, 555))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -172,7 +172,7 @@ class Ui_OptionsDialog(object):
         self.about_label_header.setObjectName("about_label_header")
         self.scroll_layout.addWidget(self.about_label_header)
         self.supportButtonHolder = QtWidgets.QFrame(self.about_scroll)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.supportButtonHolder.sizePolicy().hasHeightForWidth())
@@ -193,30 +193,30 @@ class Ui_OptionsDialog(object):
         self.like_button.setIconSize(QtCore.QSize(32, 32))
         self.like_button.setObjectName("like_button")
         self.support_buttons.addWidget(self.like_button)
-        self.kofi_button = QtWidgets.QPushButton(self.supportButtonHolder)
-        self.kofi_button.setMinimumSize(QtCore.QSize(0, 42))
-        self.kofi_button.setMaximumSize(QtCore.QSize(200, 16777215))
-        self.kofi_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.kofi_button.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.kofi_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("res/img/kofilogo_blue.PNG"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.kofi_button.setIcon(icon1)
-        self.kofi_button.setIconSize(QtCore.QSize(32, 32))
-        self.kofi_button.setObjectName("kofi_button")
-        self.support_buttons.addWidget(self.kofi_button)
         self.patreon_button = QtWidgets.QPushButton(self.supportButtonHolder)
         self.patreon_button.setMinimumSize(QtCore.QSize(0, 42))
         self.patreon_button.setMaximumSize(QtCore.QSize(200, 16777215))
         self.patreon_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.patreon_button.setFocusPolicy(QtCore.Qt.NoFocus)
         self.patreon_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("res/img/patreon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.patreon_button.setIcon(icon2)
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap("res/img/patreon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.patreon_button.setIcon(icon1)
         self.patreon_button.setIconSize(QtCore.QSize(32, 32))
         self.patreon_button.setObjectName("patreon_button")
         self.support_buttons.addWidget(self.patreon_button)
+        self.kofi_button = QtWidgets.QPushButton(self.supportButtonHolder)
+        self.kofi_button.setMinimumSize(QtCore.QSize(0, 42))
+        self.kofi_button.setMaximumSize(QtCore.QSize(200, 16777215))
+        self.kofi_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.kofi_button.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.kofi_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap("res/img/kofilogo_blue.PNG"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.kofi_button.setIcon(icon2)
+        self.kofi_button.setIconSize(QtCore.QSize(32, 32))
+        self.kofi_button.setObjectName("kofi_button")
+        self.support_buttons.addWidget(self.kofi_button)
         self.scroll_layout.addWidget(self.supportButtonHolder)
         self.about_label_body = QtWidgets.QLabel(self.about_scroll)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
@@ -265,23 +265,24 @@ class Ui_OptionsDialog(object):
         _translate = QtCore.QCoreApplication.translate
         OptionsDialog.setWindowTitle(_translate("OptionsDialog", "Study Time Stats Options"))
         self.pages_group.setTitle(_translate("OptionsDialog", "Enabled Pages"))
-        self.browser_checkbox.setToolTip(_translate("OptionsDialog", "The main Anki screen for browsing decks."))
+        self.browser_checkbox.setToolTip(_translate("OptionsDialog", "The main page for browsing decks."))
         self.browser_checkbox.setText(_translate("OptionsDialog", "Deck Browser"))
-        self.overview_checkbox.setToolTip(_translate("OptionsDialog", "The screen that shows when viewing a deck."))
+        self.overview_checkbox.setToolTip(_translate("OptionsDialog", "The page that shows when viewing a deck."))
         self.overview_checkbox.setText(_translate("OptionsDialog", "Overview"))
-        self.congrats_checkbox.setToolTip(_translate("OptionsDialog", "The screen that shows up on the Deck Overview when all reviews are finished for the day."))
-        self.congrats_checkbox.setText(_translate("OptionsDialog", "Congrats Screen"))
+        self.congrats_checkbox.setToolTip(_translate("OptionsDialog", "The page that shows when viewing a deck that has its reviews done for the day."))
+        self.congrats_checkbox.setText(_translate("OptionsDialog", "Congrats"))
         self.mainViewGroupbox.setTitle(_translate("OptionsDialog", "Stats View"))
         self.cellListWidget.setSortingEnabled(True)
         self.tabs_widget.setTabText(self.tabs_widget.indexOf(self.appearance_tab), _translate("OptionsDialog", "General"))
-        self.toolbar_checkbox.setToolTip(_translate("OptionsDialog", "Enables the Tools Menu shortcut for showing these options. \n"
-"This window can also be opened in the Add-ons menu using the Config button."))
+        self.toolbar_checkbox.setToolTip(_translate("OptionsDialog", "Enable the Tools Menu shortcut for these options. \n"
+"(Can also be accessed via Tools>Add-ons>Study Time Stats>Config)"))
         self.toolbar_checkbox.setText(_translate("OptionsDialog", "Show options shortcut in the Tools Menu"))
-        self.include_deleted_checkbox.setToolTip(_translate("OptionsDialog", "Include review times from cards that were deleted."))
+        self.include_deleted_checkbox.setToolTip(_translate("OptionsDialog", "Include review/time stats for cards that\'ve been deleted."))
         self.include_deleted_checkbox.setText(_translate("OptionsDialog", "Include reviews from deleted cards"))
-        self.useRolloverCheckbox.setToolTip(_translate("OptionsDialog", "Use the rollover (next-day) hour in Anki\'s preferences when considering the hour a day should be cut off at."))
+        self.useRolloverCheckbox.setToolTip(_translate("OptionsDialog", "Use Anki\'s rollover (next-day) hour when considering the time days are cut off."))
         self.useRolloverCheckbox.setText(_translate("OptionsDialog", "Use the next-day hour when calculating ranged times"))
-        self.useDecimalCheckbox.setToolTip(_translate("OptionsDialog", "Shows an \"hour.min\" format, versus an \"hh:mm\" format, for all time output values."))
+        self.useDecimalCheckbox.setToolTip(_translate("OptionsDialog", "Shows an \"hour.min\" format for all time outputs. \n"
+"(Otherwise uses \"hh:mm\")"))
         self.useDecimalCheckbox.setText(_translate("OptionsDialog", "Use decimal format time outputs"))
         self.enabled_decks_group.setTitle(_translate("OptionsDialog", "Enabled Decks"))
         self.deck_enable_button.setToolTip(_translate("OptionsDialog", "Enable stats for the selected deck(s)."))
@@ -298,22 +299,33 @@ class Ui_OptionsDialog(object):
 "[Releases/Changelog](https://github.com/iamjustkoi/StudyTimeStats/releases)  \n"
 "[Source Code](https://github.com/iamjustkoi/StudyTimeStats)  \n"
 "\n"
-"If you like the add-on and want to consider supporting my stuff:"))
-        self.like_button.setText(_translate("OptionsDialog", "Review on AnkiWeb "))
-        self.kofi_button.setText(_translate("OptionsDialog", "  Buy me a coffee "))
-        self.patreon_button.setText(_translate("OptionsDialog", "  Support me on patreon "))
-        self.about_label_body.setText(_translate("OptionsDialog", "Every bit helps with maintaining and developing the add-on and is greatly appreciated!\n"
+"If you like the add-on and want to consider supporting me in anyway:"))
+        self.like_button.setToolTip(_translate("OptionsDialog", "Leave a review over at AnkiWeb!"))
+        self.like_button.setText(_translate("OptionsDialog", "AnkiWeb "))
+        self.patreon_button.setToolTip(_translate("OptionsDialog", "Follow/support me on Patreon!"))
+        self.patreon_button.setText(_translate("OptionsDialog", " Patreon "))
+        self.kofi_button.setToolTip(_translate("OptionsDialog", "Buy me a coffee with Ko-Fi!"))
+        self.kofi_button.setText(_translate("OptionsDialog", "Ko-Fi"))
+        self.about_label_body.setText(_translate("OptionsDialog", "Every bit helps with maintaining and developing the add-on and is greatly appreciated! <3\n"
 "\n"
 "### Text Macros\n"
-"The add-on can also filter text in the custom labels input to show information based on what\'s set in the config (e.g. \"Past %range\" to \"Past Week\"). These can be used multiple times and will update whenever Anki\'s main window reloads. You can find more details via the \"Macro\" dialog that pops up after clicking the + icon inside any of the text inputs.\n"
+"All output text can also be filtered to show some more customized information (e.g. \"Past %range\" to \"Past Week\"). These can be used multiple times and will update whenever Anki\'s main window reloads. \n"
 "\n"
-"##### Misc\n"
-"`%%` - returns a single % symbol and doesn\'t apply a text macro (e.g. %% -> %, %%range -> %range)\n"
+"`%%` - can be used to return a single % symbol and disable filtering for any macro text (e.g. `%%` -> %, `%%range` -> %range)\n"
+"\n"
+"*Small warning: as a general rule, the more stats used/the larger the range of the stat, the longer it might take to load them all (some caching is also done per stat-card, too though).\n"
+"\n"
+"<br></br>\n"
 "<br></br>\n"
 "Thanks for downloading and hope you enjoy!\n"
+"\n"
 "-koi \n"
+"\n"
+"\n"
+"<br></br>\n"
 "<br></br>\n"
 "MIT License \n"
+"\n"
 "©2022-2023 JustKoi (iamjustkoi)"))
         self.tabs_widget.setTabText(self.tabs_widget.indexOf(self.about_tab), _translate("OptionsDialog", "About"))
         self.supportButton.setText(_translate("OptionsDialog", "<3"))

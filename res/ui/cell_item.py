@@ -384,6 +384,8 @@ class Ui_CellWidget(object):
     def retranslateUi(self, CellWidget):
         _translate = QtCore.QCoreApplication.translate
         CellWidget.setWindowTitle(_translate("CellWidget", "Form"))
+        self.titleColorButton.setToolTip(_translate("CellWidget", "Set a custom title text color."))
+        self.titleLabel.setToolTip(_translate("CellWidget", "Text that appears above or to-the-left-of the output."))
         self.titleLabel.setText(_translate("CellWidget", "Title"))
         self.startDayDropdown.setToolTip(_translate("CellWidget", "The day a new week should start on."))
         self.startDayDropdown.setCurrentText(_translate("CellWidget", "Sunday"))
@@ -394,6 +396,7 @@ class Ui_CellWidget(object):
         self.startDayDropdown.setItemText(4, _translate("CellWidget", "Thursday"))
         self.startDayDropdown.setItemText(5, _translate("CellWidget", "Friday"))
         self.startDayDropdown.setItemText(6, _translate("CellWidget", "Saturday"))
+        self.outputColorButton.setToolTip(_translate("CellWidget", "Set a custom output text color."))
         self.rangeDropdown.setToolTip(_translate("CellWidget", "Time range to filter through for the ranged total stat."))
         self.rangeDropdown.setItemText(0, _translate("CellWidget", "Total"))
         self.rangeDropdown.setItemText(1, _translate("CellWidget", "Past Week"))
@@ -409,10 +412,15 @@ class Ui_CellWidget(object):
         self.hourEdit.setText(_translate("CellWidget", "hrs"))
         self.minuteLabel.setText(_translate("CellWidget", "Minute"))
         self.minEdit.setText(_translate("CellWidget", "min"))
+        self.directionLabel.setToolTip(_translate("CellWidget", "Set text-stacking direction to either vertical/horizontal."))
         self.directionLabel.setText(_translate("CellWidget", "Direction"))
+        self.startDayLabel.setToolTip(_translate("CellWidget", "Day to consider the first day of a calendar week."))
         self.startDayLabel.setText(_translate("CellWidget", "Week-Start Day"))
+        self.rangeLabel.setToolTip(_translate("CellWidget", "Preset range to use for macros with an expected range."))
         self.rangeLabel.setText(_translate("CellWidget", "Selected Range"))
+        self.unitLabel.setToolTip(_translate("CellWidget", "Text to be appended to any time-related measurements for all output text."))
         self.unitLabel.setText(_translate("CellWidget", "Units"))
+        self.outputLabel.setToolTip(_translate("CellWidget", "Text that appears below or to-the-right-of the title."))
         self.outputLabel.setText(_translate("CellWidget", "Output"))
 from .forms import DragHandle, HoverButton, RotateButton
 

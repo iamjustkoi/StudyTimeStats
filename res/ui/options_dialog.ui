@@ -61,7 +61,7 @@
              <item>
               <widget class="QCheckBox" name="browser_checkbox">
                <property name="toolTip">
-                <string>The main Anki screen for browsing decks.</string>
+                <string>The main page for browsing decks.</string>
                </property>
                <property name="text">
                 <string>Deck Browser</string>
@@ -74,7 +74,7 @@
              <item>
               <widget class="QCheckBox" name="overview_checkbox">
                <property name="toolTip">
-                <string>The screen that shows when viewing a deck.</string>
+                <string>The page that shows when viewing a deck.</string>
                </property>
                <property name="text">
                 <string>Overview</string>
@@ -87,10 +87,10 @@
              <item>
               <widget class="QCheckBox" name="congrats_checkbox">
                <property name="toolTip">
-                <string>The screen that shows up on the Deck Overview when all reviews are finished for the day.</string>
+                <string>The page that shows when viewing a deck that has its reviews done for the day.</string>
                </property>
                <property name="text">
-                <string>Congrats Screen</string>
+                <string>Congrats</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
@@ -177,8 +177,8 @@
        <item>
         <widget class="QCheckBox" name="toolbar_checkbox">
          <property name="toolTip">
-          <string>Enables the Tools Menu shortcut for showing these options. 
-This window can also be opened in the Add-ons menu using the Config button.</string>
+          <string>Enable the Tools Menu shortcut for these options. 
+(Can also be accessed via Tools&gt;Add-ons&gt;Study Time Stats&gt;Config)</string>
          </property>
          <property name="text">
           <string>Show options shortcut in the Tools Menu</string>
@@ -191,7 +191,7 @@ This window can also be opened in the Add-ons menu using the Config button.</str
        <item>
         <widget class="QCheckBox" name="include_deleted_checkbox">
          <property name="toolTip">
-          <string>Include review times from cards that were deleted.</string>
+          <string>Include review/time stats for cards that've been deleted.</string>
          </property>
          <property name="text">
           <string>Include reviews from deleted cards</string>
@@ -204,7 +204,7 @@ This window can also be opened in the Add-ons menu using the Config button.</str
        <item>
         <widget class="QCheckBox" name="useRolloverCheckbox">
          <property name="toolTip">
-          <string>Use the rollover (next-day) hour in Anki's preferences when considering the hour a day should be cut off at.</string>
+          <string>Use Anki's rollover (next-day) hour when considering the time days are cut off.</string>
          </property>
          <property name="text">
           <string>Use the next-day hour when calculating ranged times</string>
@@ -217,7 +217,8 @@ This window can also be opened in the Add-ons menu using the Config button.</str
        <item>
         <widget class="QCheckBox" name="useDecimalCheckbox">
          <property name="toolTip">
-          <string>Shows an &quot;hour.min&quot; format, versus an &quot;hh:mm&quot; format, for all time output values.</string>
+          <string>Shows an &quot;hour.min&quot; format for all time outputs. 
+(Otherwise uses &quot;hh:mm&quot;)</string>
          </property>
          <property name="text">
           <string>Use decimal format time outputs</string>
@@ -324,8 +325,8 @@ This window can also be opened in the Add-ons menu using the Config button.</str
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>479</width>
-            <height>510</height>
+            <width>456</width>
+            <height>555</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -353,7 +354,7 @@ Have any issues or feedback? Feel free to post on the project's issue section on
 [Releases/Changelog](https://github.com/iamjustkoi/StudyTimeStats/releases)  
 [Source Code](https://github.com/iamjustkoi/StudyTimeStats)  
 
-If you like the add-on and want to consider supporting my stuff:</string>
+If you like the add-on and want to consider supporting me in anyway:</string>
              </property>
              <property name="textFormat">
               <enum>Qt::AutoText</enum>
@@ -375,7 +376,7 @@ If you like the add-on and want to consider supporting my stuff:</string>
            <item>
             <widget class="QFrame" name="supportButtonHolder">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+              <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -416,50 +417,15 @@ If you like the add-on and want to consider supporting my stuff:</string>
                 <property name="contextMenuPolicy">
                  <enum>Qt::CustomContextMenu</enum>
                 </property>
+                <property name="toolTip">
+                 <string>Leave a review over at AnkiWeb!</string>
+                </property>
                 <property name="text">
-                 <string>Review on AnkiWeb </string>
+                 <string>AnkiWeb </string>
                 </property>
                 <property name="icon">
                  <iconset>
                   <normaloff>res/img/anki_like.png</normaloff>res/img/anki_like.png</iconset>
-                </property>
-                <property name="iconSize">
-                 <size>
-                  <width>32</width>
-                  <height>32</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="kofi_button">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>42</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>200</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="cursor">
-                 <cursorShape>PointingHandCursor</cursorShape>
-                </property>
-                <property name="focusPolicy">
-                 <enum>Qt::NoFocus</enum>
-                </property>
-                <property name="contextMenuPolicy">
-                 <enum>Qt::CustomContextMenu</enum>
-                </property>
-                <property name="text">
-                 <string>  Buy me a coffee </string>
-                </property>
-                <property name="icon">
-                 <iconset>
-                  <normaloff>res/img/kofilogo_blue.PNG</normaloff>res/img/kofilogo_blue.PNG</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -492,12 +458,56 @@ If you like the add-on and want to consider supporting my stuff:</string>
                 <property name="contextMenuPolicy">
                  <enum>Qt::CustomContextMenu</enum>
                 </property>
+                <property name="toolTip">
+                 <string>Follow/support me on Patreon!</string>
+                </property>
                 <property name="text">
-                 <string>  Support me on patreon </string>
+                 <string> Patreon </string>
                 </property>
                 <property name="icon">
                  <iconset>
                   <normaloff>res/img/patreon.png</normaloff>res/img/patreon.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="kofi_button">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>42</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>200</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="cursor">
+                 <cursorShape>PointingHandCursor</cursorShape>
+                </property>
+                <property name="focusPolicy">
+                 <enum>Qt::NoFocus</enum>
+                </property>
+                <property name="contextMenuPolicy">
+                 <enum>Qt::CustomContextMenu</enum>
+                </property>
+                <property name="toolTip">
+                 <string>Buy me a coffee with Ko-Fi!</string>
+                </property>
+                <property name="text">
+                 <string>Ko-Fi</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>res/img/kofilogo_blue.PNG</normaloff>res/img/kofilogo_blue.PNG</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -519,18 +529,26 @@ If you like the add-on and want to consider supporting my stuff:</string>
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Every bit helps with maintaining and developing the add-on and is greatly appreciated!
+              <string>Every bit helps with maintaining and developing the add-on and is greatly appreciated! &lt;3
 
 ### Text Macros
-The add-on can also filter text in the custom labels input to show information based on what's set in the config (e.g. &quot;Past %range&quot; to &quot;Past Week&quot;). These can be used multiple times and will update whenever Anki's main window reloads. You can find more details via the &quot;Macro&quot; dialog that pops up after clicking the + icon inside any of the text inputs.
+All output text can also be filtered to show some more customized information (e.g. &quot;Past %range&quot; to &quot;Past Week&quot;). These can be used multiple times and will update whenever Anki's main window reloads. 
 
-##### Misc
-`%%` - returns a single % symbol and doesn't apply a text macro (e.g. %% -&gt; %, %%range -&gt; %range)
+`%%` - can be used to return a single % symbol and disable filtering for any macro text (e.g. `%%` -&gt; %, `%%range` -&gt; %range)
+
+*Small warning: as a general rule, the more stats used/the larger the range of the stat, the longer it might take to load them all (some caching is also done per stat-card, too though).
+
+&lt;br&gt;&lt;/br&gt;
 &lt;br&gt;&lt;/br&gt;
 Thanks for downloading and hope you enjoy!
+
 -koi 
+
+
+&lt;br&gt;&lt;/br&gt;
 &lt;br&gt;&lt;/br&gt;
 MIT License 
+
 ©2022-2023 JustKoi (iamjustkoi)</string>
              </property>
              <property name="textFormat">

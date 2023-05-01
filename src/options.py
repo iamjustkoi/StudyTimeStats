@@ -755,11 +755,11 @@ class CellItem(QWidget):
         icon = QIcon(pixmap)
 
         # Add the actions to the QLineEdits
-        action = QAction(icon, 'Add Entry', self.widget.titleLineEdit)
+        action = QAction(icon, 'Add Text Macro', self.widget.titleLineEdit)
         action.triggered.connect(lambda _: self.open_macro_dialog(self.widget.titleLineEdit))
         self.widget.titleLineEdit.addAction(action, QLineEdit.ActionPosition.TrailingPosition)
 
-        action = QAction(icon, 'Add Entry', self.widget.outputLineEdit)
+        action = QAction(icon, 'Add Text Macro', self.widget.outputLineEdit)
         action.triggered.connect(lambda _: self.open_macro_dialog(self.widget.outputLineEdit))
         self.widget.outputLineEdit.addAction(action, QLineEdit.ActionPosition.TrailingPosition)
 

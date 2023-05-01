@@ -97,6 +97,9 @@
           <height>20</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>Set a custom title text color.</string>
+        </property>
         <property name="styleSheet">
          <string notr="true">#titleColorButton {
 	border-radius: 10px;
@@ -122,6 +125,9 @@
           <width>82</width>
           <height>0</height>
          </size>
+        </property>
+        <property name="toolTip">
+         <string>Text that appears above or to-the-left-of the output.</string>
         </property>
         <property name="styleSheet">
          <string notr="true">#mainFrame {
@@ -280,6 +286,9 @@
              <width>20</width>
              <height>20</height>
             </size>
+           </property>
+           <property name="toolTip">
+            <string>Set a custom output text color.</string>
            </property>
            <property name="styleSheet">
             <string notr="true">#outputColorButton {
@@ -600,6 +609,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="toolTip">
+            <string>Set text-stacking direction to either vertical/horizontal.</string>
+           </property>
            <property name="text">
             <string>Direction</string>
            </property>
@@ -612,6 +624,9 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>Day to consider the first day of a calendar week.</string>
            </property>
            <property name="text">
             <string>Week-Start Day</string>
@@ -626,6 +641,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="toolTip">
+            <string>Preset range to use for macros with an expected range.</string>
+           </property>
            <property name="text">
             <string>Selected Range</string>
            </property>
@@ -638,6 +656,9 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>Text to be appended to any time-related measurements for all output text.</string>
            </property>
            <property name="text">
             <string>Units</string>
@@ -657,6 +678,9 @@
              <width>82</width>
              <height>0</height>
             </size>
+           </property>
+           <property name="toolTip">
+            <string>Text that appears below or to-the-right-of the title.</string>
            </property>
            <property name="text">
             <string>Output</string>
