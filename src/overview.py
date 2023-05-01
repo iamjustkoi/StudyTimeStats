@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from time import time
 from typing import Sequence
 
-from anki.consts import REVLOG_RESCHED
 from aqt import gui_hooks, mw
 from aqt.deckbrowser import DeckBrowser, DeckBrowserContent
 from aqt.overview import Overview, OverviewContent
@@ -14,6 +13,12 @@ from aqt.webview import AnkiWebView
 
 from .config import ANKI_VERSION, TimeStatsConfigManager
 from .consts import *
+
+if ANKI_VERSION > ANKI_LEGACY_VER:
+    # noinspection PyUnresolvedReferences
+    from anki.consts import REVLOG_RESCHED
+else:
+    REVLOG_RESCHED = 4
 
 
 def _is_enabled_for_deck(conf_manager: TimeStatsConfigManager):
