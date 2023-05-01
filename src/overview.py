@@ -14,7 +14,7 @@ from aqt.webview import AnkiWebView
 from .config import ANKI_VERSION, TimeStatsConfigManager
 from .consts import *
 
-if ANKI_VERSION > ANKI_LEGACY_VER:
+if ANKI_VERSION > ANKI_LEGACY_VER + 1:
     # noinspection PyUnresolvedReferences
     from anki.consts import REVLOG_RESCHED
 else:
