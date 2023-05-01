@@ -1,39 +1,39 @@
 # <p align="center">Study Time Stats <img src="res/img/stats_icon.svg"></p>
-<p align="center">Add some customizable total study time and ranged study time statistics to Anki's main window!</p>  
-<p align="center"><img src=".github/main_ui.png"></p>
 
-## Installation  
+<p align="center">Add some customizable study time, and review count statistics to Anki's main window!</p>  
+<p align="center"><img src=".github/ui_main.png"></p>
+
+## Installation
+
 Install from [Anki-Web](https://ankiweb.net/shared/info/1247171202)  
-Or inside Anki (Tools -> Add-ons -> Get Add-ons...)
+Or through Anki via: Tools -> Add-ons -> Get Add-ons...
 > 1247171202
 
-## Options Menu  
+## Options
+
 ### General
-These settings can be used to change the visibility, look, and text of the rendered stats, as well as how the add-on should filter the total time.  
+
+Customize the style, column count, range, text, code, and output for all rendered statistics!
 <p align="center"><img src=".github/options_general.png"></p>
 
 ### Advanced
 
-These settings can change other options outside of the UI.
-<p align="center"><img src=".github/options_advanced.png"></p>  
+Exclude decks, change time formats, and other miscellaneous options!
+<p align="center"><img src=".github/options_advanced.png"></p>
 
-The output text can also be changed here to show custom information using any of the available text macros:
-<p align="center"><img src=".github/custom_stat_options.png"></p>
-<p align="center"><img src=".github/custom_stat.png"></p>
+## Macros
 
-### Text Macros
+Custom text macros can be used for all stat outputs!
 
-The add-on can also filter text in the custom labels input to show information based on what's set in the config (e.g. "
-Past %range" to "Past Week"). These can be used multiple times and will update whenever Anki's main window reloads. You
-can find more details via the "Macro" dialog that pops up after clicking the + icon inside any of the text inputs.
-
-##### Misc
-`%%` - returns a single % symbol and doesn't apply a text macro (e.g. %% -> %, %%range -> %range)
+These can be accessed via the "Add Text Macro" button (or the little "+" to the right of the text inputs).
+<p align="center"><img src=".github/options_macros.png"></p>
 
 #### Bugs/Issues:
-Please post any issues or feedback you might have on [GitHub](https://github.com/iamjustkoi/StudyTimeStats/issues).
-<br></br>  
+
+Please post any issues/feedback you might have over the project's
+on [GitHub](https://github.com/iamjustkoi/StudyTimeStats/issues).
+<br></br>
 
 Wish you the best! -koi
 
-MIT License ©2022 JustKoi (iamjustkoi)
+MIT License ©2022-2023 JustKoi (iamjustkoi)
