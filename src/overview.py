@@ -985,6 +985,11 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
 
 
 def _excluded_did_limit(excluded_dids: list = None):
+    """
+    Retrieves an SQL limiter with a leading "AND" operator that checks if "cards.did" are
+    in the set of excluded deck id's using all currently visible decks.
+    :param excluded_dids: A list of deck id's to be excluded (expects integers, execution may vary)
+    """
     include_deleted = TimeStatsConfigManager(mw).config.get(Config.INCLUDE_DELETED, False)
 
     if include_deleted and mw.state != 'overview':
@@ -1014,8 +1019,8 @@ def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] =
         -> list[Sequence]:
     """
     Grabs a list of review data logs which each have the format: [timestamp, timerange].
-    :param excluded_dids:
-    :param time_range_ms:
+    :param excluded_dids: A list of excluded deck id's
+    :param time_range_ms: A tuple with the accepted unix millisecond time range with the format: (from, to)
     :return:
     """
 
@@ -1044,7 +1049,7 @@ def date_with_rollover(date: datetime = datetime.today()):
     """
     Retrieves a date-time adjusted to its day-end hour and Anki/add-on preferences for end of day.
 
-    :param date: date to adjust
-    :return: an adjusted datetime object
+    :param date: Date to adjust
+    :return: An adjusted datetime object
     """
     return date.replace(hour=23, minute=59, second=59) + timedelta(hours=_offset_hour())
