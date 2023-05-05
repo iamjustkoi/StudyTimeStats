@@ -690,7 +690,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             delta_days = (to_date - from_date).days
             _update_string_text(cmd, str(delta_days))
 
-    def eval_macros(precision=2):
+    def eval_macros():
         """
         Evaluates and formats calc expressions in the cell's html.
 
@@ -699,14 +699,15 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         matches = re.findall(fr'(?<!%){Macro.CMD_EVAL}([^}}]*)}}', updated_string)
         for match in matches:
             expression = match
-            raw_match = match.replace('+', r'\+').replace('*', r'\*').replace('-', r'\-')
+            escaped_match = match.replace('+', r'\+').replace('*', r'\*').replace('-', r'\-')  # .replace('.', r'\.')
             is_using_hours = False
-            result = 0
+            repl = fr'{Macro.CMD_EVAL}{escaped_match}\}}'
 
             expression = expression.lstrip('0')
 
             if f' {cell_data[Config.MIN_UNIT]}' in expression:
                 is_using_hours = True
+                # Remove units from the expression
                 expression = re.sub(
                     fr'(\d+)\s+{cell_data[Config.MIN_UNIT]}',
                     lambda m: str(int(m.group(1)) * 60),
@@ -715,6 +716,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
 
             if f' {cell_data[Config.HRS_UNIT]}' in expression:
                 is_using_hours = True
+                # Remove units from the expression
                 expression = re.sub(fr'\s+{cell_data[Config.HRS_UNIT]}', '', expression)
 
             # ! INSECURE !
@@ -728,13 +730,15 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             if is_using_hours:
                 unit_key = _unit_key_for_time(result)
                 _update_string_text(
-                    fr'{Macro.CMD_EVAL}{raw_match}\}}',
-                    f'{_formatted_time(result, use_decimal=addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+                    repl,
+                    f'{_formatted_time(result, _precision(repl), addon_config[Config.USE_DECIMAL])}'
+                    f' {cell_data[unit_key]}',
                 )
+
             else:
                 _update_string_text(
-                    fr'{Macro.CMD_EVAL}{raw_match}\}}',
-                    f'{round(result, precision):n}' if isinstance(result, float) else str(result),
+                    repl,
+                    f'{round(result, _precision(repl)):n}' if isinstance(result, float) else str(result),
                 )
 
     def _update_string_time(repl: str, revlog: list = None):
