@@ -74,6 +74,12 @@ CELL_HTML_SHELL = '''<div class="{{CellClass}}">
 </div>
 '''
 
+SUSPENDED = 'suspended'
+LEARN = 'learn'
+RELEARN = 'relearn'
+REVIEW = 'review'
+NEW = 'new'
+
 
 class Macro:
     # Text
