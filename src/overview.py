@@ -16,9 +16,35 @@ from .consts import *
 
 if ANKI_VERSION > ANKI_LEGACY_VER + 1:
     # noinspection PyUnresolvedReferences
-    from anki.consts import REVLOG_RESCHED
+    from anki.consts import (
+        REVLOG_RESCHED,
+        QUEUE_TYPE_SUSPENDED,
+        QUEUE_TYPE_LRN,
+        QUEUE_TYPE_NEW,
+        QUEUE_TYPE_REV,
+        QUEUE_TYPE_DAY_LEARN_RELEARN,
+        QUEUE_TYPE_MANUALLY_BURIED,
+        QUEUE_TYPE_SIBLING_BURIED,
+    )
 else:
+    QUEUE_TYPE_MANUALLY_BURIED = -3
+    QUEUE_TYPE_SIBLING_BURIED = -2
+    QUEUE_TYPE_SUSPENDED = -1
+    QUEUE_TYPE_NEW = 0
+    QUEUE_TYPE_LRN = 1
+    QUEUE_TYPE_REV = 2
+    QUEUE_TYPE_DAY_LEARN_RELEARN = 3
     REVLOG_RESCHED = 4
+
+CARD_STATE = {
+    SUSPENDED: QUEUE_TYPE_SUSPENDED,
+    MAN_BURIED: QUEUE_TYPE_MANUALLY_BURIED,
+    SIB_BURIED: QUEUE_TYPE_SIBLING_BURIED,
+    NEW: QUEUE_TYPE_NEW,
+    LEARN: QUEUE_TYPE_LRN,
+    REVIEW: QUEUE_TYPE_REV,
+    RELEARN: QUEUE_TYPE_DAY_LEARN_RELEARN,
+}
 
 
 def _is_enabled_for_deck(conf_manager: TimeStatsConfigManager):
@@ -34,6 +60,10 @@ def _args_from_ids(ids: list):
     :return: a string element converted from a square brackets to a parenthesis format
     """
     return '(' + (str(ids).replace('[', '').replace(']', '')) + ')'
+
+
+def _cards_in_queue(card_states: list[int] = None):
+    return f'AND cards.queue IN {_args_from_ids(card_states)}' if card_states else ''
 
 
 def _unit_key_for_time(hours: float):
@@ -213,6 +243,26 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         precision_match = re.search(fr'{cmd}\S*{Macro.CMD_PRECISION}{Macro.PRECISION_EXTRA}', updated_string)
         return int(precision_match.group(1)) if precision_match else None
 
+    def _states(cmd):
+        """
+        Searches for the state command in the string's text and outputs a list of card states,
+        if the state modifier is found.
+        :param cmd: Command text to search through.
+        :return: A list of integers representing the processed card state(s).
+        """
+        matches = re.search(fr'{cmd}\S*{Macro.CMD_STATE}{Macro.STATE_EXTRA}', updated_string)
+        states = []
+        if matches:
+            match = matches.group(1)
+            # Quick way to merge learn and relearn states
+            match = re.sub(rf'\b{LEARN}\b', f'{LEARN},{RELEARN}', match)
+            match = re.sub(rf'\b{BURIED}\b', f'{SIB_BURIED},{MAN_BURIED}', match)
+
+            state_strings = match.split(',')
+            states = [CARD_STATE[state] for state in state_strings if state in CARD_STATE.keys()]
+
+        return states
+
     def time_macros():
         # Time
         cmd = Macro.CMD_TOTAL_HOURS
@@ -221,7 +271,11 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
 
         cmd = Macro.CMD_RANGE_HOURS
         if re.search(fr'(?<!%){cmd}', updated_string):
-            _update_string_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_time_ms()))
+            _update_string_time(
+                cmd,
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_time_ms()),
+
+            )
 
         cmd = Macro.CMD_DAY_HOURS
         if re.search(fr'(?<!%){cmd}', updated_string):
@@ -231,7 +285,8 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             }
             _update_string_time(
                 cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)),
+
             )
 
         cmd = Macro.CMD_WEEK_HOURS
@@ -243,7 +298,8 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             }
             _update_string_time(
                 cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)),
+
             )
 
         cmd = Macro.CMD_TWO_WEEKS_HOURS
@@ -255,7 +311,8 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             }
             _update_string_time(
                 cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)),
+
             )
 
         cmd = Macro.CMD_MONTH_HOURS
@@ -267,7 +324,8 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             }
             _update_string_time(
                 cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)),
+
             )
 
         cmd = Macro.CMD_YEAR_HOURS
@@ -279,7 +337,8 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             }
             _update_string_time(
                 cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)),
+
             )
 
         cmd = Macro.CMD_PREVIOUS_RANGE_HOURS
@@ -292,7 +351,8 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             }
             _update_string_time(
                 cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
+
             )
 
         cmd = Macro.CMD_PREVIOUS_DAY_HOURS
@@ -303,7 +363,8 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             }
             _update_string_time(
                 cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
+
             )
 
         cmd = Macro.CMD_PREVIOUS_WEEK_HOURS
@@ -315,7 +376,8 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             }
             _update_string_time(
                 cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
+
             )
 
         cmd = Macro.CMD_PREVIOUS_TWO_WEEKS_HOURS
@@ -327,7 +389,8 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             }
             _update_string_time(
                 cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
+
             )
 
         cmd = Macro.CMD_PREVIOUS_MONTH_HOURS
@@ -338,7 +401,8 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             }
             _update_string_time(
                 cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
+
             )
 
         cmd = Macro.CMD_PREVIOUS_YEAR_HOURS
@@ -349,7 +413,8 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             }
             _update_string_time(
                 cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
+
             )
 
         cmd = Macro.CMD_ETA_HOURS
@@ -471,7 +536,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
 
         cmd = Macro.CMD_RANGE_REVIEWS
         if re.findall(fr'(?<!%){cmd}', updated_string):
-            _update_string_reviews(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_time_ms()))
+            _update_string_reviews(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS]))
 
         cmd = Macro.CMD_DAY_REVIEWS
         if re.search(fr'(?<!%){cmd}', updated_string):
@@ -741,26 +806,58 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                     f'{round(result, _precision(repl)):n}' if isinstance(result, float) else str(result),
                 )
 
+    # TODO implement way to have precision-specified values only replace one of each command
+    #  e.g. "%hrs:p{1} %hrs:p{2}" would have separate values for each parse
     def _update_string_time(repl: str, revlog: list = None):
         nonlocal updated_string
 
         if revlog is None:
             updated_string = re.sub(
-                fr'(?<!%){repl}({Macro.CMD_PRECISION}{Macro.PRECISION_EXTRA})?',
+                fr'(?<!%){repl}(?:{Macro.CMD_PRECISION}{Macro.PRECISION_EXTRA}|{Macro.CMD_STATE}{Macro.STATE_EXTRA})*',
                 f'ERR',
                 updated_string
             )
             return
 
-        total_hrs = _total_hrs_in_revlog(revlog)
+        card_states = _states(repl)
+        precision = _precision(repl)
+
+        extra_strings: list[str] = []
+
+        if precision:
+            extra_strings.append(fr'{Macro.CMD_PRECISION}\{{{precision}\}}')
+
+        # TODO implement queue type using _states and 2nd index of log (log[2]) to to filter card types
+        filtered_logs = []
+        if card_states:
+            matches = re.search(fr'{repl}\S*{Macro.CMD_STATE}{Macro.STATE_EXTRA}', updated_string)
+            extra_strings.append(fr'{Macro.CMD_STATE}\{{{matches.group(1) if matches else ""}\}}')
+
+            for log in revlog:
+                # print(f'{int(log[2])=}')
+                if int(log[2]) in card_states:
+                    filtered_logs.append(log)
+        else:
+            filtered_logs = revlog
+
+        extra_pattern = ''
+        if len(extra_strings) > 0:
+            for __ in extra_strings:
+                extra_pattern += ('(' + '|'.join(extra_strings) + ')')
+
+        pattern = fr'(?<!%){repl}{extra_pattern}'
+
+        print(f'{pattern=}')
+
+        total_hrs = _total_hrs_in_revlog(filtered_logs)
         unit_key = _unit_key_for_time(total_hrs)
         updated_string = re.sub(
-            fr'(?<!%){repl}({Macro.CMD_PRECISION}{Macro.PRECISION_EXTRA})?',
+            pattern,
             f'{_formatted_time(total_hrs, _precision(repl), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
             updated_string,
         )
 
-    def _update_string_reviews(macro: str, revlog: list = None):
+    def _update_string_reviews(macro: str, revlog: list = None, card_states: list[int] = None):
         nonlocal updated_string
 
         if revlog is None:
@@ -772,7 +869,11 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
 
     def _update_string_text(macro: str, text: str):
         nonlocal updated_string
-        updated_string = re.sub(fr'(?<!%){macro}({Macro.CMD_PRECISION}{Macro.PRECISION_EXTRA})?', text, updated_string)
+        updated_string = re.sub(
+            fr'(?<!%){macro}(?:{Macro.CMD_PRECISION}{Macro.PRECISION_EXTRA}|{Macro.CMD_STATE}{Macro.STATE_EXTRA})*',
+            text,
+            updated_string
+        )
 
     def _process_range(from_date_str: str, to_date_str: str = None, replace_cb=None, cmd=Macro.CMD_FROM_DATE_HOURS):
         """
@@ -797,6 +898,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                     replace_cb(
                         fr'{cmd}:{from_date_str}:{to_date_str}',
                         filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
+
                     )
 
             else:
@@ -806,6 +908,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                     replace_cb(
                         fr'{cmd}:{from_date_str}(?!:\d)',
                         filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
+
                     )
 
         except ValueError:
@@ -836,7 +939,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
     def _max_log_from_modifier(
         modifiers: [str] = None,
         timerange: tuple[int, int] = _range_time_ms(),
-        order_by='time'
+        order_by='time',
     ) -> Sequence:
         """
         Grabs a log with the highest total time and total reviews found in the selected range,
@@ -882,7 +985,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             ORDER BY {order_by} DESC LIMIT 1;
         '''
 
-        print(f'sql_cmd={sql_query}')
+        # print(f'sql_cmd={sql_query}')
 
         max_log = mw.col.db.first(sql_query)
         if not max_log:
@@ -1044,13 +1147,12 @@ def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] =
     # (Optional: select cards in included decks)
     # Select id (unix time) between the (optional) unix time range, else end query (;)
     revlog_cmd = f'''
-        SELECT revlog.id, revlog.time
+        SELECT revlog.id, revlog.time, cards.queue
         FROM revlog
         INNER JOIN cards
         ON revlog.cid = cards.id
         WHERE revlog.type < {REVLOG_RESCHED}
         {_excluded_did_limit(excluded_dids)}
-        {f'AND revlog.id BETWEEN {time_range_ms[0]} AND {time_range_ms[1]}' if time_range_ms else ''}
         ORDER BY revlog.cid;
     '''
 

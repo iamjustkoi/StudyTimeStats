@@ -79,6 +79,9 @@ LEARN = 'learn'
 RELEARN = 'relearn'
 REVIEW = 'review'
 NEW = 'new'
+SIB_BURIED = 'sib_buried'
+MAN_BURIED = 'man_buried'
+BURIED = 'buried'
 
 
 class Macro:
@@ -280,7 +283,8 @@ class Macro:
 
         CMD_STATE:
             '''filter an output to use a specific or multiple card-state, separated by commas (,)'''
-            ''' (%range_hrs:state{<new,learn,review,suspended,buried>}, e.g. %range_hrs:state{new,learn})''',
+            f''' (%range_hrs:state{{<{NEW}/{LEARN}/{REVIEW}/{SUSPENDED}/{BURIED}>}},'''
+            f''' e.g. %range_hrs:state{{{LEARN},{REVIEW}}})''',
     }
 
 
