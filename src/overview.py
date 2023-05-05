@@ -206,9 +206,9 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
 
     def _precision(cmd):
         """
-        Searches for the command in the string's text and outputs a precision value, if one is found.
-        :param cmd: Command text to search for.
-        :return:
+        Searches for the precision command in the string's text and outputs a precision value, if one is found.
+        :param cmd: Command text to search through.
+        :return: An integer representing the processed decimal precision.
         """
         precision_match = re.search(fr'{cmd}{Macro.CMD_PRECISION}{Macro.PRECISION_EXTRA}', updated_string)
         return int(precision_match.group(1)) if precision_match else None
