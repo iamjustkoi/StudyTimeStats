@@ -147,7 +147,7 @@ class Macro:
     PRECISION_EXTRA = r'{(\d*)}'
 
     CMD_STATE = r':state'
-    STATE_EXTRA = r'{(\w*)}'
+    STATE_EXTRA = r'{([\w,]*)}'
 
     # Definitions for all macros
     DEFINITIONS = {
