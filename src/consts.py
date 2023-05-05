@@ -142,8 +142,12 @@ class Macro:
 
     # Misc
     CMD_EVAL = '%eval{'
+
     CMD_PRECISION = r':p'
+    PRECISION_EXTRA = r'{(\d*)}'
+
     CMD_STATE = r':state'
+    STATE_EXTRA = r'{(\w*)}'
 
     # Definitions for all macros
     DEFINITIONS = {
