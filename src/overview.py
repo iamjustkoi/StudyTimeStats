@@ -210,7 +210,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         :param cmd: Command text to search through.
         :return: An integer representing the processed decimal precision.
         """
-        precision_match = re.search(fr'{cmd}{Macro.CMD_PRECISION}{Macro.PRECISION_EXTRA}', updated_string)
+        precision_match = re.search(fr'{cmd}\S*{Macro.CMD_PRECISION}{Macro.PRECISION_EXTRA}', updated_string)
         return int(precision_match.group(1)) if precision_match else None
 
     def time_macros():
