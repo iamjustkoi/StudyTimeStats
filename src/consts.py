@@ -146,6 +146,7 @@ class Macro:
 
     # Definitions for all macros
     DEFINITIONS = {
+        # Text
         CMD_RANGE:
             '''label for the currently selected range''',
         CMD_DATE:
@@ -165,6 +166,7 @@ class Macro:
         CMD_FULL_MONTH:
             '''range filter's full month name''',
 
+        # Time
         CMD_TOTAL_HOURS:
             '''total study time''',
         CMD_RANGE_HOURS:
@@ -193,11 +195,13 @@ class Macro:
         CMD_HIGHEST_YEAR_HOURS:
             '''highest total study time for all years in the current range''',
 
+        # Avg
         CMD_CARD_AVERAGE_HOURS:
             '''average study time per card for the current range''',
         CMD_DAY_AVERAGE_HOURS:
             '''average study time per day for the current range''',
 
+        # Previous Time
         CMD_PREVIOUS_RANGE_HOURS:
             '''total study time for the previous range''',
         CMD_PREVIOUS_DAY_HOURS:
@@ -214,6 +218,7 @@ class Macro:
         CMD_FROM_DATE_HOURS:
             '''total study time for a custom date range (%from_custom_hrs:<from>:<to> (YYYY-MM-DD))''',
 
+        # Reviews
         CMD_TOTAL_REVIEWS:
             '''total reviews''',
         CMD_RANGE_REVIEWS:
@@ -255,6 +260,7 @@ class Macro:
         CMD_HIGHEST_YEAR_REVIEWS:
             '''highest total reviews for all years in the current range''',
 
+        # Misc
         CMD_EVAL:
             '''customized output that accepts any macros, math, or python as input (warning: unsafe implementation)''',
 
