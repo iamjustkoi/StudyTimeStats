@@ -295,7 +295,7 @@ class String:
     DISABLE_ACTION = '&Disable'
     INSERT = 'Insert'
     ERR = 'ERR'
-    DELETE_CELL = 'Delete cell?'
+    DELETE_CELL = 'Delete view?'
 
 
 class Range:
