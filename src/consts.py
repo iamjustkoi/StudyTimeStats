@@ -143,6 +143,7 @@ class Macro:
     # Misc
     CMD_EVAL = '%eval{'
     CMD_PRECISION = r':p'
+    CMD_TYPE = r':state'
 
     # Definitions for all macros
     DEFINITIONS = {
@@ -266,6 +267,10 @@ class Macro:
 
         CMD_PRECISION:
             '''precision of the output decimal number for time-based macros (%range_hrs:p{<0-4>})''',
+
+        CMD_TYPE:
+            '''filter an output to use a specific or multiple card-state, separated by commas (,)'''
+            ''' (%range_hrs:state{<new,learn,review,suspended,buried>}, e.g. %range_hrs:state{new,learn})''',
     }
 
 
