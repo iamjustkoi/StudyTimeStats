@@ -46,6 +46,8 @@ CARD_STATE = {
     RELEARN: QUEUE_TYPE_DAY_LEARN_RELEARN,
 }
 
+cached_logs: dict[str:list] = {}
+
 
 def _is_enabled_for_deck(conf_manager: TimeStatsConfigManager):
     return mw.col.decks.current().get('id') not in conf_manager.config[Config.EXCLUDED_DIDS]
@@ -234,23 +236,22 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
 
     initial_time = time()
 
-    def _precision(cmd):
+    def _precision(text):
         """
-        Searches for the precision command in the string's text and outputs a precision value, if one is found.
-        :param cmd: Command text to search through.
+        Searches for the precision modifier in the given text and outputs a precision value, if one is found.
+        :param text: Command text to search through.
         :return: An integer representing the processed decimal precision.
         """
-        precision_match = re.search(fr'{cmd}\S*{Macro.CMD_PRECISION}{Macro.PRECISION_EXTRA}', updated_string)
+        precision_match = re.search(fr'{Macro.CMD_PRECISION}{{({Macro.PRECISION_EXTRA})}}', text)
         return int(precision_match.group(1)) if precision_match else None
 
-    def _states(cmd):
+    def _states(pattern):
         """
-        Searches for the state command in the string's text and outputs a list of card states,
-        if the state modifier is found.
-        :param cmd: Command text to search through.
+        Searches for the state modifier in the given text and outputs a list of card states, if found.
+        :param pattern: Command text to search through.
         :return: A list of integers representing the processed card state(s).
         """
-        matches = re.search(fr'{cmd}\S*{Macro.CMD_STATE}{Macro.STATE_EXTRA}', updated_string)
+        matches = re.search(fr'{Macro.CMD_STATE}{{({Macro.STATE_EXTRA})}}', pattern)
         states = []
         if matches:
             match = matches.group(1)
@@ -263,86 +264,110 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
 
         return states
 
+    def _time_pattern(pattern: str):
+        return f'(?<!%){pattern}' \
+            + fr'(?:{Macro.CMD_PRECISION}{{{Macro.PRECISION_EXTRA}}}|{Macro.CMD_STATE}{{{Macro.STATE_EXTRA}}})*'
+
+    def _review_pattern(pattern: str):
+        return f'(?<!%){pattern}' \
+            + fr'(?:{Macro.CMD_STATE}{{{Macro.STATE_EXTRA}}})?'
+
+    def _cached_log(cmd, excluded_dids: list = None, time_range_ms: tuple[int, int] = None):
+        global cached_logs
+        cached_log = cached_logs.get(cmd, None)
+
+        print(f'cached_log[{cmd}]={cached_log is not None}')
+
+        if cached_log:
+            return cached_log
+
+        filtered_log = filtered_revlog(excluded_dids, time_range_ms)
+        cached_logs[cmd] = filtered_log
+
+        return filtered_log
+
     def time_macros():
         # Time
         cmd = Macro.CMD_TOTAL_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
-            _update_string_time(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS]))
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
+            _update_string_time(match, _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS]))
 
         cmd = Macro.CMD_RANGE_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             _update_string_time(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_time_ms()),
-
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], _range_time_ms()),
             )
 
         cmd = Macro.CMD_DAY_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.CUSTOM,
                 Config.DAYS: 1,
             }
             _update_string_time(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)),
-
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)),
             )
 
         cmd = Macro.CMD_WEEK_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.WEEK,
                 Config.USE_CALENDAR: True,
                 Config.WEEK_START: cell_data[Config.WEEK_START],
             }
             _update_string_time(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)),
-
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)),
             )
 
         cmd = Macro.CMD_TWO_WEEKS_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.TWO_WEEKS,
                 Config.USE_CALENDAR: True,
                 Config.WEEK_START: cell_data[Config.WEEK_START],
             }
             _update_string_time(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)),
-
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)),
             )
 
         cmd = Macro.CMD_MONTH_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.MONTH,
                 Config.USE_CALENDAR: True,
                 Config.WEEK_START: cell_data[Config.WEEK_START],
             }
             _update_string_time(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)),
-
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)),
             )
 
         cmd = Macro.CMD_YEAR_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.YEAR,
                 Config.USE_CALENDAR: True,
                 Config.WEEK_START: cell_data[Config.WEEK_START],
             }
             _update_string_time(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)),
-
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data)),
             )
 
         cmd = Macro.CMD_PREVIOUS_RANGE_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: cell_data[Config.RANGE],
                 Config.USE_CALENDAR: True,
@@ -350,76 +375,76 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                 Config.DAYS: cell_data[Config.DAYS],
             }
             _update_string_time(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
-
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
             )
 
         cmd = Macro.CMD_PREVIOUS_DAY_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.CUSTOM,
                 Config.DAYS: 1,
             }
             _update_string_time(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
-
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
             )
 
         cmd = Macro.CMD_PREVIOUS_WEEK_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.WEEK,
                 Config.USE_CALENDAR: True,
                 Config.WEEK_START: cell_data[Config.WEEK_START],
             }
             _update_string_time(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
-
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
             )
 
         cmd = Macro.CMD_PREVIOUS_TWO_WEEKS_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.TWO_WEEKS,
                 Config.USE_CALENDAR: True,
                 Config.WEEK_START: cell_data[Config.WEEK_START],
             }
             _update_string_time(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
-
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
             )
 
         cmd = Macro.CMD_PREVIOUS_MONTH_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.MONTH,
                 Config.USE_CALENDAR: True,
             }
             _update_string_time(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
-
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
             )
 
         cmd = Macro.CMD_PREVIOUS_YEAR_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.YEAR,
                 Config.USE_CALENDAR: True,
             }
             _update_string_time(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
-
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
             )
 
         cmd = Macro.CMD_ETA_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
-            logs = filtered_revlog(addon_config[Config.EXCLUDED_DIDS])
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
+            logs = _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS])
 
             avg_hrs_per_card = (_total_hrs_in_revlog(logs) / len(logs)) if len(logs) > 0 else 0
 
@@ -440,61 +465,68 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             eta_hrs = avg_hrs_per_card * total_count
             unit_key = _unit_key_for_time(eta_hrs)
 
-            _update_string_text(
-                cmd,
-                f'{_formatted_time(eta_hrs, _precision(cmd), addon_config[Config.USE_DECIMAL])} '
+            _sub_text(
+                match,
+                f'{_formatted_time(eta_hrs, _precision(match), addon_config[Config.USE_DECIMAL])} '
                 f'{cell_data[unit_key]}',
             )
 
         cmd = fr'{Macro.CMD_FROM_DATE_HOURS}:(\d\d\d\d-\d\d-\d\d)'
-        for match in re.findall(fr'(?<!%){cmd}(?!:\d)', updated_string):
-            print(f'Running {cmd}. {match=}')
+        pattern = _time_pattern(cmd)
+        for match in re.findall(fr'(?<!%){pattern}(?!:\d)', updated_string):
+            print(f'Running {pattern}. {match=}')
             match: str
             _process_range(match, replace_cb=_update_string_time, cmd=Macro.CMD_FROM_DATE_HOURS)
 
         cmd = fr'{Macro.CMD_FROM_DATE_HOURS}:(\d\d\d\d-\d\d-\d\d):(\d\d\d\d-\d\d-\d\d)'
-        for match in re.findall(fr'(?<!%){cmd}', updated_string):
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             match: tuple[str]
             _process_range(match[0], match[1], replace_cb=_update_string_time, cmd=Macro.CMD_FROM_DATE_HOURS)
 
         # Avg
         cmd = Macro.CMD_DAY_AVERAGE_HOURS
-        if re.findall(fr'(?<!%){cmd}', updated_string):
-            logs = filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_time_ms())
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
+            logs = _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], _range_time_ms())
             from_date = datetime.fromtimestamp(_range_time_ms()[0] / 1000)
             to_date = datetime.fromtimestamp(_range_time_ms()[1] / 1000)
             days_in_logs = (to_date - from_date).days
             avg_hrs = _total_hrs_in_revlog(logs) / (days_in_logs if days_in_logs > 0 else 1)
             unit_key = _unit_key_for_time(avg_hrs)
-            _update_string_text(
-                cmd,
-                f'{_formatted_time(avg_hrs, _precision(cmd), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+            _sub_text(
+                match,
+                f'{_formatted_time(avg_hrs, _precision(match), addon_config[Config.USE_DECIMAL])} '
+                f'{cell_data[unit_key]}',
             )
 
         cmd = Macro.CMD_CARD_AVERAGE_HOURS
-        if re.findall(fr'(?<!%){cmd}', updated_string):
-            logs = filtered_revlog(addon_config[Config.EXCLUDED_DIDS], _range_time_ms())
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
+            logs = _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], _range_time_ms())
 
             avg_hrs = (_total_hrs_in_revlog(logs) / len(logs)) if len(logs) > 0 else 0
             unit_key = _unit_key_for_time(avg_hrs)
-            _update_string_text(
-                cmd,
-                f'{_formatted_time(avg_hrs, _precision(cmd), addon_config[Config.USE_DECIMAL])} '
+            _sub_text(
+                match,
+                f'{_formatted_time(avg_hrs, _precision(match), addon_config[Config.USE_DECIMAL])} '
                 f'{cell_data[unit_key]}',
             )
 
         cmd = Macro.CMD_HIGHEST_DAY_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             max_log = _max_log_from_modifier()
             hours = max_log[1] / 60 / 60 / 1000
             unit_key = _unit_key_for_time(hours)
-            _update_string_text(
-                cmd,
-                f'{_formatted_time(hours, _precision(cmd), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+            _sub_text(
+                match,
+                f'{_formatted_time(hours, _precision(match), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
             )
 
         cmd = Macro.CMD_HIGHEST_WEEK_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             # Set weekday to -1 of itself
             #  Note: SQLite's STRFTIME has Sunday at 0, while datetime (Python) has Monday at 0
             weekday_for_modifier = cell_data[Config.WEEK_START] - 1
@@ -502,103 +534,113 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             max_log = _max_log_from_modifier([f'weekday {weekday_for_modifier}'])
             hours = max_log[1] / 60 / 60 / 1000
             unit_key = _unit_key_for_time(hours)
-            _update_string_text(
-                cmd,
-                f'{_formatted_time(hours, _precision(cmd), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+            _sub_text(
+                match,
+                f'{_formatted_time(hours, _precision(match), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
             )
 
         cmd = Macro.CMD_HIGHEST_MONTH_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             max_log = _max_log_from_modifier(['start of month'])
             hours = max_log[1] / 60 / 60 / 1000
             unit_key = _unit_key_for_time(hours)
-            _update_string_text(
-                cmd,
-                f'{_formatted_time(hours, _precision(cmd), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+            _sub_text(
+                match,
+                f'{_formatted_time(hours, _precision(match), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
             )
 
         cmd = Macro.CMD_HIGHEST_YEAR_HOURS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             max_log = _max_log_from_modifier(['start of year'])
             hours = max_log[1] / 60 / 60 / 1000
             unit_key = _unit_key_for_time(hours)
 
-            _update_string_text(
-                cmd,
-                f'{_formatted_time(hours, _precision(cmd), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
+            _sub_text(
+                match,
+                f'{_formatted_time(hours, _precision(match), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
             )
 
     def review_macros():
         # Reviews
         cmd = Macro.CMD_TOTAL_REVIEWS
-        if re.findall(fr'(?<!%){cmd}', updated_string):
-            _update_string_reviews(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS]))
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
+            _update_string_reviews(match, _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS]))
 
         cmd = Macro.CMD_RANGE_REVIEWS
-        if re.findall(fr'(?<!%){cmd}', updated_string):
-            _update_string_reviews(cmd, filtered_revlog(addon_config[Config.EXCLUDED_DIDS]))
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
+            _update_string_reviews(match, _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS]))
 
         cmd = Macro.CMD_DAY_REVIEWS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.CUSTOM,
                 Config.DAYS: 1,
             }
             _update_string_reviews(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
             )
 
         cmd = Macro.CMD_WEEK_REVIEWS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.WEEK,
                 Config.USE_CALENDAR: True,
                 Config.WEEK_START: cell_data[Config.WEEK_START],
             }
             _update_string_reviews(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
             )
 
         cmd = Macro.CMD_TWO_WEEKS_REVIEWS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.TWO_WEEKS,
                 Config.USE_CALENDAR: True,
                 Config.WEEK_START: cell_data[Config.WEEK_START],
             }
             _update_string_reviews(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
             )
 
         cmd = Macro.CMD_MONTH_REVIEWS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.MONTH,
                 Config.USE_CALENDAR: True,
                 Config.WEEK_START: cell_data[Config.WEEK_START],
             }
             _update_string_reviews(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
             )
 
         cmd = Macro.CMD_YEAR_REVIEWS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.YEAR,
                 Config.USE_CALENDAR: True,
                 Config.WEEK_START: cell_data[Config.WEEK_START],
             }
             _update_string_reviews(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data))
             )
 
         cmd = Macro.CMD_PREVIOUS_RANGE_REVIEWS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: cell_data[Config.RANGE],
                 Config.USE_CALENDAR: True,
@@ -606,104 +648,115 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                 Config.DAYS: cell_data[Config.DAYS],
             }
             _update_string_reviews(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
         cmd = Macro.CMD_PREVIOUS_DAY_REVIEWS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.CUSTOM,
                 Config.DAYS: 1,
             }
             _update_string_reviews(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
         cmd = Macro.CMD_PREVIOUS_WEEK_REVIEWS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.WEEK,
                 Config.USE_CALENDAR: True,
                 Config.WEEK_START: cell_data[Config.WEEK_START],
             }
             _update_string_reviews(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
         cmd = Macro.CMD_PREVIOUS_TWO_WEEKS_REVIEWS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.TWO_WEEKS,
                 Config.USE_CALENDAR: True,
                 Config.WEEK_START: cell_data[Config.WEEK_START],
             }
             _update_string_reviews(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
         cmd = Macro.CMD_PREVIOUS_MONTH_REVIEWS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.MONTH,
                 Config.USE_CALENDAR: True,
             }
             _update_string_reviews(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
         cmd = Macro.CMD_PREVIOUS_YEAR_REVIEWS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             placeholder_data = {
                 Config.RANGE: Range.YEAR,
                 Config.USE_CALENDAR: True,
             }
             _update_string_reviews(
-                cmd,
-                filtered_revlog(addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+                match,
+                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
             )
 
         cmd = fr'{Macro.CMD_FROM_DATE_REVIEWS}:(\d\d\d\d-\d\d-\d\d)(?!:)'
-        for match in re.findall(fr'(?<!%){cmd}', updated_string):
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             match: str
             _process_range(match, replace_cb=_update_string_reviews, cmd=Macro.CMD_FROM_DATE_REVIEWS)
 
         cmd = fr'{Macro.CMD_FROM_DATE_REVIEWS}:(\d\d\d\d-\d\d-\d\d):(\d\d\d\d-\d\d-\d\d)'
-        for match in re.findall(fr'(?<!%){cmd}', updated_string):
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             match: tuple[str]
             _process_range(match[0], match[1], replace_cb=_update_string_reviews, cmd=Macro.CMD_FROM_DATE_REVIEWS)
 
         cmd = Macro.CMD_HIGHEST_DAY_REVIEWS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             max_log = _max_log_from_modifier(order_by='count')
             reviews = max_log[2]
-            _update_string_text(cmd, str(reviews))
+            _sub_text(match, str(reviews))
 
         cmd = Macro.CMD_HIGHEST_WEEK_REVIEWS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             # Set weekday to -1 of itself
             #  Note: SQLite's STRFTIME has Sunday at 0, while datetime (Python) has Monday at 0
             weekday_for_modifier = cell_data[Config.WEEK_START] - 1
             weekday_for_modifier += 7 if weekday_for_modifier < 0 else 0
             max_log = _max_log_from_modifier([f'weekday {weekday_for_modifier}'], order_by='count')
             reviews = max_log[2]
-            _update_string_text(cmd, str(reviews))
+            _sub_text(match, str(reviews))
 
         cmd = Macro.CMD_HIGHEST_MONTH_REVIEWS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             max_log = _max_log_from_modifier(['start of month'], order_by='count')
             reviews = max_log[2]
-            _update_string_text(cmd, str(reviews))
+            _sub_text(match, str(reviews))
 
         cmd = Macro.CMD_HIGHEST_YEAR_REVIEWS
-        if re.search(fr'(?<!%){cmd}', updated_string):
+        pattern = _review_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
             max_log = _max_log_from_modifier(['start of year'], order_by='count')
             reviews = max_log[2]
-            _update_string_text(cmd, str(reviews))
+            _sub_text(match, str(reviews))
 
     def text_macros():
         # Text
@@ -716,59 +769,56 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             else:
                 repl = Range.LABEL[cell_data[Config.RANGE]]
 
-            _update_string_text(cmd, repl)
+            _sub_text(cmd, repl)
 
         cmd = Macro.CMD_DATE + '(?!:)'
         if re.findall(fr'(?<!%){cmd}', updated_string):
-            _update_string_text(fr'(?<!%){cmd}', datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime("%x"))
+            _sub_text(fr'(?<!%){cmd}', datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime("%x"))
 
         cmd = Macro.CMD_DATE_FORMATTED
         for match in re.findall(fr'(?<!%){cmd}', updated_string):
             match: str
             date_format = match[(match.find("\"") + 1):(match.rfind("\""))]
-            _update_string_text(match, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime(date_format))
+            _sub_text(match, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime(date_format))
 
         cmd = Macro.CMD_YEAR
         if re.search(fr'(?<!%){cmd}', updated_string):
-            _update_string_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%Y'))
+            _sub_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%Y'))
 
         cmd = Macro.CMD_FULL_DAY
         if re.search(fr'(?<!%){cmd}', updated_string):
-            _update_string_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%A'))
+            _sub_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%A'))
 
         cmd = Macro.CMD_DAY
         if re.search(fr'(?<!%){cmd}', updated_string):
-            _update_string_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%a'))
+            _sub_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%a'))
 
         cmd = Macro.CMD_MONTH
         if re.search(fr'(?<!%){cmd}', updated_string):
-            _update_string_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%b'))
+            _sub_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%b'))
 
         cmd = Macro.CMD_FULL_MONTH
         if re.search(fr'(?<!%){cmd}', updated_string):
-            _update_string_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%B'))
+            _sub_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%B'))
 
         cmd = Macro.CMD_DAYS
         if re.search(fr'(?<!%){cmd}', updated_string):
             from_date = datetime.fromtimestamp(_range_time_ms()[0] / 1000)
             to_date = date_with_rollover(datetime.today())
             delta_days = (to_date - from_date).days
-            _update_string_text(cmd, str(delta_days))
+            _sub_text(cmd, str(delta_days))
 
     def eval_macros():
         """
         Evaluates and formats calc expressions in the cell's html.
-
-        :param precision: The precision of the resulting value.
         """
         matches = re.findall(fr'(?<!%){Macro.CMD_EVAL}([^}}]*)}}', updated_string)
         for match in matches:
-            expression = match
-            escaped_match = match.replace('+', r'\+').replace('*', r'\*').replace('-', r'\-')  # .replace('.', r'\.')
             is_using_hours = False
-            repl = fr'{Macro.CMD_EVAL}{escaped_match}\}}'
-
-            expression = expression.lstrip('0')
+            expression = match.lstrip('0')
+            escaped_match = match.replace('+', r'\+').replace('*', r'\*').replace('-', r'\-')  # .replace('.', r'\.')
+            precision = _precision(fr'{Macro.CMD_EVAL}{escaped_match}\}}')
+            repl = f'{Macro.CMD_EVAL}{match}}}'
 
             if f' {cell_data[Config.MIN_UNIT]}' in expression:
                 is_using_hours = True
@@ -794,45 +844,36 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
 
             if is_using_hours:
                 unit_key = _unit_key_for_time(result)
-                _update_string_text(
+                _sub_text(
                     repl,
-                    f'{_formatted_time(result, _precision(repl), addon_config[Config.USE_DECIMAL])}'
+                    f'{_formatted_time(result, precision, addon_config[Config.USE_DECIMAL])}'
                     f' {cell_data[unit_key]}',
                 )
 
             else:
-                _update_string_text(
+                _sub_text(
                     repl,
-                    f'{round(result, _precision(repl)):n}' if isinstance(result, float) else str(result),
+                    f'{round(result, precision):n}' if isinstance(result, float) else str(result),
                 )
 
-    # TODO implement way to have precision-specified values only replace one of each command
-    #  e.g. "%hrs:p{1} %hrs:p{2}" would have separate values for each parse
     def _update_string_time(repl: str, revlog: list = None):
         nonlocal updated_string
 
         if revlog is None:
-            updated_string = re.sub(
-                fr'(?<!%){repl}(?:{Macro.CMD_PRECISION}{Macro.PRECISION_EXTRA}|{Macro.CMD_STATE}{Macro.STATE_EXTRA})*',
-                f'ERR',
-                updated_string
+            _sub_text(
+                repl,
+                'ERR'
             )
             return
 
         card_states = _states(repl)
         precision = _precision(repl)
 
-        extra_strings: list[str] = []
-
-        if precision:
-            extra_strings.append(fr'{Macro.CMD_PRECISION}\{{{precision}\}}')
-
         # TODO implement queue type using _states and 2nd index of log (log[2]) to to filter card types
         filtered_logs = []
         if card_states:
-            matches = re.search(fr'{repl}\S*{Macro.CMD_STATE}{Macro.STATE_EXTRA}', updated_string)
-            extra_strings.append(fr'{Macro.CMD_STATE}\{{{matches.group(1) if matches else ""}\}}')
-
+            # matches = re.search(fr'{repl}\S*{Macro.CMD_STATE}{Macro.STATE_EXTRA}', updated_string)
+            # extra_strings.append(fr'{Macro.CMD_STATE}\{{{matches.group(1) if matches else ""}\}}')
             for log in revlog:
                 # print(f'{int(log[2])=}')
                 if int(log[2]) in card_states:
@@ -840,40 +881,28 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         else:
             filtered_logs = revlog
 
-        extra_pattern = ''
-        if len(extra_strings) > 0:
-            for __ in extra_strings:
-                extra_pattern += ('(' + '|'.join(extra_strings) + ')')
-
-        pattern = fr'(?<!%){repl}{extra_pattern}'
-
-        print(f'{pattern=}')
-
         total_hrs = _total_hrs_in_revlog(filtered_logs)
         unit_key = _unit_key_for_time(total_hrs)
-        updated_string = re.sub(
-            pattern,
-            f'{_formatted_time(total_hrs, _precision(repl), addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}',
-            updated_string,
+
+        _sub_text(
+            repl,
+            f'{_formatted_time(total_hrs, precision, addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}'
         )
 
-    def _update_string_reviews(macro: str, revlog: list = None, card_states: list[int] = None):
+    def _update_string_reviews(repl: str, revlog: list = None):
         nonlocal updated_string
 
         if revlog is None:
-            updated_string = re.sub(fr'(?<!%){macro}', f'ERR', updated_string)
+            updated_string = re.sub(fr'(?<!%){repl}', f'ERR', updated_string)
             return
 
         total_reviews = len(revlog)
-        updated_string = re.sub(fr'(?<!%){macro}', str(total_reviews), updated_string)
+        updated_string = re.sub(fr'(?<!%){repl}', str(total_reviews), updated_string)
 
-    def _update_string_text(macro: str, text: str):
+    def _sub_text(repl: str, text: str):
         nonlocal updated_string
-        updated_string = re.sub(
-            fr'(?<!%){macro}(?:{Macro.CMD_PRECISION}{Macro.PRECISION_EXTRA}|{Macro.CMD_STATE}{Macro.STATE_EXTRA})*',
-            text,
-            updated_string
-        )
+
+        updated_string = updated_string.replace(repl, text)
 
     def _process_range(from_date_str: str, to_date_str: str = None, replace_cb=None, cmd=Macro.CMD_FROM_DATE_HOURS):
         """
@@ -882,7 +911,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         :param from_date_str: A string representing the starting date in ISO format.
         :param to_date_str: A string representing the ending date in ISO format. If None, today's date is used.
         :param replace_cb: A callback function to replace the matched pattern using the filtered revlog.
-        :param cmd: A string representing the command to be used in the matched pattern (e.g. <cmd>:<from>:<to>).
+        :param cmd: A string representing the command to be used in the matched pattern (e.g. <pattern>:<from>:<to>).
         """
         try:
             # minus a day for inclusive checking
@@ -897,7 +926,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                 if replace_cb:
                     replace_cb(
                         fr'{cmd}:{from_date_str}:{to_date_str}',
-                        filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
+                        _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
 
                     )
 
@@ -907,7 +936,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                 if replace_cb:
                     replace_cb(
                         fr'{cmd}:{from_date_str}(?!:\d)',
-                        filtered_revlog(addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
+                        _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
 
                     )
 
