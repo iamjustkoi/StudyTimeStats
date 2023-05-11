@@ -582,7 +582,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         cmd = Macro.CMD_RANGE_REVIEWS
         pattern = _review_pattern(cmd)
         for match in re.findall(pattern, updated_string):
-            _update_string_reviews(match, _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS]))
+            _update_string_reviews(match, _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], _range_time_ms()))
 
         cmd = Macro.CMD_DAY_REVIEWS
         pattern = _review_pattern(cmd)
