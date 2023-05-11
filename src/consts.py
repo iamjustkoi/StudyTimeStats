@@ -279,10 +279,10 @@ class Macro:
             '''customized output that accepts any macros, math, or python as input (warning: unsafe implementation)''',
 
         CMD_PRECISION:
-            '''precision of the output decimal number for time-based macros (%range_hrs:p{<0-4>})''',
+            '''filters an output's precision for time-based, decimal macros (%range_hrs:p{<0-4>})''',
 
         CMD_STATE:
-            '''filter an output to use a specific or multiple card-state, separated by commas (,)'''
+            '''filters an output to the current state of a card, separated by commas'''
             f''' (%range_hrs:state{{<{NEW}/{LEARN}/{REVIEW}/{SUSPENDED}/{BURIED}>}},'''
             f''' e.g. %range_hrs:state{{{LEARN},{REVIEW}}})''',
     }
