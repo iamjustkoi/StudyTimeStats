@@ -65,7 +65,7 @@ def _args_from_ids(ids: list):
 
 
 def _cards_in_queue(card_states: list[int] = None):
-    return f'AND cards.queue IN {_args_from_ids(card_states)}' if card_states else ''
+    return f'AND cards.queue IN {_args_from_ids(card_states)}' if card_states and len(card_states) > 0 else ''
 
 
 def _unit_key_for_time(hours: float):
@@ -1159,27 +1159,30 @@ def _excluded_did_limit(excluded_dids: list = None):
     in the set of excluded deck id's using all currently visible decks.
     :param excluded_dids: A list of deck id's to be excluded (expects integers, execution may vary)
     """
-    include_deleted = TimeStatsConfigManager(mw).config.get(Config.INCLUDE_DELETED, False)
+    if len(excluded_dids) > 0:
+        include_deleted = TimeStatsConfigManager(mw).config.get(Config.INCLUDE_DELETED, False)
 
-    if include_deleted and mw.state != 'overview':
-        # If not currently viewing a deck, including deleted decks, grab all non-excluded deck ids
-        filtered_did_cmd = f'AND cards.did NOT IN {_args_from_ids(excluded_dids) if excluded_dids else ""}'
+        if include_deleted and mw.state != 'overview':
+            # If not currently viewing a deck, including deleted decks, grab all non-excluded deck ids
+            filtered_did_cmd = f'AND cards.did NOT IN {_args_from_ids(excluded_dids) if excluded_dids else ""}'
 
-    else:
-        # If currently in a deck's overview: grab the current deck's parent/children deck ids (inclusive)
-        if mw.state == 'overview':
-            included_dids = [
-                i for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))
-                if i not in excluded_dids
-            ]
-        # Else: grab all deck ids (inclusive)
         else:
-            included_dids = [
-                name_id.id for name_id in mw.col.decks.all_names_and_ids()
-                if name_id.id not in excluded_dids
-            ]
+            # If currently in a deck's overview: grab the current deck's parent/children deck ids (inclusive)
+            if mw.state == 'overview':
+                included_dids = [
+                    i for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))
+                    if i not in excluded_dids
+                ]
+            # Else: grab all deck ids (inclusive)
+            else:
+                included_dids = [
+                    name_id.id for name_id in mw.col.decks.all_names_and_ids()
+                    if name_id.id not in excluded_dids
+                ]
 
-        filtered_did_cmd = f'AND cards.did IN {_args_from_ids(included_dids)}'
+            filtered_did_cmd = f'AND cards.did IN {_args_from_ids(included_dids)}'
+    else:
+        filtered_did_cmd = ''
 
     return filtered_did_cmd
 
