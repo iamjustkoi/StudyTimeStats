@@ -271,11 +271,15 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         return states
 
     def _time_pattern(pattern: str):
-        return f'(?<!%){pattern}' \
+        # Prepended "any" character ('.') so only macros with the character's context are matched
+        return '.' \
+            + f'(?<!%){pattern}' \
             + fr'(?:{Macro.CMD_PRECISION}{{{Macro.PRECISION_EXTRA}}}|{Macro.CMD_STATE}{{{Macro.STATE_EXTRA}}})*'
 
     def _review_pattern(pattern: str):
-        return f'(?<!%){pattern}' \
+        # Prepended "any" character ('.') so only macros with the character's context are matched
+        return '.' \
+            + f'(?<!%){pattern}' \
             + fr'(?:{Macro.CMD_STATE}{{{Macro.STATE_EXTRA}}})?'
 
     def _cached_log(cmd, excluded_dids: list = None, time_range_ms: tuple[int, int] = None):
@@ -907,8 +911,12 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         _sub_text(repl, str(total_reviews))
         # updated_string = re.sub(fr'(?<!%){repl}', str(total_reviews), updated_string)
 
-    def _sub_text(repl: str, text: str):
+    def _sub_text(repl: str, text: str, has_context_char=True):
         nonlocal updated_string
+        if has_context_char and repl[0] != '%':
+            text = repl[0] + text
+
+        print(f'repl="{repl}", text="{text}"')
 
         updated_string = updated_string.replace(repl, text)
 
