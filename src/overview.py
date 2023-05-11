@@ -226,7 +226,13 @@ def cell_data_html():
     return cells_html
 
 
+def clear_cached_logs():
+    global cached_logs
+    cached_logs = {}
+
+
 def stats_html():
+    clear_cached_logs()
     return HTML_SHELL.replace("{cell_data}", cell_data_html())
 
 
@@ -474,7 +480,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         cmd = fr'{Macro.CMD_FROM_DATE_HOURS}:(\d\d\d\d-\d\d-\d\d)'
         pattern = _time_pattern(cmd)
         for match in re.findall(fr'(?<!%){pattern}(?!:\d)', updated_string):
-            print(f'Running {pattern}. {match=}')
+            # print(f'Running {pattern}. {match=}')
             match: str
             _process_range(match, replace_cb=_update_string_time, cmd=Macro.CMD_FROM_DATE_HOURS)
 
@@ -814,8 +820,9 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         """
         matches = re.findall(fr'(?<!%){Macro.CMD_EVAL}([^}}]*)}}', updated_string)
         for match in matches:
+            match: str
             is_using_hours = False
-            expression = match.lstrip('0')
+            expression = match
             escaped_match = match.replace('+', r'\+').replace('*', r'\*').replace('-', r'\-')  # .replace('.', r'\.')
             precision = _precision(fr'{Macro.CMD_EVAL}{escaped_match}\}}')
             repl = f'{Macro.CMD_EVAL}{match}}}'
@@ -824,7 +831,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                 is_using_hours = True
                 # Remove units from the expression
                 expression = re.sub(
-                    fr'(\d+)\s+{cell_data[Config.MIN_UNIT]}',
+                    fr'(\d+)\s{cell_data[Config.MIN_UNIT]}',
                     lambda m: str(int(m.group(1)) * 60),
                     expression,
                 )
@@ -897,7 +904,8 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             return
 
         total_reviews = len(revlog)
-        updated_string = re.sub(fr'(?<!%){repl}', str(total_reviews), updated_string)
+        _sub_text(repl, str(total_reviews))
+        # updated_string = re.sub(fr'(?<!%){repl}', str(total_reviews), updated_string)
 
     def _sub_text(repl: str, text: str):
         nonlocal updated_string
@@ -924,19 +932,20 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                 to_date = date_with_rollover(to_date_raw)
                 to_ms = int(to_date.timestamp() * 1000)
                 if replace_cb:
+                    repl = fr'{cmd}:{from_date_str}:{to_date_str}'
                     replace_cb(
-                        fr'{cmd}:{from_date_str}:{to_date_str}',
-                        _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
-
+                        repl,
+                        _cached_log(repl, addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
                     )
 
             else:
                 to_date_raw = datetime.today()
                 to_ms = int(date_with_rollover(to_date_raw).timestamp() * 1000)
                 if replace_cb:
+                    repl = fr'{cmd}:{from_date_str}'
                     replace_cb(
-                        fr'{cmd}:{from_date_str}',
-                        _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
+                        repl,
+                        _cached_log(repl, addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
 
                     )
 
