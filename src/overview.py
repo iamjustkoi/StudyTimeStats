@@ -848,8 +848,9 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             # ! INSECURE !
             #  Leaving open-ended, for now, may want to do some more checks depending on use-cases
             try:
+                print(f'{expression=}')
                 result = eval(expression)
-            except ValueError:
+            except ValueError or SyntaxError:
                 result = String.ERR
                 is_using_hours = False
 
@@ -867,6 +868,20 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                     f'{round(result, precision):n}' if isinstance(result, float) else str(result),
                 )
 
+    def _logs_with_states(revlog: list, card_states: list[int]):
+        filtered_logs = []
+        # matches = re.search(fr'{repl}\S*{Macro.CMD_STATE}{Macro.STATE_EXTRA}', updated_string)
+        # extra_strings.append(fr'{Macro.CMD_STATE}\{{{matches.group(1) if matches else ""}\}}')
+
+        print(f'{card_states=}')
+
+        for log in revlog:
+            # print(f'{int(log[2])=}')
+            if int(log[2]) in card_states:
+                filtered_logs.append(log)
+
+        return filtered_logs
+
     def _update_string_time(repl: str, revlog: list = None):
         nonlocal updated_string
 
@@ -880,17 +895,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         card_states = _states(repl)
         precision = _precision(repl)
 
-        # TODO implement queue type using _states and 2nd index of log (log[2]) to to filter card types
-        filtered_logs = []
-        if card_states:
-            # matches = re.search(fr'{repl}\S*{Macro.CMD_STATE}{Macro.STATE_EXTRA}', updated_string)
-            # extra_strings.append(fr'{Macro.CMD_STATE}\{{{matches.group(1) if matches else ""}\}}')
-            for log in revlog:
-                # print(f'{int(log[2])=}')
-                if int(log[2]) in card_states:
-                    filtered_logs.append(log)
-        else:
-            filtered_logs = revlog
+        filtered_logs = _logs_with_states(revlog, card_states) if card_states else revlog
 
         total_hrs = _total_hrs_in_revlog(filtered_logs)
         unit_key = _unit_key_for_time(total_hrs)
@@ -907,9 +912,12 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             updated_string = re.sub(fr'(?<!%){repl}', f'ERR', updated_string)
             return
 
-        total_reviews = len(revlog)
+        card_states = _states(repl)
+        filtered_logs = _logs_with_states(revlog, card_states) if card_states else revlog
+
+        total_reviews = len(filtered_logs)
+
         _sub_text(repl, str(total_reviews))
-        # updated_string = re.sub(fr'(?<!%){repl}', str(total_reviews), updated_string)
 
     def _sub_text(repl: str, text: str, has_context_char=True):
         nonlocal updated_string
