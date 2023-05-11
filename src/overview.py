@@ -935,7 +935,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                 to_ms = int(date_with_rollover(to_date_raw).timestamp() * 1000)
                 if replace_cb:
                     replace_cb(
-                        fr'{cmd}:{from_date_str}(?!:\d)',
+                        fr'{cmd}:{from_date_str}',
                         _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], (from_ms, to_ms)),
 
                     )
