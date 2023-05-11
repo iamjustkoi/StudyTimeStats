@@ -1182,6 +1182,7 @@ def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] =
         ON revlog.cid = cards.id
         WHERE revlog.type < {REVLOG_RESCHED}
         {_excluded_did_limit(excluded_dids)}
+        {f'AND revlog.id BETWEEN {time_range_ms[0]} AND {time_range_ms[1]}' if time_range_ms else ''}        
         ORDER BY revlog.cid;
     '''
 
