@@ -779,44 +779,44 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             else:
                 repl = Range.LABEL[cell_data[Config.RANGE]]
 
-            _sub_text(cmd, repl)
+            _sub_text(cmd, repl, False)
 
-        cmd = Macro.CMD_DATE + '(?!:)'
-        if re.findall(fr'(?<!%){cmd}', updated_string):
-            _sub_text(fr'(?<!%){cmd}', datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime("%x"))
+        cmd = Macro.CMD_DATE
+        if re.search(fr'(?<!%){cmd}(?!:)', updated_string):
+            _sub_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime("%x"), False)
 
         cmd = Macro.CMD_DATE_FORMATTED
         for match in re.findall(fr'(?<!%){cmd}', updated_string):
             match: str
             date_format = match[(match.find("\"") + 1):(match.rfind("\""))]
-            _sub_text(match, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime(date_format))
+            _sub_text(match, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime(date_format), False)
 
         cmd = Macro.CMD_YEAR
         if re.search(fr'(?<!%){cmd}', updated_string):
-            _sub_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%Y'))
+            _sub_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%Y'), False)
 
         cmd = Macro.CMD_FULL_DAY
         if re.search(fr'(?<!%){cmd}', updated_string):
-            _sub_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%A'))
+            _sub_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%A'), False)
 
         cmd = Macro.CMD_DAY
         if re.search(fr'(?<!%){cmd}', updated_string):
-            _sub_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%a'))
+            _sub_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%a'), False)
 
         cmd = Macro.CMD_MONTH
         if re.search(fr'(?<!%){cmd}', updated_string):
-            _sub_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%b'))
+            _sub_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%b'), False)
 
         cmd = Macro.CMD_FULL_MONTH
         if re.search(fr'(?<!%){cmd}', updated_string):
-            _sub_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%B'))
+            _sub_text(cmd, datetime.fromtimestamp(_range_time_ms()[0] / 1000).strftime('%B'), False)
 
         cmd = Macro.CMD_DAYS
         if re.search(fr'(?<!%){cmd}', updated_string):
             from_date = datetime.fromtimestamp(_range_time_ms()[0] / 1000)
             to_date = date_with_rollover(datetime.today())
             delta_days = (to_date - from_date).days
-            _sub_text(cmd, str(delta_days))
+            _sub_text(cmd, str(delta_days), False)
 
     def eval_macros():
         """
