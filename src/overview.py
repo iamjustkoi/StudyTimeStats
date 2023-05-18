@@ -286,7 +286,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         global cached_logs
         cached_log = cached_logs.get(cmd, None)
 
-        print(f'cached_log[{cmd}]={cached_log is not None}')
+        # print(f'cached_log[{cmd}]={cached_log is not None}')
 
         if cached_log:
             return cached_log
@@ -295,6 +295,10 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         cached_logs[cmd] = filtered_log
 
         return filtered_log
+
+    def _cache_key(cmd: str, extra):
+        # Basic, repeatable joiner method
+        return cmd + '<' + str(extra) + '>'
 
     def time_macros():
         # Time
@@ -308,7 +312,11 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         for match in re.findall(pattern, updated_string):
             _update_string_time(
                 match,
-                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], _range_time_ms()),
+                _cached_log(
+                    _cache_key(cmd, cell_data[Config.RANGE]),
+                    addon_config[Config.EXCLUDED_DIDS],
+                    _range_time_ms(),
+                ),
             )
 
         cmd = Macro.CMD_DAY_HOURS
@@ -386,7 +394,11 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             }
             _update_string_time(
                 match,
-                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
+                _cached_log(
+                    _cache_key(cmd, cell_data[Config.RANGE]),
+                    addon_config[Config.EXCLUDED_DIDS],
+                    range_from_data(placeholder_data, 2),
+                ),
             )
 
         cmd = Macro.CMD_PREVIOUS_DAY_HOURS
@@ -582,7 +594,14 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         cmd = Macro.CMD_RANGE_REVIEWS
         pattern = _review_pattern(cmd)
         for match in re.findall(pattern, updated_string):
-            _update_string_reviews(match, _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], _range_time_ms()))
+            _update_string_reviews(
+                match,
+                _cached_log(
+                    _cache_key(cmd, cell_data[Config.RANGE]),
+                    addon_config[Config.EXCLUDED_DIDS],
+                    _range_time_ms()
+                ),
+            )
 
         cmd = Macro.CMD_DAY_REVIEWS
         pattern = _review_pattern(cmd)
@@ -659,7 +678,11 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             }
             _update_string_reviews(
                 match,
-                _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2))
+                _cached_log(
+                    _cache_key(cmd, cell_data[Config.RANGE]),
+                    addon_config[Config.EXCLUDED_DIDS],
+                    range_from_data(placeholder_data, 2)
+                ),
             )
 
         cmd = Macro.CMD_PREVIOUS_DAY_REVIEWS
