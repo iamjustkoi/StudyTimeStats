@@ -14,7 +14,6 @@ HEART_ICON_PATH = '../res/img/heart_icon.svg'
 KOFI_ICON_PATH = '../res/img/kofilogo_blue.PNG'
 PATREON_ICON_PATH = '../res/img/patreon.png'
 ANKI_LIKE_ICON_PATH = '../res/img/anki_like.png'
-HEART_ICON_PATH = '../res/img/heart_icon.svg'
 
 REMOVE_ICON_PATH = '../res/img/remove_icon.svg'
 ADD_ICON_PATH = '../res/img/add_icon.svg'
