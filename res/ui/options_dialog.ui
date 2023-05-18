@@ -529,14 +529,14 @@ If you like the add-on and want to consider supporting me in anyway:</string>
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Every bit helps with maintaining and developing the add-on and is greatly appreciated! &lt;3
+              <string>Every bit helps and is greatly appreciated! &lt;3
 
 ### Text Macros
 All output text can also be filtered to show some more customized information (e.g. &quot;Past %range&quot; to &quot;Past Week&quot;). These can be used multiple times and will update whenever Anki's main window reloads. 
 
 `%%` - can be used to return a single % symbol and disable filtering for any macro text (e.g. `%%` -&gt; %, `%%range` -&gt; %range)
 
-*Small warning: as a general rule, the more stats used/the larger the range of the stat, the longer it might take to load them all (some caching is also done per stat-card, too though).
+*Small warning: as a general rule, the more stats used/the larger the range of the stat, the longer it might take to load them all (some caching is also done on the side, too though).
 
 &lt;br&gt;&lt;/br&gt;
 &lt;br&gt;&lt;/br&gt;

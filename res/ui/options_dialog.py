@@ -306,14 +306,14 @@ class Ui_OptionsDialog(object):
         self.patreon_button.setText(_translate("OptionsDialog", " Patreon "))
         self.kofi_button.setToolTip(_translate("OptionsDialog", "Buy me a coffee with Ko-Fi!"))
         self.kofi_button.setText(_translate("OptionsDialog", "Ko-Fi"))
-        self.about_label_body.setText(_translate("OptionsDialog", "Every bit helps with maintaining and developing the add-on and is greatly appreciated! <3\n"
+        self.about_label_body.setText(_translate("OptionsDialog", "Every bit helps and is greatly appreciated! <3\n"
 "\n"
 "### Text Macros\n"
 "All output text can also be filtered to show some more customized information (e.g. \"Past %range\" to \"Past Week\"). These can be used multiple times and will update whenever Anki\'s main window reloads. \n"
 "\n"
 "`%%` - can be used to return a single % symbol and disable filtering for any macro text (e.g. `%%` -> %, `%%range` -> %range)\n"
 "\n"
-"*Small warning: as a general rule, the more stats used/the larger the range of the stat, the longer it might take to load them all (some caching is also done per stat-card, too though).\n"
+"*Small warning: as a general rule, the more stats used/the larger the range of the stat, the longer it might take to load them all (some caching is also done on the side, too though).\n"
 "\n"
 "<br></br>\n"
 "<br></br>\n"
