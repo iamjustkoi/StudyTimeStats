@@ -27,6 +27,10 @@ class Ui_MacroDialog(object):
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.macroGroupBox)
         self.verticalLayout_2.setContentsMargins(6, 0, 6, 6)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.filterLineEdit = QtWidgets.QLineEdit(self.macroGroupBox)
+        self.filterLineEdit.setClearButtonEnabled(True)
+        self.filterLineEdit.setObjectName("filterLineEdit")
+        self.verticalLayout_2.addWidget(self.filterLineEdit)
         self.listView = QtWidgets.QListView(self.macroGroupBox)
         self.listView.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.listView.setFrameShadow(QtWidgets.QFrame.Plain)
@@ -41,7 +45,7 @@ class Ui_MacroDialog(object):
         self.previewGroupBox.setMinimumSize(QtCore.QSize(0, 42))
         self.previewGroupBox.setObjectName("previewGroupBox")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.previewGroupBox)
-        self.verticalLayout_3.setContentsMargins(6, 4, 6, 6)
+        self.verticalLayout_3.setContentsMargins(6, 6, 6, 6)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.previewLabel = QtWidgets.QLabel(self.previewGroupBox)
         self.previewLabel.setObjectName("previewLabel")
@@ -62,6 +66,7 @@ class Ui_MacroDialog(object):
         _translate = QtCore.QCoreApplication.translate
         MacroDialog.setWindowTitle(_translate("MacroDialog", "Macros"))
         self.macroGroupBox.setTitle(_translate("MacroDialog", "Macros"))
+        self.filterLineEdit.setPlaceholderText(_translate("MacroDialog", "Filter..."))
         self.previewGroupBox.setTitle(_translate("MacroDialog", "Preview"))
         self.previewLabel.setText(_translate("MacroDialog", "test"))
 

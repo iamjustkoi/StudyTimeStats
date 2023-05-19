@@ -26,6 +26,7 @@ from aqt.qt import (
     QPoint,
     QPropertyAnimation,
     QResizeEvent,
+    QSortFilterProxyModel,
     QStandardItem,
     QStandardItemModel,
     QToolButton,
@@ -955,22 +956,52 @@ class CellItem(QWidget):
 
 
 class MacroDialog(QDialog):
+    class FilterModel(QSortFilterProxyModel):
+        def __init__(self, parent=None):
+            super().__init__(parent)
+            self._filter = ""
+
+        def filterAcceptsRow(self, source_idx, source_parent):
+            index = self.sourceModel().index(source_idx, 0, source_parent)
+            data = index.data()
+
+            if isinstance(data, str):
+                data = data.lower()
+
+            if not self.filter:
+                return True
+
+            return self.filter in data
+
+        @property
+        def filter(self):
+            return self._filter
+
+        @filter.setter
+        def filter(self, text: str):
+            self._filter = text
+            self.invalidateFilter()
 
     def __init__(self, line_edit: aqt.qt.QLineEdit, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.setWindowModality(Qt.WindowModal)
+
         self.ui = Ui_MacroDialog()
         self.ui.setupUi(MacroDialog=self)
 
         self.line_edit = line_edit
+
+        # Initialize configs and the linked cell item
         self.addon_config = None
         self.cell_config = None
 
         cell_item = self.parent()
+
         if isinstance(cell_item, CellItem):
             self.cell_item = cell_item
             self.cell_config = self.cell_item.get_data()
+
             options_dialog = self.cell_item.parent().window()
 
             if isinstance(options_dialog, TimeStatsOptionsDialog):
@@ -986,7 +1017,6 @@ class MacroDialog(QDialog):
                 self.name = name
                 self.cmd = cmd
                 self.definition = definition
-
         self.model = QStandardItemModel()
         self.macros: list[MacroItem] = []
 
@@ -1013,13 +1043,23 @@ class MacroDialog(QDialog):
                     # Append macro to stored list
                     self.macros.append(MacroItem(formatted_name, attr, Macro.DEFINITIONS[attr]))
 
+        # Initialize proxy filter
+        self.proxy_model = MacroDialog.FilterModel()
+        self.proxy_model.setSourceModel(self.model)
+
         # Set to the newly created model
-        self.ui.listView.setModel(self.model)
+        self.ui.listView.setModel(self.proxy_model)
+
+        #
+        def text_changed(text: str):
+            self.proxy_model.filter = text.lower()
+
+        self.ui.filterLineEdit.textChanged.connect(text_changed)
 
         # Run updates to the preview label on item selected
         self.ui.listView.selectionModel().currentChanged.connect(self.update_preview)
 
-        # Use selected macro on item double-clicked
+        # Use selected macro on double-clicked item
         self.ui.listView.doubleClicked.connect(self.accept)
 
         # Update list view's item selection
@@ -1036,7 +1076,8 @@ class MacroDialog(QDialog):
         :param index: The index of the selected item in the model.
         :param __args: Any additional arguments.
         """
-        macro_cmd: str = self.model.data(index, Qt.UserRole)
+        # macro_cmd: str = self.model.data(index, Qt.UserRole)
+        macro_cmd: str = self.proxy_model.data(index, Qt.UserRole)
         macro_cmd += '}' if macro_cmd.find('{') >= 0 else ''
 
         parsed_cmd = None

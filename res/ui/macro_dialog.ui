@@ -39,6 +39,16 @@
        <number>6</number>
       </property>
       <item>
+       <widget class="QLineEdit" name="filterLineEdit">
+        <property name="placeholderText">
+         <string>Filter...</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QListView" name="listView">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
