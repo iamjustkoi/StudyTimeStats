@@ -1050,7 +1050,7 @@ class MacroDialog(QDialog):
         # Set to the newly created model
         self.ui.listView.setModel(self.proxy_model)
 
-        #
+        # Build filter list text-change updates
         def text_changed(text: str):
             self.proxy_model.filter = text.lower()
 
