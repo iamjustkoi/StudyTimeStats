@@ -1034,11 +1034,10 @@ class MacroDialog(QDialog):
                     formatted_name = attr_name.replace('CMD_', '').replace('_', ' ').title()
                     formatted_cmd = attr + ('}' if attr.find('{') >= 0 else '')
 
-                    item_def = f'({formatted_cmd}) {macro_def}'
-                    item_text = f'{formatted_name} - {item_def}'
+                    item_text = f'{formatted_name} - ({formatted_cmd}) {macro_def}'
 
                     item = QStandardItem(item_text)
-                    item.setToolTip(item_def)
+                    item.setToolTip(item_text)
                     item.setData(attr, Qt.UserRole)
 
                     # Add row to item list model
