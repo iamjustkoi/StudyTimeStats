@@ -1017,6 +1017,7 @@ class MacroDialog(QDialog):
                 self.name = name
                 self.cmd = cmd
                 self.definition = definition
+
         self.model = QStandardItemModel()
         self.macros: list[MacroItem] = []
 
@@ -1032,9 +1033,12 @@ class MacroDialog(QDialog):
                     # Remove the CMD_ prefix, replace underscores with spaces, and title case the string
                     formatted_name = attr_name.replace('CMD_', '').replace('_', ' ').title()
                     formatted_cmd = attr + ('}' if attr.find('{') >= 0 else '')
-                    item_label = f'{formatted_name} - ({formatted_cmd}) {macro_def}'
 
-                    item = QStandardItem(item_label)
+                    item_def = f'({formatted_cmd}) {macro_def}'
+                    item_text = f'{formatted_name} - {item_def}'
+
+                    item = QStandardItem(item_text)
+                    item.setToolTip(item_def)
                     item.setData(attr, Qt.UserRole)
 
                     # Add row to item list model
