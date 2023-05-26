@@ -1086,7 +1086,12 @@ class MacroDialog(QDialog):
         parsed_cmd = None
         for macro in self.macros:
             if macro.cmd == macro_cmd:
-                parsed_cmd = parsed_string(macro_cmd, self.addon_config, self.cell_config)
+                # Prepend a random character to match an arbitrary context for the
+                modified_cmd = f'_{macro_cmd}'
+
+                # Grab the parsed string, minus the prepended context character
+                parsed_cmd = parsed_string(modified_cmd, self.addon_config, self.cell_config)[1:]
+
                 self.ui.previewLabel.setText(parsed_cmd)
                 break
 
