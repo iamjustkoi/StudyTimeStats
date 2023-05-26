@@ -1,12 +1,15 @@
 # MIT License: Copyright (c) 2022-2023 JustKoi (iamjustkoi) <https://github.com/iamjustkoi>
 # Full license text available in the "LICENSE" file, packaged with the add-on.
 
+from aqt.qt import QT_VERSION_STR
 from aqt.theme import theme_manager
 
 CURRENT_VERSION = '2.0.1'
 
 ANKI_LEGACY_VER = 35
 ANKI_DEFAULT_ROLLOVER = 4
+ANKI_QT_VER = int(QT_VERSION_STR.split('.')[0])
+
 UNIQUE_DATE = '2006-10-05'
 
 ADDON_ICON_PATH = '../res/img/stats_icon.svg'
