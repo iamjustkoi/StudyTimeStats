@@ -46,7 +46,7 @@ CARD_STATE = {
     RELEARN: QUEUE_TYPE_DAY_LEARN_RELEARN,
 }
 
-cached_logs: dict[str:list] = {}
+cached_logs: dict = {}
 
 
 def _is_enabled_for_deck(conf_manager: TimeStatsConfigManager):
@@ -285,8 +285,6 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
     def _cached_log(cmd, excluded_dids: list = None, time_range_ms: tuple[int, int] = None):
         global cached_logs
         cached_log = cached_logs.get(cmd, None)
-
-        # print(f'cached_log[{cmd}]={cached_log is not None}')
 
         if cached_log:
             return cached_log
