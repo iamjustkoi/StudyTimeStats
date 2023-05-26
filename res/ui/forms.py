@@ -12,6 +12,20 @@ from aqt.qt import (
     QListWidget,
 )
 
+from aqt.qt import QT_VERSION_STR
+ANKI_QT_VER = int(QT_VERSION_STR.split('.')[0])
+
+if ANKI_QT_VER == 5:
+    MaskOutColor = Qt.MaskOutColor
+    ClosedHandCursor = Qt.ClosedHandCursor
+    OpenHandCursor = Qt.OpenHandCursor
+    SmoothTransformation = Qt.SmoothTransformation
+else:
+    MaskOutColor = Qt.MaskMode.MaskOutColor
+    ClosedHandCursor = Qt.CursorShape.ClosedHandCursor
+    OpenHandCursor = Qt.CursorShape.OpenHandCursor
+    SmoothTransformation = Qt.TransformationMode.SmoothTransformation
+
 
 class HoverButton(QToolButton):
     """
@@ -34,13 +48,13 @@ class HoverButton(QToolButton):
         pixmap = self.raw_icon.pixmap(self.size(), QIcon.Normal, QIcon.On)
 
         if is_hovered:
-            mask = pixmap.createMaskFromColor(QColor(self.mask_color), Qt.MaskOutColor)
+            mask = pixmap.createMaskFromColor(QColor(self.mask_color), MaskOutColor)
             pixmap.fill(QColor(self.hover_tint))
             pixmap.setMask(mask)
             self.setIcon(QIcon(pixmap))
 
         else:
-            mask = pixmap.createMaskFromColor(QColor(self.mask_color), Qt.MaskOutColor)
+            mask = pixmap.createMaskFromColor(QColor(self.mask_color), MaskOutColor)
             pixmap.fill(QColor(self.tint))
             pixmap.setMask(mask)
             self.setIcon(QIcon(pixmap))
@@ -109,8 +123,8 @@ class RotateButton(QToolButton):
         Updates the icon of the RotateButton to the tinted color, using the stored mask color.
         """
         pixmap = self.raw_icon.pixmap(self.size(), QIcon.Normal, QIcon.On)\
-            .transformed(QTransform().rotate(self.rotation), Qt.SmoothTransformation)
-        mask = pixmap.createMaskFromColor(QColor(self.mask_color), Qt.MaskOutColor)
+            .transformed(QTransform().rotate(self.rotation), SmoothTransformation)
+        mask = pixmap.createMaskFromColor(QColor(self.mask_color), MaskOutColor)
         pixmap.fill(QColor(self.tint))
         pixmap.setMask(mask)
 
@@ -132,11 +146,11 @@ class DragHandle(QToolButton):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.setCursor(Qt.OpenHandCursor)
+        self.setCursor(OpenHandCursor)
         
     def setIcon(self, icon: QIcon) -> None:
         pixmap = icon.pixmap(self.size(), QIcon.Normal, QIcon.On)
-        mask = pixmap.createMaskFromColor(QColor('black'), Qt.MaskOutColor)
+        mask = pixmap.createMaskFromColor(QColor('black'), MaskOutColor)
         pixmap.fill(QColor(self.icon_color))
         pixmap.setMask(mask)
         super().setIcon(QIcon(pixmap))
@@ -157,12 +171,12 @@ class DragHandle(QToolButton):
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
         self.is_dragging = False
         self.start_pos = None
-        self.setCursor(Qt.OpenHandCursor)
+        self.setCursor(OpenHandCursor)
 
     def drag(self, offset: int):
         if not self.is_dragging:
             self.is_dragging = True
-            self.setCursor(Qt.ClosedHandCursor)
+            self.setCursor(ClosedHandCursor)
 
         # Offset greater than half of the currently dragged cell item's height (plus padding)
         if self.list_widget and self.list_item and abs(offset) > ((self.parentWidget().height() / 2) + self.padding):

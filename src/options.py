@@ -42,6 +42,17 @@ from ..res.ui.macro_dialog import Ui_MacroDialog
 from ..res.ui.options_dialog import Ui_OptionsDialog
 from ..src.overview import parsed_string
 
+if ANKI_QT_VER == 6:
+    WindowModal = Qt.WindowModality.WindowModal
+    UserRole = Qt.ItemDataRole.UserRole
+    MaskOutColor = Qt.MaskMode.MaskOutColor
+    RightButton = Qt.MouseButton.RightButton
+else:
+    WindowModal = Qt.WindowModal
+    UserRole = Qt.UserRole
+    MaskOutColor = Qt.MaskOutColor
+    RightButton = Qt.RightButton
+
 FLAT_ICON_STYLE = \
     '''
     background: transparent;
@@ -503,7 +514,7 @@ class DeckItem(QWidget):
 
     def mouseReleaseEvent(self, mouse_event: aqt.QMouseEvent) -> None:
         super(DeckItem, self).mousePressEvent(mouse_event)
-        if mouse_event.button() == aqt.qt.Qt.RightButton:
+        if mouse_event.button() == RightButton:
             self.on_context_menu(mouse_event.pos())
 
     def on_context_menu(self, point):
@@ -723,7 +734,7 @@ class CellItem(QWidget):
         # Setup radio button-like functionality for the vertical button
         vert_lines = QIcon(f'{Path(__file__).parent.resolve()}\\{VERT_LINES_PATH}')
         vert_pixmap = vert_lines.pixmap(self.widget.directionVerticalButton.size(), QIcon.Normal, QIcon.On)
-        mask = vert_pixmap.createMaskFromColor(QColor(mask_color), Qt.MaskOutColor)
+        mask = vert_pixmap.createMaskFromColor(QColor(mask_color), MaskOutColor)
         vert_pixmap.fill(QColor(Color.BUTTON_ICON[theme_manager.get_night_mode()]))
         vert_pixmap.setMask(mask)
         self.widget.directionVerticalButton.setIcon(QIcon(vert_pixmap))
@@ -732,7 +743,7 @@ class CellItem(QWidget):
         # Setup radio button-like functionality for the horizontal button
         horiz_lines = QIcon(f'{Path(__file__).parent.resolve()}\\{HORIZ_LINES_PATH}')
         horiz_pixmap = horiz_lines.pixmap(self.widget.directionHorizontalButton.size(), QIcon.Normal, QIcon.On)
-        mask = horiz_pixmap.createMaskFromColor(QColor(mask_color), Qt.MaskOutColor)
+        mask = horiz_pixmap.createMaskFromColor(QColor(mask_color), MaskOutColor)
         horiz_pixmap.fill(QColor(Color.BUTTON_ICON[theme_manager.get_night_mode()]))
         horiz_pixmap.setMask(mask)
         self.widget.directionHorizontalButton.setIcon(QIcon(horiz_pixmap))
@@ -748,7 +759,7 @@ class CellItem(QWidget):
         tint_color = Color.BUTTON_ICON[theme_manager.get_night_mode()]
 
         pixmap = QIcon(icon_path).pixmap(self.size(), QIcon.Normal, QIcon.On)
-        mask = pixmap.createMaskFromColor(QColor(mask_color), Qt.MaskOutColor)
+        mask = pixmap.createMaskFromColor(QColor(mask_color), MaskOutColor)
 
         pixmap.fill(QColor(tint_color))
         pixmap.setMask(mask)
@@ -985,7 +996,7 @@ class MacroDialog(QDialog):
     def __init__(self, line_edit: aqt.qt.QLineEdit, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.setWindowModality(Qt.WindowModal)
+        self.setWindowModality(WindowModal)
 
         self.ui = Ui_MacroDialog()
         self.ui.setupUi(MacroDialog=self)
@@ -1038,7 +1049,7 @@ class MacroDialog(QDialog):
 
                     item = QStandardItem(item_text)
                     item.setToolTip(item_text)
-                    item.setData(attr, Qt.UserRole)
+                    item.setData(attr, UserRole)
 
                     # Add row to item list model
                     self.model.appendRow(item)
@@ -1079,8 +1090,8 @@ class MacroDialog(QDialog):
         :param index: The index of the selected item in the model.
         :param __args: Any additional arguments.
         """
-        # macro_cmd: str = self.model.data(index, Qt.UserRole)
-        macro_cmd: str = self.proxy_model.data(index, Qt.UserRole)
+        # macro_cmd: str = self.model.data(index, UserRole)
+        macro_cmd: str = self.proxy_model.data(index, UserRole)
         macro_cmd += '}' if macro_cmd.find('{') >= 0 else ''
 
         parsed_cmd = None
@@ -1103,7 +1114,7 @@ class MacroDialog(QDialog):
         selected_index = self.ui.listView.currentIndex()
 
         # Get macro data from selected item
-        macro_cmd: str = self.ui.listView.model().data(selected_index, Qt.UserRole)
+        macro_cmd: str = self.ui.listView.model().data(selected_index, UserRole)
 
         # Get current cursor position
         cursor_pos = self.line_edit.cursorPosition()
