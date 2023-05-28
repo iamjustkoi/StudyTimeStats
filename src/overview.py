@@ -463,28 +463,46 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                 _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], range_from_data(placeholder_data, 2)),
             )
 
+        def _avg_hrs_per_card(in_logs):
+            return (_total_hrs_in_revlog(in_logs) / len(in_logs)) if len(in_logs) > 0 else 0
+
         cmd = Macro.CMD_ETA_HOURS
         pattern = _time_pattern(cmd)
         for match in re.findall(pattern, updated_string):
             logs = _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS])
 
-            avg_hrs_per_card = (_total_hrs_in_revlog(logs) / len(logs)) if len(logs) > 0 else 0
-
-            total_count = 0
-
+            # Grab total cards due
             current_did = mw.col.decks.current().get('id') if mw.state == 'overview' else None
             due_tree = mw.col.sched.deck_due_tree(current_did)
 
-            for child in due_tree.children:
-                if child.deck_id not in addon_config[Config.EXCLUDED_DIDS]:
-                    deck_conf = _conf_for_did(child.deck_id)
+            def _total_due_in_tree(tree: DeckTreeNode):
+                """
+                Recursively grabs the total cards due for a given deck node.
+
+                :param tree: The DeckNodeTree to use when grabbing delays/card totals.
+                :return: The total number of cards due for the given node.
+                """
+                out_total = 0
+
+                # If children found in tree, recursively combine their due cards
+                if tree.children and len(tree.children) > 0:
+                    for child in tree.children:
+                        out_total += _total_due_in_tree(child)
+
+                # Else, output the current due-card total using the deck config group's new-card steps (delays)
+                else:
+                    deck_conf = _conf_for_did(tree.deck_id)
 
                     # Check for filtered/dynamic deck
                     if deck_conf and deck_conf.get('new', None):
                         delays = len(deck_conf['new'].get('delays', [0]))
-                        total_count += (delays * child.new_count) + child.learn_count + child.review_count
 
-            eta_hrs = avg_hrs_per_card * total_count
+                        out_total = (delays * tree.new_count) + tree.learn_count + tree.review_count
+
+                return out_total
+
+            # Build output
+            eta_hrs = _avg_hrs_per_card(logs) * _total_due_in_tree(due_tree)
             unit_key = _unit_key_for_time(eta_hrs)
 
             _sub_text(
@@ -947,7 +965,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         if has_context_char and repl[0] != '%':
             text = repl[0] + text
 
-        print(f'repl="{repl}", text="{text}"')
+        # print(f'repl="{repl}", text="{text}"')
 
         updated_string = updated_string.replace(repl, text)
 
