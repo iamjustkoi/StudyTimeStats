@@ -237,6 +237,7 @@ def stats_html():
     return HTML_SHELL.replace("{cell_data}", cell_data_html())
 
 
+# May want to convert this to a class, instead (caching, function access, multiple queries, etc.)
 def parsed_string(string: str, addon_config: dict, cell_data: dict):
     updated_string = string
     _cached_range_time_ms: tuple[int, int] = 0, 0
