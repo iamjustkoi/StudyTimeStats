@@ -1211,7 +1211,7 @@ def _excluded_did_limit(excluded_dids: list = None):
 def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] = None) \
         -> list[Sequence]:
     """
-    Grabs a list of review data logs which each have the format: [timestamp, timerange].
+    Grabs a list of review data logs which each have the format: [timestamp, timerange, review-queue].
     :param excluded_dids: A list of excluded deck id's
     :param time_range_ms: A tuple with the accepted unix millisecond time range with the format: (from, to)
     :return:
