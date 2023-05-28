@@ -538,7 +538,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         cmd = Macro.CMD_HIGHEST_DAY_HOURS
         pattern = _time_pattern(cmd)
         for match in re.findall(pattern, updated_string):
-            max_log = _max_log_from_modifier()
+            max_log = _highest_date_modified_log()
             hours = max_log[1] / 60 / 60 / 1000
             unit_key = _unit_key_for_time(hours)
             _sub_text(
@@ -553,7 +553,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             #  Note: SQLite's STRFTIME has Sunday at 0, while datetime (Python) has Monday at 0
             weekday_for_modifier = cell_data[Config.WEEK_START] - 1
             weekday_for_modifier += 7 if weekday_for_modifier < 0 else 0
-            max_log = _max_log_from_modifier([f'weekday {weekday_for_modifier}'])
+            max_log = _highest_date_modified_log([f'weekday {weekday_for_modifier}'])
             hours = max_log[1] / 60 / 60 / 1000
             unit_key = _unit_key_for_time(hours)
             _sub_text(
@@ -564,7 +564,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         cmd = Macro.CMD_HIGHEST_MONTH_HOURS
         pattern = _time_pattern(cmd)
         for match in re.findall(pattern, updated_string):
-            max_log = _max_log_from_modifier(['start of month'])
+            max_log = _highest_date_modified_log(['start of month'])
             hours = max_log[1] / 60 / 60 / 1000
             unit_key = _unit_key_for_time(hours)
             _sub_text(
@@ -575,7 +575,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         cmd = Macro.CMD_HIGHEST_YEAR_HOURS
         pattern = _time_pattern(cmd)
         for match in re.findall(pattern, updated_string):
-            max_log = _max_log_from_modifier(['start of year'])
+            max_log = _highest_date_modified_log(['start of year'])
             hours = max_log[1] / 60 / 60 / 1000
             unit_key = _unit_key_for_time(hours)
 
@@ -762,7 +762,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         cmd = Macro.CMD_HIGHEST_DAY_REVIEWS
         pattern = _review_pattern(cmd)
         for match in re.findall(pattern, updated_string):
-            max_log = _max_log_from_modifier(order_by='count')
+            max_log = _highest_date_modified_log(order_by='count')
             reviews = max_log[2]
             _sub_text(match, str(reviews))
 
@@ -773,21 +773,21 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             #  Note: SQLite's STRFTIME has Sunday at 0, while datetime (Python) has Monday at 0
             weekday_for_modifier = cell_data[Config.WEEK_START] - 1
             weekday_for_modifier += 7 if weekday_for_modifier < 0 else 0
-            max_log = _max_log_from_modifier([f'weekday {weekday_for_modifier}'], order_by='count')
+            max_log = _highest_date_modified_log([f'weekday {weekday_for_modifier}'], order_by='count')
             reviews = max_log[2]
             _sub_text(match, str(reviews))
 
         cmd = Macro.CMD_HIGHEST_MONTH_REVIEWS
         pattern = _review_pattern(cmd)
         for match in re.findall(pattern, updated_string):
-            max_log = _max_log_from_modifier(['start of month'], order_by='count')
+            max_log = _highest_date_modified_log(['start of month'], order_by='count')
             reviews = max_log[2]
             _sub_text(match, str(reviews))
 
         cmd = Macro.CMD_HIGHEST_YEAR_REVIEWS
         pattern = _review_pattern(cmd)
         for match in re.findall(pattern, updated_string):
-            max_log = _max_log_from_modifier(['start of year'], order_by='count')
+            max_log = _highest_date_modified_log(['start of year'], order_by='count')
             reviews = max_log[2]
             _sub_text(match, str(reviews))
 
@@ -1013,7 +1013,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
 
         return _cached_range_time_ms
 
-    def _max_log_from_modifier(
+    def _highest_date_modified_log(
         modifiers: [str] = None,
         timerange: tuple[int, int] = _range_time_ms(),
         order_by='time',
