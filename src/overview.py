@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from time import time
 from typing import Sequence
 
+from anki.decks import DeckTreeNode
 from aqt import gui_hooks, mw
 from aqt.deckbrowser import DeckBrowser, DeckBrowserContent
 from aqt.overview import Overview, OverviewContent
@@ -1017,16 +1018,18 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         order_by='time',
     ) -> Sequence:
         """
-        Grabs a log with the highest total time and total reviews found in the selected range,
-        suggested by the given modifier. Uses 'start of day' modifier for all queries.
+        Grabs a log with the highest total time and highest total reviews found in the selected range,
+        suggested by the given date modifier. Always uses the 'start of day' modifier to group queries.
+
         :param modifiers: A list of string values used to format review log timestamps
-        and group them using the selected modified outputs.
+         and group them using the selected modified outputs.
 
         (e.g. 'start of day', 'weekday', 'start of month', 'start of year', etc.)
+
         https://www.sqlite.org/lang_datefunc.html#modifiers
 
         :return: A single sequence with the timestamp and total time in a grouped range:
-        [timestamp, total time, review count]
+         [timestamp, total time, review count]
         """
 
         modifiers = ['start of day'] if not modifiers else modifiers + ['start of day']
