@@ -62,51 +62,8 @@ FLAT_ICON_STYLE = \
     '''
 
 
-def _refresh_cell_list(list_widget: QListWidget):
-    """
-    Updates the sorting indices of the cells in the given QListWidget.
-
-    :param list_widget: The QListWidget containing the cells to be updated.
-    """
-    # update sorting indices
-    for i in range(list_widget.count()):
-        cell_widget = list_widget.item(i)
-        if isinstance(cell_widget, CellItem.CellListItem):
-            cell_widget.cell_item.index = i
-
-
-def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem):
-    """
-    Adds a cell item to a QListWidget and refreshes the list.
-
-    :param list_widget: The QListWidget to add the cell item to.
-    :param cell_item: The cell item to add to the list.
-    """
-    list_widget.addItem(cell_item.list_item)
-    list_widget.setItemWidget(cell_item.list_item, cell_item)
-    list_widget.sortItems()
-    list_widget.currentRowChanged.emit(list_widget.currentRow())
-
-    _refresh_cell_list(list_widget)
-
-
-def _remove_cell_from_list(list_widget: QListWidget, cell_item: CellItem):
-    """
-    Removes a cell item from the QListWidget.
-
-    :param list_widget: The QListWidget to remove the cell item from.
-    :param cell_item: The cell item to remove.
-    """
-    for i in range(list_widget.count()):
-        item = list_widget.item(i)
-        if item and isinstance(item, CellItem.CellListItem) and item.cell_item == cell_item:
-            list_widget.takeItem(i)
-            break
-
-    _refresh_cell_list(list_widget)
-
-    list_widget.sortItems()
-    list_widget.currentRowChanged.emit(list_widget.currentRow())
+def _resolved_path(relative_path: str):
+    return str(Path(f'{Path(__file__).parent}\\{relative_path}').resolve())
 
 
 class TimeStatsOptionsDialog(QDialog):
@@ -125,7 +82,7 @@ class TimeStatsOptionsDialog(QDialog):
         self.ui = Ui_OptionsDialog()
         self.ui.setupUi(OptionsDialog=self)
 
-        self.setWindowIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{ADDON_ICON_PATH}'))
+        self.setWindowIcon(QIcon(_resolved_path(ADDON_ICON_PATH)))
 
         # Deck list items
         self.ui.deck_enable_button.released.connect(lambda: self.set_selected_enabled(True))
@@ -137,21 +94,21 @@ class TimeStatsOptionsDialog(QDialog):
         self.ui.context_menu = QMenu(self)
 
         kofi_button = self.ui.kofi_button
-        kofi_button.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{KOFI_ICON_PATH}'))
+        kofi_button.setIcon(QIcon(_resolved_path(KOFI_ICON_PATH)))
         kofi_button.released.connect(lambda: webbrowser.open(KOFI_URL))
         kofi_button.customContextMenuRequested.connect(
             lambda point: self.on_line_context_menu(point, kofi_button)
         )
 
         patreon_button = self.ui.patreon_button
-        patreon_button.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{PATREON_ICON_PATH}'))
+        patreon_button.setIcon(QIcon(_resolved_path(PATREON_ICON_PATH)))
         patreon_button.released.connect(lambda: webbrowser.open(PATREON_URL))
         patreon_button.customContextMenuRequested.connect(
             lambda point: self.on_line_context_menu(point, patreon_button)
         )
 
         ankiweb_button = self.ui.like_button
-        ankiweb_button.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{ANKI_LIKE_ICON_PATH}'))
+        ankiweb_button.setIcon(QIcon(_resolved_path(ANKI_LIKE_ICON_PATH)))
         ankiweb_button.released.connect(lambda: webbrowser.open(ANKI_URL))
         ankiweb_button.customContextMenuRequested.connect(
             lambda point: self.on_line_context_menu(point, ankiweb_button)
@@ -171,7 +128,7 @@ class TimeStatsOptionsDialog(QDialog):
         # Update about header text with the current version number and stats image
         updated_about_header = self.ui.about_label_header.text().format(
             version=CURRENT_VERSION,
-            img_path=f'{Path(__file__).parent.resolve()}\\{ADDON_ICON_PATH}'
+            img_path=_resolved_path(ADDON_ICON_PATH)
         )
         self.ui.about_label_header.setText(updated_about_header)
 
@@ -204,7 +161,7 @@ class TimeStatsOptionsDialog(QDialog):
         self._attach_change_signals(change_signals)
 
         # Build support button
-        self.ui.supportButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{HEART_ICON_PATH}'))
+        self.ui.supportButton.setRawIcon(QIcon(_resolved_path(HEART_ICON_PATH)))
         self.ui.supportButton.setTint(Color.BUTTON_ICON[theme_manager.get_night_mode()])
         self.ui.supportButton.setHoverTint(Color.HOVER[theme_manager.get_night_mode()])
         self.ui.supportButton.setStyleSheet('border: unset;')
@@ -605,9 +562,7 @@ class CellItem(QWidget):
 
             self.widget.addButton.clicked.connect(lambda *_: add_cell())
 
-            self.widget.addButton.setRawIcon(
-                QIcon(f'{Path(__file__).parent.resolve()}\\{ADD_ICON_PATH}')
-            )
+            self.widget.addButton.setRawIcon(QIcon(_resolved_path(ADD_ICON_PATH)))
             self.widget.addButton.setTint(Color.BUTTON_ICON[theme_manager.get_night_mode()])
             self.widget.addButton.setHoverTint(Color.HOVER[theme_manager.get_night_mode()])
 
@@ -677,17 +632,17 @@ class CellItem(QWidget):
     def build_hover_buttons(self):
         self.widget.removeButton.clicked.connect(lambda *_: self.open_delete_confirm_button(self.list_widget))
 
-        self.widget.removeButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{REMOVE_ICON_PATH}'))
+        self.widget.removeButton.setRawIcon(QIcon(_resolved_path(REMOVE_ICON_PATH)))
         self.widget.removeButton.setTint(Color.BUTTON_ICON[theme_manager.get_night_mode()])
         self.widget.removeButton.setHoverTint(Color.HOVER[theme_manager.get_night_mode()])
         self.widget.removeButton.setStyleSheet(FLAT_ICON_STYLE)
 
-        self.widget.codeButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{CODE_ICON_PATH}'))
+        self.widget.codeButton.setRawIcon(QIcon(_resolved_path(CODE_ICON_PATH)))
         self.widget.codeButton.setTint(Color.BUTTON_ICON[theme_manager.get_night_mode()])
         self.widget.codeButton.setHoverTint(Color.HOVER[theme_manager.get_night_mode()])
         self.widget.codeButton.setStyleSheet(FLAT_ICON_STYLE)
 
-        self.widget.expandoButton.setRawIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{CHEVRON_ICON_PATH}'))
+        self.widget.expandoButton.setRawIcon(QIcon(_resolved_path(CHEVRON_ICON_PATH)))
         self.widget.expandoButton.setTint(Color.BUTTON_ICON[theme_manager.get_night_mode()])
         self.widget.expandoButton.setStyleSheet(FLAT_ICON_STYLE)
 
@@ -727,7 +682,7 @@ class CellItem(QWidget):
         )
 
         # Setup radio button-like functionality for the vertical button
-        vert_lines = QIcon(f'{Path(__file__).parent.resolve()}\\{VERT_LINES_PATH}')
+        vert_lines = QIcon(_resolved_path(VERT_LINES_PATH))
         vert_pixmap = vert_lines.pixmap(self.widget.directionVerticalButton.size(), QIcon.Normal, QIcon.On)
         mask = vert_pixmap.createMaskFromColor(QColor(mask_color), MaskOutColor)
         vert_pixmap.fill(QColor(Color.BUTTON_ICON[theme_manager.get_night_mode()]))
@@ -736,7 +691,7 @@ class CellItem(QWidget):
         self.widget.directionVerticalButton.setStyleSheet(style)
 
         # Setup radio button-like functionality for the horizontal button
-        horiz_lines = QIcon(f'{Path(__file__).parent.resolve()}\\{HORIZ_LINES_PATH}')
+        horiz_lines = QIcon(_resolved_path(HORIZ_LINES_PATH))
         horiz_pixmap = horiz_lines.pixmap(self.widget.directionHorizontalButton.size(), QIcon.Normal, QIcon.On)
         mask = horiz_pixmap.createMaskFromColor(QColor(mask_color), MaskOutColor)
         horiz_pixmap.fill(QColor(Color.BUTTON_ICON[theme_manager.get_night_mode()]))
@@ -750,7 +705,7 @@ class CellItem(QWidget):
 
     def build_line_edits(self, mask_color='black'):
         # Build macro-add action's icon and colors
-        icon_path = f'{Path(__file__).parent.resolve()}\\{ADD_ICON_PATH}'
+        icon_path = QIcon(_resolved_path(ADD_ICON_PATH))
         tint_color = Color.BUTTON_ICON[theme_manager.get_night_mode()]
 
         pixmap = QIcon(icon_path).pixmap(self.size(), QIcon.Normal, QIcon.On)
@@ -788,7 +743,7 @@ class CellItem(QWidget):
 
     def build_drag_handles(self):
         self.widget.dragHandle.icon_color = Color.BUTTON_ICON[theme_manager.get_night_mode()]
-        self.widget.dragHandle.setIcon(QIcon(f'{Path(__file__).parent.resolve()}\\{HANDLES_PATH}'))
+        self.widget.dragHandle.setIcon(QIcon(_resolved_path(HANDLES_PATH)))
         self.widget.dragHandle.setStyleSheet(FLAT_ICON_STYLE)
         self.widget.dragHandle.list_widget = self.list_widget
         self.widget.dragHandle.list_item = self.list_item
