@@ -65,7 +65,7 @@ def _args_from_ids(ids: list):
     return '(' + (str(ids).replace('[', '').replace(']', '')) + ')'
 
 
-def _cards_in_queue(card_states: list[int] = None):
+def _cards_in_queue(card_states: List[int] = None):
     return f'AND cards.queue IN {_args_from_ids(card_states)}' if card_states and len(card_states) > 0 else ''
 
 
@@ -908,7 +908,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                     f'{round(result, precision):n}' if isinstance(result, float) else str(result),
                 )
 
-    def _logs_with_states(revlog: list, card_states: list[int]):
+    def _logs_with_states(revlog: list, card_states: List[int]):
         filtered_logs = []
         # matches = re.search(fr'{repl}\S*{Macro.CMD_STATE}{Macro.STATE_EXTRA}', updated_string)
         # extra_strings.append(fr'{Macro.CMD_STATE}\{{{matches.group(1) if matches else ""}\}}')
