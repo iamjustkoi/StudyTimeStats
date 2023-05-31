@@ -23,11 +23,26 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
+  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0">
    <item>
     <widget class="QTabWidget" name="tabs_widget">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="tabPosition">
+      <enum>QTabWidget::North</enum>
+     </property>
+     <property name="tabShape">
+      <enum>QTabWidget::Rounded</enum>
+     </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="appearance_tab">
       <property name="enabled">
@@ -60,6 +75,12 @@
             <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
               <widget class="QCheckBox" name="browser_checkbox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="toolTip">
                 <string>The main page for browsing decks.</string>
                </property>
@@ -73,6 +94,12 @@
              </item>
              <item>
               <widget class="QCheckBox" name="overview_checkbox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="toolTip">
                 <string>The page that shows when viewing a deck.</string>
                </property>
@@ -86,6 +113,12 @@
              </item>
              <item>
               <widget class="QCheckBox" name="congrats_checkbox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="toolTip">
                 <string>The page that shows when viewing a deck that has its reviews done for the day.</string>
                </property>
