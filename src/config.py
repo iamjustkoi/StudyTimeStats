@@ -59,6 +59,7 @@ def _reformat_conf(config: dict):
                     Config.HTML: CELL_HTML_SHELL,
                 }
             )
+
         if not config.get('Hide_Ranged_Stat', False):
             cells.append(
                 {
