@@ -50,109 +50,6 @@ CARD_STATE = {
 cached_logs: dict = {}
 
 
-def _is_enabled_for_deck(conf_manager: TimeStatsConfigManager):
-    return mw.col.decks.current().get('id') not in conf_manager.config[Config.EXCLUDED_DIDS]
-
-
-def _args_from_ids(ids: list):
-    """
-    Does the same thing as Anki's implementation (ids2str) with less concern over versioning, but also less
-    reliability.
-
-    :param ids: ids to output
-    :return: a string element converted from a square brackets to a parenthesis format
-    """
-    return '(' + (str(ids).replace('[', '').replace(']', '')) + ')'
-
-
-def _cards_in_queue(card_states: List[int] = None):
-    return f'AND cards.queue IN {_args_from_ids(card_states)}' if card_states and len(card_states) > 0 else ''
-
-
-def _unit_key_for_time(hours: float):
-    """
-    Returns the given unit key for the given amount of time.
-
-    :param hours: referenced time
-    :return: the hours unit if given a value larger than 1, otherwise the minutes unit
-    """
-    return Config.HRS_UNIT if hours > 1 else Config.MIN_UNIT
-
-
-def _formatted_time(hours: float, precision: int = None, use_decimal=True):
-    """
-    Returns a locale-formatted length of time.
-
-    :param hours: referenced time
-    :param precision: total digits to show after a decimal
-    :param use_decimal: whether to use the hh:mm format instead of a decimal for the output value
-
-    :return: hours if given a value larger than 1, otherwise minutes
-    """
-
-    if precision is None:
-        precision = 2
-
-    if use_decimal:
-        val = round(hours, precision) if hours > 1 else round(hours * 60, precision)
-        return f'{val:n}'
-    else:
-        # Contributed by x51mon
-        hour_only = int(hours)
-        min_and_sec = (hours - hour_only) * 60
-        min_only = int(min_and_sec)
-        sec_only = (min_and_sec - min_only) * 60
-
-        return str(hour_only) + ':' + "{:02.0f}".format(min_only) if hours > 1 \
-            else str(min_only) + ':' + "{:02.0f}".format(sec_only)
-
-
-def _offset_hour():
-    offset_hour = 0
-
-    if TimeStatsConfigManager(mw).config[Config.USE_ROLLOVER]:
-        if ANKI_VERSION > ANKI_LEGACY_VER:
-            offset_hour = mw.col.get_preferences().scheduling.rollover
-        else:
-            offset_hour = mw.col.conf.get('rollover', ANKI_DEFAULT_ROLLOVER)
-
-    return offset_hour
-
-
-def _total_hrs_in_revlog(revlog: [[int, int]]):
-    """
-    Returns the total review time within a sequence of reviews.
-
-    :param revlog: referenced log sequence
-    :return: total hours in the sequence
-    """
-    return sum([log[1] for log in revlog[0:]]) / 1000 / 60 / 60
-
-
-def _conf_for_did(did: int):
-    """
-    Returns the configuration for the requested deck id (did).
-    If a configuration is already associated with the deck, it is returned as-is.
-    Otherwise, the default configuration is returned.
-
-    Custom method used instead of Anki's method to hopefully future-proof it a bit.
-
-    :param did: Integer representation for a deck's id.
-    :return: A json object with the config values for a given deck, or the default deck's config.
-    """
-    deck = mw.col.decks.get(did, default=False)
-    assert deck
-    if "conf" in deck:
-        conf = mw.col.decks.get_config(int(deck["conf"]))
-        if not conf:
-            # fall back on default
-            conf = mw.col.decks.get_config("0")
-        conf["dyn"] = False
-        return conf
-    # dynamic decks have embedded conf
-    return deck
-
-
 def build_hooks():
     gui_hooks.deck_browser_will_render_content.append(append_to_browser)
     gui_hooks.overview_will_render_content.append(append_to_overview)
@@ -1194,41 +1091,6 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
     return from_ms, to_ms
 
 
-def _excluded_did_limit(excluded_dids: list = None):
-    """
-    Retrieves an SQL limiter with a leading "AND" operator that checks if "cards.did" are
-    in the set of excluded deck id's using all currently visible decks.
-    :param excluded_dids: A list of deck id's to be excluded (expects integers, execution may vary)
-    """
-    if len(excluded_dids) > 0:
-        include_deleted = TimeStatsConfigManager(mw).config.get(Config.INCLUDE_DELETED, False)
-
-        if include_deleted and mw.state != 'overview':
-            # If not currently viewing a deck, including deleted decks, grab all non-excluded deck ids
-            filtered_did_cmd = f'AND cards.did NOT IN {_args_from_ids(excluded_dids) if excluded_dids else ""}'
-
-        else:
-            # If currently in a deck's overview: grab the current deck's parent/children deck ids (inclusive)
-            if mw.state == 'overview':
-                included_dids = [
-                    i for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))
-                    if i not in excluded_dids
-                ]
-
-            # Else, grab all deck ids (inclusive)
-            else:
-                included_dids = [
-                    name_id.id for name_id in mw.col.decks.all_names_and_ids()
-                    if name_id.id not in excluded_dids
-                ]
-
-            filtered_did_cmd = f'AND cards.did IN {_args_from_ids(included_dids)}'
-    else:
-        filtered_did_cmd = ''
-
-    return filtered_did_cmd
-
-
 def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] = None) \
         -> list[Sequence]:
     """
@@ -1267,3 +1129,141 @@ def date_with_rollover(date: datetime = datetime.today()):
     :return: An adjusted datetime object
     """
     return date.replace(hour=23, minute=59, second=59) + timedelta(hours=_offset_hour())
+
+
+def _is_enabled_for_deck(conf_manager: TimeStatsConfigManager):
+    return mw.col.decks.current().get('id') not in conf_manager.config[Config.EXCLUDED_DIDS]
+
+
+def _args_from_ids(ids: list):
+    """
+    Does the same thing as Anki's implementation (ids2str) with less concern over versioning, but also less
+    reliability.
+
+    :param ids: ids to output
+    :return: a string element converted from a square brackets to a parenthesis format
+    """
+    return '(' + (str(ids).replace('[', '').replace(']', '')) + ')'
+
+
+def _cards_in_queue(card_states: List[int] = None):
+    return f'AND cards.queue IN {_args_from_ids(card_states)}' if card_states and len(card_states) > 0 else ''
+
+
+def _unit_key_for_time(hours: float):
+    """
+    Returns the given unit key for the given amount of time.
+
+    :param hours: referenced time
+    :return: the hours unit if given a value larger than 1, otherwise the minutes unit
+    """
+    return Config.HRS_UNIT if hours > 1 else Config.MIN_UNIT
+
+
+def _formatted_time(hours: float, precision: int = None, use_decimal=True):
+    """
+    Returns a locale-formatted length of time.
+
+    :param hours: referenced time
+    :param precision: total digits to show after a decimal
+    :param use_decimal: whether to use the hh:mm format instead of a decimal for the output value
+
+    :return: hours if given a value larger than 1, otherwise minutes
+    """
+
+    if precision is None:
+        precision = 2
+
+    if use_decimal:
+        val = round(hours, precision) if hours > 1 else round(hours * 60, precision)
+        return f'{val:n}'
+    else:
+        # Contributed by x51mon
+        hour_only = int(hours)
+        min_and_sec = (hours - hour_only) * 60
+        min_only = int(min_and_sec)
+        sec_only = (min_and_sec - min_only) * 60
+
+        return str(hour_only) + ':' + "{:02.0f}".format(min_only) if hours > 1 \
+            else str(min_only) + ':' + "{:02.0f}".format(sec_only)
+
+
+def _offset_hour():
+    offset_hour = 0
+
+    if TimeStatsConfigManager(mw).config[Config.USE_ROLLOVER]:
+        if ANKI_VERSION > ANKI_LEGACY_VER:
+            offset_hour = mw.col.get_preferences().scheduling.rollover
+        else:
+            offset_hour = mw.col.conf.get('rollover', ANKI_DEFAULT_ROLLOVER)
+
+    return offset_hour
+
+
+def _total_hrs_in_revlog(revlog: [[int, int]]):
+    """
+    Returns the total review time within a sequence of reviews.
+
+    :param revlog: referenced log sequence
+    :return: total hours in the sequence
+    """
+    return sum([log[1] for log in revlog[0:]]) / 1000 / 60 / 60
+
+
+def _conf_for_did(did: int):
+    """
+    Returns the configuration for the requested deck id (did).
+    If a configuration is already associated with the deck, it is returned as-is.
+    Otherwise, the default configuration is returned.
+
+    Custom method used instead of Anki's method to hopefully future-proof it a bit.
+
+    :param did: Integer representation for a deck's id.
+    :return: A json object with the config values for a given deck, or the default deck's config.
+    """
+    deck = mw.col.decks.get(did, default=False)
+    assert deck
+    if "conf" in deck:
+        conf = mw.col.decks.get_config(int(deck["conf"]))
+        if not conf:
+            # fall back on default
+            conf = mw.col.decks.get_config("0")
+        conf["dyn"] = False
+        return conf
+    # dynamic decks have embedded conf
+    return deck
+
+
+def _excluded_did_limit(excluded_dids: list = None):
+    """
+    Retrieves an SQL limiter with a leading "AND" operator that checks if "cards.did" are
+    in the set of excluded deck id's using all currently visible decks.
+    :param excluded_dids: A list of deck id's to be excluded (expects integers, execution may vary)
+    """
+    if len(excluded_dids) > 0:
+        include_deleted = TimeStatsConfigManager(mw).config.get(Config.INCLUDE_DELETED, False)
+
+        if include_deleted and mw.state != 'overview':
+            # If not currently viewing a deck, including deleted decks, grab all non-excluded deck ids
+            filtered_did_cmd = f'AND cards.did NOT IN {_args_from_ids(excluded_dids) if excluded_dids else ""}'
+
+        else:
+            # If currently in a deck's overview: grab the current deck's parent/children deck ids (inclusive)
+            if mw.state == 'overview':
+                included_dids = [
+                    i for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))
+                    if i not in excluded_dids
+                ]
+
+            # Else, grab all deck ids (inclusive)
+            else:
+                included_dids = [
+                    name_id.id for name_id in mw.col.decks.all_names_and_ids()
+                    if name_id.id not in excluded_dids
+                ]
+
+            filtered_did_cmd = f'AND cards.did IN {_args_from_ids(included_dids)}'
+    else:
+        filtered_did_cmd = ''
+
+    return filtered_did_cmd

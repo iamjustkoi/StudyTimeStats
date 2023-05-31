@@ -259,6 +259,84 @@ class TimeStatsOptionsDialog(QDialog):
         self._save()
         self.apply_button.setEnabled(False)
 
+    def accept(self) -> None:
+        """
+        Saves all user config values and closes the window.
+        """
+        self._save()
+        self.close()
+
+    def set_selected_enabled(self, should_enable: bool):
+        for item in self.ui.excluded_decks_list.selectedItems():
+            deck_item = DeckItem.from_list_widget(self, item)
+            deck_item.set_included(should_enable)
+
+    def on_item_double_clicked(self, item: QListWidgetItem):
+        self.set_selected_enabled(not DeckItem.from_list_widget(self, item).is_included())
+
+    def on_line_context_menu(self, point, button):
+        """
+        Handles context menu actions for the input button.
+
+        :param point: input coordinate to display the menu
+        :param button: button being clicked/triggered
+        """
+        self.ui.context_menu = QMenu(self)
+        self.ui.context_menu.addAction(String.COPY_LINK_ACTION).triggered.connect(lambda: self.on_copy_link(button))
+        self.ui.context_menu.exec(button.mapToGlobal(point))
+
+    def on_copy_link(self, button):
+        """
+        Copies a link to the clipboard based on the input button.
+
+        :param button: button to use for determining which link to copy
+        """
+        cb = self.manager.mw.app.clipboard()
+        cb.clear()
+
+        if button.objectName() == self.ui.patreon_button.objectName():
+            cb.setText(PATREON_URL)
+        elif button.objectName() == self.ui.kofi_button.objectName():
+            cb.setText(KOFI_URL)
+        elif button.objectName() == self.ui.like_button.objectName():
+            cb.setText(ANKI_URL)
+
+    def on_restore_defaults(self):
+        """
+        Restores all config value to their default settings.
+        """
+        for field in Config.DEFAULT_CONFIG:
+            # load_data temp defaults
+            self.config[field] = Config.DEFAULT_CONFIG[field]
+        self._load()
+
+    def on_support_button_clicked(self):
+        start_value = 127
+
+        # Switch to about tab
+        self.ui.tabs_widget.setCurrentWidget(self.ui.about_tab)
+
+        # Scroll to support button holder position
+        scroll_pos = self.ui.supportButtonHolder.pos().y()
+        self.ui.scroll_area.verticalScrollBar().setValue(scroll_pos)
+
+        # Animate support button holder background color
+        if not self.anim.startValue() or self.anim.currentValue() != self.anim.startValue():
+            self.anim.setDirection(QAbstractAnimation.Direction.Backward)
+            self.anim.setStartValue(start_value + self.anim_delay)
+            self.anim.setDuration(100)
+            self.anim.start()
+
+        def playForward():
+            if self.anim.currentValue() != self.anim.endValue():
+                self.anim.setDirection(QAbstractAnimation.Direction.Forward)
+                self.anim.setDuration(600)
+                self.anim.setStartValue(start_value)
+                self.anim.start()
+
+        if self.anim.receivers(self.anim.finished) <= 0:
+            self.anim.finished.connect(playForward)
+
     def _attach_change_signals(self, signals: set[aqt.qt.pyqtBoundSignal]):
         for signal in signals:
             def enable_apply(*__args):
@@ -368,84 +446,6 @@ class TimeStatsOptionsDialog(QDialog):
             if not deck_item.is_included():
                 dids.append(self.manager.decks.id(deck_item.label.text(), create=False))
         return dids
-
-    def accept(self) -> None:
-        """
-        Saves all user config values and closes the window.
-        """
-        self._save()
-        self.close()
-
-    def set_selected_enabled(self, should_enable: bool):
-        for item in self.ui.excluded_decks_list.selectedItems():
-            deck_item = DeckItem.from_list_widget(self, item)
-            deck_item.set_included(should_enable)
-
-    def on_item_double_clicked(self, item: QListWidgetItem):
-        self.set_selected_enabled(not DeckItem.from_list_widget(self, item).is_included())
-
-    def on_line_context_menu(self, point, button):
-        """
-        Handles context menu actions for the input button.
-
-        :param point: input coordinate to display the menu
-        :param button: button being clicked/triggered
-        """
-        self.ui.context_menu = QMenu(self)
-        self.ui.context_menu.addAction(String.COPY_LINK_ACTION).triggered.connect(lambda: self.on_copy_link(button))
-        self.ui.context_menu.exec(button.mapToGlobal(point))
-
-    def on_copy_link(self, button):
-        """
-        Copies a link to the clipboard based on the input button.
-
-        :param button: button to use for determining which link to copy
-        """
-        cb = self.manager.mw.app.clipboard()
-        cb.clear()
-
-        if button.objectName() == self.ui.patreon_button.objectName():
-            cb.setText(PATREON_URL)
-        elif button.objectName() == self.ui.kofi_button.objectName():
-            cb.setText(KOFI_URL)
-        elif button.objectName() == self.ui.like_button.objectName():
-            cb.setText(ANKI_URL)
-
-    def on_restore_defaults(self):
-        """
-        Restores all config value to their default settings.
-        """
-        for field in Config.DEFAULT_CONFIG:
-            # load_data temp defaults
-            self.config[field] = Config.DEFAULT_CONFIG[field]
-        self._load()
-
-    def on_support_button_clicked(self):
-        start_value = 127
-
-        # Switch to about tab
-        self.ui.tabs_widget.setCurrentWidget(self.ui.about_tab)
-
-        # Scroll to support button holder position
-        scroll_pos = self.ui.supportButtonHolder.pos().y()
-        self.ui.scroll_area.verticalScrollBar().setValue(scroll_pos)
-
-        # Animate support button holder background color
-        if not self.anim.startValue() or self.anim.currentValue() != self.anim.startValue():
-            self.anim.setDirection(QAbstractAnimation.Direction.Backward)
-            self.anim.setStartValue(start_value + self.anim_delay)
-            self.anim.setDuration(100)
-            self.anim.start()
-
-        def playForward():
-            if self.anim.currentValue() != self.anim.endValue():
-                self.anim.setDirection(QAbstractAnimation.Direction.Forward)
-                self.anim.setDuration(600)
-                self.anim.setStartValue(start_value)
-                self.anim.start()
-
-        if self.anim.receivers(self.anim.finished) <= 0:
-            self.anim.finished.connect(playForward)
 
 
 class DeckItem(QWidget):
@@ -673,11 +673,6 @@ class CellItem(QWidget):
         self.data[Config.DIRECTION] = self.direction
 
         return self.data
-
-    def _redraw(self):
-        self.widget.expandFrame.adjustSize()
-        self.widget.mainFrame.adjustSize()
-        self.list_item.setSizeHint(self.sizeHint())
 
     def build_hover_buttons(self):
         self.widget.removeButton.clicked.connect(lambda *_: self.open_delete_confirm_button(self.list_widget))
@@ -965,6 +960,11 @@ class CellItem(QWidget):
         macro_dialog = MacroDialog(line_edit=line_edit, parent=self)
         macro_dialog.show()
 
+    def _redraw(self):
+        self.widget.expandFrame.adjustSize()
+        self.widget.mainFrame.adjustSize()
+        self.list_item.setSizeHint(self.sizeHint())
+
 
 class MacroDialog(QDialog):
     class FilterModel(QSortFilterProxyModel):
@@ -1127,3 +1127,50 @@ class MacroDialog(QDialog):
 
         # Close macro dialog
         self.close()
+
+
+def _refresh_cell_list(list_widget: QListWidget):
+    """
+    Updates the sorting indices of the cells in the given QListWidget.
+
+    :param list_widget: The QListWidget containing the cells to be updated.
+    """
+    # update sorting indices
+    for i in range(list_widget.count()):
+        cell_widget = list_widget.item(i)
+        if isinstance(cell_widget, CellItem.CellListItem):
+            cell_widget.cell_item.index = i
+
+
+def _add_cell_to_list(list_widget: QListWidget, cell_item: CellItem):
+    """
+    Adds a cell item to a QListWidget and refreshes the list.
+
+    :param list_widget: The QListWidget to add the cell item to.
+    :param cell_item: The cell item to add to the list.
+    """
+    list_widget.addItem(cell_item.list_item)
+    list_widget.setItemWidget(cell_item.list_item, cell_item)
+    list_widget.sortItems()
+    list_widget.currentRowChanged.emit(list_widget.currentRow())
+
+    _refresh_cell_list(list_widget)
+
+
+def _remove_cell_from_list(list_widget: QListWidget, cell_item: CellItem):
+    """
+    Removes a cell item from the QListWidget.
+
+    :param list_widget: The QListWidget to remove the cell item from.
+    :param cell_item: The cell item to remove.
+    """
+    for i in range(list_widget.count()):
+        item = list_widget.item(i)
+        if item and isinstance(item, CellItem.CellListItem) and item.cell_item == cell_item:
+            list_widget.takeItem(i)
+            break
+
+    _refresh_cell_list(list_widget)
+
+    list_widget.sortItems()
+    list_widget.currentRowChanged.emit(list_widget.currentRow())

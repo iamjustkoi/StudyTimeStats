@@ -38,30 +38,6 @@ class HoverButton(QToolButton):
     raw_icon = None
     locked = False
 
-    def _updateIcon(self, is_hovered: bool):
-        """
-        Updates the icon of the HoverButton to a tinted color if the mouse is currently hovering over it.
-
-        :param is_hovered: whether the mouse is currently hovered over the HoverButton
-        """
-
-        pixmap = self.raw_icon.pixmap(self.size(), QIcon.Normal, QIcon.On)
-
-        if is_hovered:
-            mask = pixmap.createMaskFromColor(QColor(self.mask_color), MaskOutColor)
-            pixmap.fill(QColor(self.hover_tint))
-            pixmap.setMask(mask)
-            self.setIcon(QIcon(pixmap))
-
-        else:
-            mask = pixmap.createMaskFromColor(QColor(self.mask_color), MaskOutColor)
-            pixmap.fill(QColor(self.tint))
-            pixmap.setMask(mask)
-            self.setIcon(QIcon(pixmap))
-
-        self.adjustSize()
-        self.setMinimumSize(self.sizeHint())
-
     def setMaskColor(self, color: str):
         self.mask_color = color
 
@@ -93,6 +69,30 @@ class HoverButton(QToolButton):
 
     def lockHoverTint(self, locked: bool = True):
         self.locked = locked
+
+    def _updateIcon(self, is_hovered: bool):
+        """
+        Updates the icon of the HoverButton to a tinted color if the mouse is currently hovering over it.
+
+        :param is_hovered: whether the mouse is currently hovered over the HoverButton
+        """
+
+        pixmap = self.raw_icon.pixmap(self.size(), QIcon.Normal, QIcon.On)
+
+        if is_hovered:
+            mask = pixmap.createMaskFromColor(QColor(self.mask_color), MaskOutColor)
+            pixmap.fill(QColor(self.hover_tint))
+            pixmap.setMask(mask)
+            self.setIcon(QIcon(pixmap))
+
+        else:
+            mask = pixmap.createMaskFromColor(QColor(self.mask_color), MaskOutColor)
+            pixmap.fill(QColor(self.tint))
+            pixmap.setMask(mask)
+            self.setIcon(QIcon(pixmap))
+
+        self.adjustSize()
+        self.setMinimumSize(self.sizeHint())
 
 
 class RotateButton(QToolButton):
