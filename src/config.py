@@ -2,6 +2,7 @@
 # Full license text available in the "LICENSE" file, packaged with the add-on.
 
 import re
+from typing import List
 
 from anki import buildinfo
 from aqt import AnkiQt
@@ -69,7 +70,7 @@ def _reformat_conf(config: dict):
     """
     addon_ver = config.get(Config.VERSION, '0.0.0')
     formatted_addon_ver = re.sub('-.*', '', addon_ver)
-    ver_numbers: list[int] = [int(n) for n in formatted_addon_ver.split('.')]
+    ver_numbers: List[int] = [int(n) for n in formatted_addon_ver.split('.')]
 
     # v1.3.5
     # Replaces "%from_custom_date" with the updated, custom-date-range hours macro.

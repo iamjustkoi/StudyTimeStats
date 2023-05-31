@@ -6,6 +6,7 @@ from __future__ import annotations
 import webbrowser
 from datetime import date
 from pathlib import Path
+from typing import List
 
 import aqt.theme
 import markdown
@@ -985,7 +986,7 @@ class MacroDialog(QDialog):
                 self.definition = definition
 
         self.model = QStandardItemModel()
-        self.macros: list[MacroItem] = []
+        self.macros: List[MacroItem] = []
 
         # Loop through the attribute names of all "CMD"-string attributes in the Macro class
         for attr_name in dir(Macro):

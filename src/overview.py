@@ -4,7 +4,7 @@ import calendar
 import re
 from datetime import datetime, timedelta
 from time import time
-from typing import List, Sequence
+from typing import List, Sequence, Tuple
 
 from anki.decks import DeckTreeNode
 from aqt import gui_hooks, mw
@@ -137,7 +137,7 @@ def stats_html():
 # May want to convert this to a class, instead (caching, function access, multiple queries, etc.)
 def parsed_string(string: str, addon_config: dict, cell_data: dict):
     updated_string = string
-    _cached_range_time_ms: tuple[int, int] = 0, 0
+    _cached_range_time_ms: Tuple[int, int] = 0, 0
 
     initial_time = time()
 
@@ -181,7 +181,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             + f'(?<!%){pattern}' \
             + fr'(?:{Macro.CMD_STATE}{{{Macro.STATE_EXTRA}}})?'
 
-    def _cached_log(cmd, excluded_dids: list = None, time_range_ms: tuple[int, int] = None):
+    def _cached_log(cmd, excluded_dids: list = None, time_range_ms: Tuple[int, int] = None):
         global cached_logs
         cached_log = cached_logs.get(cmd, None)
 
@@ -417,7 +417,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         cmd = fr'{Macro.CMD_FROM_DATE_HOURS}:(\d\d\d\d-\d\d-\d\d):(\d\d\d\d-\d\d-\d\d)'
         pattern = _time_pattern(cmd)
         for match in re.findall(pattern, updated_string):
-            match: tuple[str]
+            match: Tuple[str]
             _process_range(match[0], match[1], replace_cb=_update_string_time, cmd=Macro.CMD_FROM_DATE_HOURS)
 
         # Avg
@@ -670,7 +670,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         cmd = fr'{Macro.CMD_FROM_DATE_REVIEWS}:(\d\d\d\d-\d\d-\d\d):(\d\d\d\d-\d\d-\d\d)'
         pattern = _review_pattern(cmd)
         for match in re.findall(pattern, updated_string):
-            match: tuple[str]
+            match: Tuple[str]
             _process_range(match[0], match[1], replace_cb=_update_string_reviews, cmd=Macro.CMD_FROM_DATE_REVIEWS)
 
         cmd = Macro.CMD_HIGHEST_DAY_REVIEWS
@@ -906,7 +906,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             if replace_cb:
                 replace_cb(fr'{cmd}:{from_date_str}(:{to_date_str})?', None)
 
-    def _range_time_ms() -> tuple[int, int]:
+    def _range_time_ms() -> Tuple[int, int]:
         """
         Retrieves the current range from cell data and caches it for future range calls.
         :return:  Tuple of range times in unix milliseconds, with the format: [from, to]
@@ -929,7 +929,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
 
     def _highest_date_modified_log(
         modifiers: [str] = None,
-        timerange: tuple[int, int] = _range_time_ms(),
+        timerange: Tuple[int, int] = _range_time_ms(),
         order_by='time',
     ) -> Sequence:
         """
@@ -1000,7 +1000,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
     return updated_string
 
 
-def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
+def range_from_data(cell_data: dict, iterations=1) -> Tuple[int, int]:
     """
     Retrieve a time range tuple. Adjusted for preferred rollover/offset hour.
     :param cell_data: Template data used to distinguish target return data.
@@ -1091,8 +1091,8 @@ def range_from_data(cell_data: dict, iterations=1) -> tuple[int, int]:
     return from_ms, to_ms
 
 
-def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] = None) \
-        -> list[Sequence]:
+def filtered_revlog(excluded_dids: list = None, time_range_ms: Tuple[int, int] = None) \
+        -> List[Sequence]:
     """
     Grabs a list of review data logs which each have the format: [timestamp, timerange, review-queue].
     :param excluded_dids: A list of excluded deck id's
