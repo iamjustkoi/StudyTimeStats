@@ -1214,7 +1214,8 @@ def _excluded_did_limit(excluded_dids: list = None):
                     i for i in mw.col.decks.deck_and_child_ids(mw.col.decks.current().get('id'))
                     if i not in excluded_dids
                 ]
-            # Else: grab all deck ids (inclusive)
+
+            # Else, grab all deck ids (inclusive)
             else:
                 included_dids = [
                     name_id.id for name_id in mw.col.decks.all_names_and_ids()
