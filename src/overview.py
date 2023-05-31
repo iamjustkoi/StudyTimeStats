@@ -4,7 +4,7 @@ import calendar
 import re
 from datetime import datetime, timedelta
 from time import time
-from typing import Sequence
+from typing import List, Sequence
 
 from anki.decks import DeckTreeNode
 from aqt import gui_hooks, mw
@@ -514,7 +514,6 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         cmd = fr'{Macro.CMD_FROM_DATE_HOURS}:(\d\d\d\d-\d\d-\d\d)'
         pattern = _time_pattern(cmd)
         for match in re.findall(fr'(?<!%){pattern}(?!:\d)', updated_string):
-            # print(f'Running {pattern}. {match=}')
             match: str
             _process_range(match, replace_cb=_update_string_time, cmd=Macro.CMD_FROM_DATE_HOURS)
 
@@ -544,9 +543,9 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         pattern = _time_pattern(cmd)
         for match in re.findall(pattern, updated_string):
             logs = _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], _range_time_ms())
-
-            avg_hrs = (_total_hrs_in_revlog(logs) / len(logs)) if len(logs) > 0 else 0
+            avg_hrs = _avg_hrs_per_card(logs)
             unit_key = _unit_key_for_time(avg_hrs)
+
             _sub_text(
                 match,
                 f'{_formatted_time(avg_hrs, _precision(match), addon_config[Config.USE_DECIMAL])} '
@@ -889,7 +888,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             # ! INSECURE !
             #  Leaving open-ended, for now, may want to do some more checks depending on use-cases
             try:
-                print(f'{expression=}')
+                # print(f'{expression=}')
                 result = eval(expression)
             except ValueError or SyntaxError:
                 result = String.ERR
@@ -914,7 +913,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         # matches = re.search(fr'{repl}\S*{Macro.CMD_STATE}{Macro.STATE_EXTRA}', updated_string)
         # extra_strings.append(fr'{Macro.CMD_STATE}\{{{matches.group(1) if matches else ""}\}}')
 
-        print(f'{card_states=}')
+        # print(f'{card_states=}')
 
         for log in revlog:
             # print(f'{int(log[2])=}')
@@ -1071,7 +1070,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             -- Search in revlog table
             FROM revlog
             -- Map revlog cid to cards id for selecting deck-id's from the cards table
-            INNER JOIN cards
+            LEFT JOIN cards
             ON revlog.cid = cards.id
             -- Select reviews only, excluding preset decks, between "range_limit" range
             WHERE revlog.type < {REVLOG_RESCHED}
@@ -1099,8 +1098,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
     # Combine leftover symbols
     updated_string = updated_string.replace('%%', '%')
 
-    print(f'Commands completed. Elapsed time: {((time() - initial_time) * 1000):2f}ms')
-    print()
+    print(f'Commands completed. Elapsed time: {((time() - initial_time) * 1000):2f}ms', end='\n\n')
 
     return updated_string
 
@@ -1249,7 +1247,7 @@ def filtered_revlog(excluded_dids: list = None, time_range_ms: tuple[int, int] =
     revlog_cmd = f'''
         SELECT revlog.id, revlog.time, cards.queue
         FROM revlog
-        INNER JOIN cards
+        LEFT JOIN cards
         ON revlog.cid = cards.id
         WHERE revlog.type < {REVLOG_RESCHED}
         {_excluded_did_limit(excluded_dids)}
