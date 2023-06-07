@@ -64,7 +64,7 @@ FLAT_ICON_STYLE = \
 
 
 def _resolved_path(relative_path: str):
-    return str(Path(f'{Path(__file__).parent}\\{relative_path}').resolve())
+    return str(Path(f'{Path(__file__).parent}/{relative_path}').resolve())
 
 
 class TimeStatsOptionsDialog(QDialog):
