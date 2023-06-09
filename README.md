@@ -1,6 +1,6 @@
 # <p align="center">Study Time Stats <img src="res/img/stats_icon.svg"></p>
 
-<p align="center">Add some customizable study time, and review count statistics to Anki's main window!</p>  
+<p align="center">Add some customizable study time and review count statistics to Anki's main window!</p>  
 <p align="center"><img src=".github/ui_main.png"></p>
 
 ## Installation
