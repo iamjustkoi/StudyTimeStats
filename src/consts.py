@@ -4,7 +4,7 @@
 from aqt.qt import QT_VERSION_STR
 from aqt.theme import theme_manager
 
-CURRENT_VERSION = '2.0.5'
+CURRENT_VERSION = '2.0.6'
 
 ANKI_LEGACY_VER = 35
 ANKI_DEFAULT_ROLLOVER = 4
