@@ -5,15 +5,21 @@ import re
 from typing import List
 
 from anki.buildinfo import version
-from anki.utils import int_version
 from aqt import AnkiQt
 
 from .consts import CELL_HTML_SHELL, CURRENT_VERSION, Config, Direction, Macro, Range, String
 
 try:
+    from anki.utils import int_version
+except ImportError:
+    def int_version():
+        return int(version.replace('2.1.', ''))
+
+try:
     ANKI_VERSION = int(version.replace('2.1.', ''))
 except ValueError:
     ANKI_VERSION = int_version()
+
 
 class TimeStatsConfigManager:
 
