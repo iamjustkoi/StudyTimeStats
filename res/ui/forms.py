@@ -5,14 +5,11 @@ from aqt.qt import (
     QShowEvent,
     QIcon,
     QTransform,
-)
-
-from aqt.qt import (
     QMouseEvent,
     QListWidget,
+    QT_VERSION_STR,
 )
 
-from aqt.qt import QT_VERSION_STR
 ANKI_QT_VER = int(QT_VERSION_STR.split('.')[0])
 
 if ANKI_QT_VER == 5:
