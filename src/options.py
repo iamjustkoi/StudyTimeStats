@@ -38,17 +38,22 @@ from aqt.qt import (
 
 from .config import ANKI_VERSION, TimeStatsConfigManager
 from .consts import *
-from ..res.ui.cell_item import Ui_CellWidget
-from ..res.ui.macro_dialog import Ui_MacroDialog
-from ..res.ui.options_dialog import Ui_OptionsDialog
 from ..src.overview import parsed_string
 
 if ANKI_QT_VER == 6:
+    from res.ui.Qt5.cell_item import Ui_CellWidget
+    from res.ui.Qt5.macro_dialog import Ui_MacroDialog
+    from res.ui.Qt5.options_dialog import Ui_OptionsDialog
+
     WindowModal = Qt.WindowModality.WindowModal
     UserRole = Qt.ItemDataRole.UserRole
     MaskOutColor = Qt.MaskMode.MaskOutColor
     RightButton = Qt.MouseButton.RightButton
 else:
+    from res.ui.Qt6.cell_item import Ui_CellWidget
+    from res.ui.Qt6.macro_dialog import Ui_MacroDialog
+    from res.ui.Qt6.options_dialog import Ui_OptionsDialog
+
     WindowModal = Qt.WindowModal
     UserRole = Qt.UserRole
     MaskOutColor = Qt.MaskOutColor
