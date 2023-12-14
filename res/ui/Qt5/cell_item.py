@@ -37,7 +37,7 @@ class Ui_CellWidget(object):
 "    background: transparent;\n"
 "}")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("../img/add_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("../../img/add_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.addButton.setIcon(icon)
         self.addButton.setIconSize(QtCore.QSize(20, 20))
         self.addButton.setObjectName("addButton")
@@ -95,7 +95,7 @@ class Ui_CellWidget(object):
         self.dragHandle.setCursor(QtGui.QCursor(QtCore.Qt.OpenHandCursor))
         self.dragHandle.setMouseTracking(True)
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("../img/vert_grip.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap("../../img/vert_grip.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.dragHandle.setIcon(icon1)
         self.dragHandle.setObjectName("dragHandle")
         self.gridLayout.addWidget(self.dragHandle, 0, 4, 1, 1)
@@ -107,7 +107,7 @@ class Ui_CellWidget(object):
         self.expandoButton.setSizePolicy(sizePolicy)
         self.expandoButton.setMaximumSize(QtCore.QSize(20, 20))
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("../img/chevron_down.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap("../../img/chevron_down.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.expandoButton.setIcon(icon2)
         self.expandoButton.setIconSize(QtCore.QSize(20, 20))
         self.expandoButton.setObjectName("expandoButton")
@@ -241,7 +241,7 @@ class Ui_CellWidget(object):
         self.directionVerticalButton.setSizePolicy(sizePolicy)
         self.directionVerticalButton.setMaximumSize(QtCore.QSize(42, 16777215))
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap("../img/vert_lines.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap("../../img/vert_lines.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.directionVerticalButton.setIcon(icon3)
         self.directionVerticalButton.setObjectName("directionVerticalButton")
         self.horizontalLayout_2.addWidget(self.directionVerticalButton)
@@ -253,7 +253,7 @@ class Ui_CellWidget(object):
         self.directionHorizontalButton.setSizePolicy(sizePolicy)
         self.directionHorizontalButton.setMaximumSize(QtCore.QSize(42, 16777215))
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap("../img/horiz_lines.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon4.addPixmap(QtGui.QPixmap("../../img/horiz_lines.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.directionHorizontalButton.setIcon(icon4)
         self.directionHorizontalButton.setObjectName("directionHorizontalButton")
         self.horizontalLayout_2.addWidget(self.directionHorizontalButton)
@@ -345,7 +345,7 @@ class Ui_CellWidget(object):
         self.removeButton.setMinimumSize(QtCore.QSize(0, 0))
         self.removeButton.setMaximumSize(QtCore.QSize(20, 20))
         icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap("../img/remove_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon5.addPixmap(QtGui.QPixmap("../../img/remove_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.removeButton.setIcon(icon5)
         self.removeButton.setIconSize(QtCore.QSize(20, 20))
         self.removeButton.setObjectName("removeButton")
@@ -359,7 +359,7 @@ class Ui_CellWidget(object):
         self.codeButton.setMinimumSize(QtCore.QSize(0, 0))
         self.codeButton.setMaximumSize(QtCore.QSize(20, 20))
         icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap("../img/code_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon6.addPixmap(QtGui.QPixmap("../../img/code_icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.codeButton.setIcon(icon6)
         self.codeButton.setIconSize(QtCore.QSize(20, 20))
         self.codeButton.setObjectName("codeButton")
@@ -422,7 +422,9 @@ class Ui_CellWidget(object):
         self.unitLabel.setText(_translate("CellWidget", "Units"))
         self.outputLabel.setToolTip(_translate("CellWidget", "Text that appears below or to-the-right-of the title."))
         self.outputLabel.setText(_translate("CellWidget", "Output"))
-from .forms import DragHandle, HoverButton, RotateButton
+
+
+from res.ui.forms import DragHandle, HoverButton, RotateButton
 
 
 if __name__ == "__main__":
