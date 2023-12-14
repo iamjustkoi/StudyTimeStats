@@ -10,15 +10,16 @@ from aqt import AnkiQt
 from .consts import CELL_HTML_SHELL, CURRENT_VERSION, Config, Direction, Macro, Range, String
 
 try:
-    from anki.utils import int_version
+    # from anki.utils import pointVersion
+    from anki.utils import pointVersion
 except ImportError:
-    def int_version():
+    def pointVersion():
         return int(version.replace('2.1.', ''))
 
 try:
     ANKI_VERSION = int(version.replace('2.1.', ''))
 except ValueError:
-    ANKI_VERSION = int_version()
+    ANKI_VERSION = pointVersion()
 
 
 class TimeStatsConfigManager:
