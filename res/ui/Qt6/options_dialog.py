@@ -344,19 +344,23 @@ class Ui_OptionsDialog(object):
 "\n"
 "-koi \n"
 "\n"
-"\n"
-"<br></br>\n"
-"<br></br>\n"
-"MIT License \n"
-"\n"
-"©2022-2023 JustKoi (iamjustkoi)"))
+                                                                  "\n"
+                                                                  "<br></br>\n"
+                                                                  "<br></br>\n"
+                                                                  "MIT License \n"
+                                                                  "\n"
+                                                                  "©2022-2023 JustKoi (iamjustkoi)"
+        )
+        )
         self.tabs_widget.setTabText(self.tabs_widget.indexOf(self.about_tab), _translate("OptionsDialog", "About"))
         self.supportButton.setText(_translate("OptionsDialog", "<3"))
-from .forms import HoverButton
 
+
+from ..forms import HoverButton
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     OptionsDialog = QtWidgets.QDialog()
     ui = Ui_OptionsDialog()

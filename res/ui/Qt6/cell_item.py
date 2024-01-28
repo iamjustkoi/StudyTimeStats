@@ -569,7 +569,7 @@ class Ui_CellWidget(object):
                         _translate("CellWidget", "Text that appears below or to-the-right-of the title.")
                 )
                 self.outputLabel.setText(_translate("CellWidget", "Output"))
-from res.ui.forms import DragHandle, HoverButton, RotateButton
+from ..forms import DragHandle, HoverButton, RotateButton
 
 if __name__ == "__main__":
         import sys

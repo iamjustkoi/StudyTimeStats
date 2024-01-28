@@ -433,7 +433,7 @@ class Ui_OptionsDialog(object):
         self.supportButton.setText(_translate("OptionsDialog", "<3"))
 
 
-from res.ui.forms import HoverButton
+from ..forms import HoverButton
 
 if __name__ == "__main__":
     import sys
