@@ -54,10 +54,10 @@ else:
     from ..res.ui.Qt5.macro_dialog import Ui_MacroDialog
     from ..res.ui.Qt5.options_dialog import Ui_OptionsDialog
 
-    WindowModal = Qt.WindowModal
-    UserRole = Qt.UserRole
-    MaskOutColor = Qt.MaskOutColor
-    RightButton = Qt.RightButton
+    WindowModal = Qt.WindowModality.WindowModal
+    UserRole = Qt.ItemDataRole.UserRole
+    MaskOutColor = Qt.MaskMode.MaskOutColor
+    RightButton = Qt.MouseButton.RightButton
 
 FLAT_ICON_STYLE = \
     '''
@@ -125,7 +125,7 @@ class TimeStatsOptionsDialog(QDialog):
         self.ui.about_label_body.setText(markdown.markdown(self.ui.about_label_body.text()))
 
         # Restore Defaults Button
-        self.ui.confirm_button_box.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.on_restore_defaults)
+        self.ui.confirm_button_box.button(QDialogButtonBox.StandardButton.RestoreDefaults).clicked.connect(self.on_restore_defaults)
 
         # Setup Cell List
         self.ui.cellListWidget.setStyleSheet('#cellListWidget { background: transparent; border: none; }')
@@ -139,7 +139,7 @@ class TimeStatsOptionsDialog(QDialog):
         self.ui.about_label_header.setText(updated_about_header)
 
         # Apply button
-        self.apply_button = self.ui.confirm_button_box.button(QDialogButtonBox.Apply)
+        self.apply_button = self.ui.confirm_button_box.button(QDialogButtonBox.StandardButton.Apply)
         self.apply_button.setEnabled(False)
         self.apply_button.clicked.connect(self.apply)
 
@@ -689,7 +689,7 @@ class CellItem(QWidget):
 
         # Setup radio button-like functionality for the vertical button
         vert_lines = QIcon(_resolved_path(VERT_LINES_PATH))
-        vert_pixmap = vert_lines.pixmap(self.widget.directionVerticalButton.size(), QIcon.Normal, QIcon.On)
+        vert_pixmap = vert_lines.pixmap(self.widget.directionVerticalButton.size(), QIcon.Mode.Normal, QIcon.State.On)
         mask = vert_pixmap.createMaskFromColor(QColor(mask_color), MaskOutColor)
         vert_pixmap.fill(QColor(Color.BUTTON_ICON[theme_manager.get_night_mode()]))
         vert_pixmap.setMask(mask)
@@ -698,7 +698,7 @@ class CellItem(QWidget):
 
         # Setup radio button-like functionality for the horizontal button
         horiz_lines = QIcon(_resolved_path(HORIZ_LINES_PATH))
-        horiz_pixmap = horiz_lines.pixmap(self.widget.directionHorizontalButton.size(), QIcon.Normal, QIcon.On)
+        horiz_pixmap = horiz_lines.pixmap(self.widget.directionHorizontalButton.size(), QIcon.Mode.Normal, QIcon.State.On)
         mask = horiz_pixmap.createMaskFromColor(QColor(mask_color), MaskOutColor)
         horiz_pixmap.fill(QColor(Color.BUTTON_ICON[theme_manager.get_night_mode()]))
         horiz_pixmap.setMask(mask)
@@ -714,7 +714,7 @@ class CellItem(QWidget):
         icon_path = QIcon(_resolved_path(ADD_ICON_PATH))
         tint_color = Color.BUTTON_ICON[theme_manager.get_night_mode()]
 
-        pixmap = QIcon(icon_path).pixmap(self.size(), QIcon.Normal, QIcon.On)
+        pixmap = QIcon(icon_path).pixmap(self.size(), QIcon.Mode.Normal, QIcon.State.On)
         mask = pixmap.createMaskFromColor(QColor(mask_color), MaskOutColor)
 
         pixmap.fill(QColor(tint_color))
@@ -979,7 +979,7 @@ class MacroDialog(QDialog):
             if isinstance(options_dialog, TimeStatsOptionsDialog):
                 self.addon_config = options_dialog.config
 
-        self.ui.buttonBox.button(aqt.qt.QDialogButtonBox.Ok).setText(String.INSERT)
+        self.ui.buttonBox.button(aqt.qt.QDialogButtonBox.StandardButton.Ok).setText(String.INSERT)
 
         class MacroItem:
             def __init__(self, name: str, cmd: str, definition: str):
@@ -1040,7 +1040,7 @@ class MacroDialog(QDialog):
         # Update list view's item selection
         self.ui.listView.selectionModel().select(
             self.ui.listView.currentIndex(),
-            aqt.qt.QItemSelectionModel.SelectCurrent,
+            aqt.qt.QItemSelectionModel.SelectionFlag.SelectCurrent,
         )
 
     def update_preview(self, index, *__args):

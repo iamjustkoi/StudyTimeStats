@@ -13,10 +13,10 @@ from aqt.qt import (
 ANKI_QT_VER = int(QT_VERSION_STR.split('.')[0])
 
 if ANKI_QT_VER == 5:
-    MaskOutColor = Qt.MaskOutColor
-    ClosedHandCursor = Qt.ClosedHandCursor
-    OpenHandCursor = Qt.OpenHandCursor
-    SmoothTransformation = Qt.SmoothTransformation
+    MaskOutColor = Qt.MaskMode.MaskOutColor
+    ClosedHandCursor = Qt.CursorShape.ClosedHandCursor
+    OpenHandCursor = Qt.CursorShape.OpenHandCursor
+    SmoothTransformation = Qt.TransformationMode.SmoothTransformation
 else:
     MaskOutColor = Qt.MaskMode.MaskOutColor
     ClosedHandCursor = Qt.CursorShape.ClosedHandCursor
@@ -74,7 +74,7 @@ class HoverButton(QToolButton):
         :param is_hovered: whether the mouse is currently hovered over the HoverButton
         """
 
-        pixmap = self.raw_icon.pixmap(self.size(), QIcon.Normal, QIcon.On)
+        pixmap = self.raw_icon.pixmap(self.size(), QIcon.Mode.Normal, QIcon.State.On)
 
         if is_hovered:
             mask = pixmap.createMaskFromColor(QColor(self.mask_color), MaskOutColor)
@@ -119,7 +119,7 @@ class RotateButton(QToolButton):
         """
         Updates the icon of the RotateButton to the tinted color, using the stored mask color.
         """
-        pixmap = self.raw_icon.pixmap(self.size(), QIcon.Normal, QIcon.On)\
+        pixmap = self.raw_icon.pixmap(self.size(), QIcon.Mode.Normal, QIcon.State.On)\
             .transformed(QTransform().rotate(self.rotation), SmoothTransformation)
         mask = pixmap.createMaskFromColor(QColor(self.mask_color), MaskOutColor)
         pixmap.fill(QColor(self.tint))
@@ -146,7 +146,7 @@ class DragHandle(QToolButton):
         self.setCursor(OpenHandCursor)
         
     def setIcon(self, icon: QIcon) -> None:
-        pixmap = icon.pixmap(self.size(), QIcon.Normal, QIcon.On)
+        pixmap = icon.pixmap(self.size(), QIcon.Mode.Normal, QIcon.State.On)
         mask = pixmap.createMaskFromColor(QColor('black'), MaskOutColor)
         pixmap.fill(QColor(self.icon_color))
         pixmap.setMask(mask)
