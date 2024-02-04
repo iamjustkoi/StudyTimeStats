@@ -551,7 +551,7 @@ class Ui_CellWidget(object):
                 self.outputLabel.setText(_translate("CellWidget", "Output"))
 
 
-from .forms import DragHandle, HoverButton, RotateButton
+from ..forms import DragHandle, HoverButton, RotateButton
 
 if __name__ == "__main__":
         import sys
