@@ -363,6 +363,9 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
         def _avg_hrs_per_card(in_logs):
             return (_total_hrs_in_revlog(in_logs) / len(in_logs)) if len(in_logs) > 0 else 0
 
+        def _avg_reviews_per_card(in_logs):
+            return (_reviews_in_revlog(in_logs) / len(in_logs)) if len(in_logs) > 0 else 0
+
         cmd = Macro.CMD_ETA_HOURS
         pattern = _time_pattern(cmd)
         for match in re.findall(pattern, updated_string):
@@ -462,6 +465,14 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                 f'{_formatted_time(avg_hrs, _precision(match), addon_config[Config.USE_DECIMAL])} '
                 f'{cell_data[unit_key]}',
             )
+
+        cmd = Macro.CMD_CARD_AVERAGE_REVIEWS
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
+            logs = _cached_log(cmd, addon_config[Config.EXCLUDED_DIDS], _range_time_ms())
+            avg_revs = _avg_reviews_per_card(logs)
+
+            _sub_text(match, str(round(avg_revs)))
 
         cmd = Macro.CMD_HIGHEST_DAY_HOURS
         pattern = _time_pattern(cmd)
