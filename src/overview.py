@@ -436,6 +436,20 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
                 f'{cell_data[unit_key]}',
             )
 
+        cmd = Macro.CMD_DAY_AVERAGE_REVIEWS
+        pattern = _time_pattern(cmd)
+        for match in re.findall(pattern, updated_string):
+            logs = _cached_log(
+                    _cache_key(cmd, cell_data[Config.RANGE]),
+                    addon_config[Config.EXCLUDED_DIDS],
+                    _range_time_ms(),
+                )
+            from_date = datetime.fromtimestamp(_range_time_ms()[0] / 1000)
+            to_date = datetime.fromtimestamp(_range_time_ms()[1] / 1000)
+            days_in_logs = (to_date - from_date).days
+            avg_revs = _reviews_in_revlog(match, logs) / (days_in_logs if days_in_logs > 0 else 1)
+            _sub_text(match, str(round(avg_revs)))
+
         cmd = Macro.CMD_CARD_AVERAGE_HOURS
         pattern = _time_pattern(cmd)
         for match in re.findall(pattern, updated_string):
