@@ -842,6 +842,15 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             f'{_formatted_time(total_hrs, precision, addon_config[Config.USE_DECIMAL])} {cell_data[unit_key]}'
         )
 
+    def _reviews_in_revlog(repl: str, revlog: list = None):
+        if revlog is None:
+            return 0
+
+        card_states = _states(repl)
+        filtered_logs = _logs_with_states(revlog, card_states) if card_states else revlog
+
+        return len(filtered_logs)
+
     def _update_string_reviews(repl: str, revlog: list = None):
         nonlocal updated_string
 
@@ -849,10 +858,7 @@ def parsed_string(string: str, addon_config: dict, cell_data: dict):
             updated_string = re.sub(fr'(?<!%){repl}', f'ERR', updated_string)
             return
 
-        card_states = _states(repl)
-        filtered_logs = _logs_with_states(revlog, card_states) if card_states else revlog
-
-        total_reviews = len(filtered_logs)
+        total_reviews = _reviews_in_revlog(repl, revlog)
 
         _sub_text(repl, str(total_reviews))
 
