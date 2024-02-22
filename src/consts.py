@@ -118,7 +118,9 @@ class Macro:
 
     # Avg
     CMD_CARD_AVERAGE_HOURS = '%card_avg_hrs'
+    CMD_CARD_AVERAGE_REVIEWS = '%card_avg_rev'
     CMD_DAY_AVERAGE_HOURS = '%day_avg_hrs'
+    CMD_DAY_AVERAGE_REVIEWS = '%day_avg_rev'
 
     # Previous Time
     CMD_PREVIOUS_RANGE_HOURS = '%prev_range_hrs'
@@ -214,8 +216,12 @@ class Macro:
         # Avg
         CMD_CARD_AVERAGE_HOURS:
             '''average study time per card for the current range''',
+        CMD_CARD_AVERAGE_REVIEWS:
+            '''average reviews per card for the current range''',
         CMD_DAY_AVERAGE_HOURS:
             '''average study time per day for the current range''',
+        CMD_DAY_AVERAGE_REVIEWS:
+            '''average reviews per day for the current range''',
 
         # Previous Time
         CMD_PREVIOUS_RANGE_HOURS:
